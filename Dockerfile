@@ -10,5 +10,6 @@ COPY app.py .
 COPY index.html .
 
 ENV PYTHONUNBUFFERED=1
+ENV PORT=5000
 
-CMD ["gunicorn", "--bind", "0.0.0.0:8080", "app:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "1", "--timeout", "120", "app:app"]
