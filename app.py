@@ -5,15 +5,7 @@ import sqlite3
 import os
 import json
 
-# =========================
-# مسیر برنامه
-# =========================
-
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-
-# =========================
-# تنظیمات
-# =========================
 
 load_dotenv(os.path.join(BASE_DIR, ".env"))
 
@@ -34,7 +26,7 @@ DB_FILE = os.path.join(BASE_DIR, "whale_ai.db")
 
 
 # =========================
-# Database
+# DATABASE
 # =========================
 
 def get_db():
@@ -69,6 +61,11 @@ def init_db():
     conn.close()
 
 
+# مهم: Gunicorn این فایل را Import می‌کند،
+# بنابراین دیتابیس باید اینجا ساخته شود.
+init_db()
+
+
 def create_conversation():
     conn = get_db()
     cursor = conn.cursor()
@@ -87,24 +84,12 @@ def create_conversation():
 
 
 # =========================
-# INDEX
+# HOME
 # =========================
 
 @app.route("/")
 def index():
-
-    index_path = os.path.join(
-        BASE_DIR,
-        "index.html"
-    )
-
-    if not os.path.exists(index_path):
-        return "index.html پیدا نشد.", 404
-
-    return send_from_directory(
-        BASE_DIR,
-        "index.html"
-    )
+    return send_from_directory(BASE_DIR, "index.html")
 
 
 # =========================
@@ -228,11 +213,7 @@ def chat():
 
     cursor.execute("""
         INSERT INTO messages
-        (
-            conversation_id,
-            role,
-            content
-        )
+        (conversation_id, role, content)
         VALUES (?, ?, ?)
     """, (
         conversation_id,
@@ -259,8 +240,7 @@ def chat():
             "content": (
                 "تو Whale AI هستی. "
                 "دقیق و مفید پاسخ بده. "
-                "اگر کاربر فارسی صحبت کرد، "
-                "فارسی پاسخ بده."
+                "اگر کاربر فارسی صحبت کرد، فارسی پاسخ بده."
             )
         }
     ]
@@ -313,11 +293,7 @@ def chat():
 
             cursor.execute("""
                 INSERT INTO messages
-                (
-                    conversation_id,
-                    role,
-                    content
-                )
+                (conversation_id, role, content)
                 VALUES (?, ?, ?)
             """, (
                 conversation_id,
@@ -375,7 +351,7 @@ def chat():
 
 
 # =========================
-# DELETE
+# DELETE ONE
 # =========================
 
 @app.route(
@@ -405,6 +381,10 @@ def delete_conversation(conversation_id):
     })
 
 
+# =========================
+# DELETE ALL
+# =========================
+
 @app.route(
     "/conversations",
     methods=["DELETE"]
@@ -426,12 +406,10 @@ def delete_all():
 
 
 # =========================
-# START
+# LOCAL RUN
 # =========================
 
 if __name__ == "__main__":
-
-    init_db()
 
     port = int(
         os.environ.get(
