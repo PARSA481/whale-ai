@@ -25,10 +25,6 @@ client = OpenAI(
 DB_FILE = os.path.join(BASE_DIR, "whale_ai.db")
 
 
-# =========================
-# DATABASE
-# =========================
-
 def get_db():
     conn = sqlite3.connect(DB_FILE)
     conn.row_factory = sqlite3.Row
@@ -61,12 +57,10 @@ def init_db():
     conn.close()
 
 
-# مهم: Gunicorn این فایل را Import می‌کند،
-# بنابراین دیتابیس باید اینجا ساخته شود.
-init_db()
-
-
 def create_conversation():
+    # قبل از ساخت گفتگو مطمئن شو جدول‌ها وجود دارند
+    init_db()
+
     conn = get_db()
     cursor = conn.cursor()
 
@@ -83,21 +77,15 @@ def create_conversation():
     return conversation_id
 
 
-# =========================
-# HOME
-# =========================
-
 @app.route("/")
 def index():
     return send_from_directory(BASE_DIR, "index.html")
 
 
-# =========================
-# CONVERSATIONS
-# =========================
-
 @app.route("/conversations", methods=["POST"])
 def new_conversation():
+
+    init_db()
 
     conversation_id = create_conversation()
 
@@ -109,6 +97,8 @@ def new_conversation():
 
 @app.route("/conversations", methods=["GET"])
 def get_conversations():
+
+    init_db()
 
     conn = get_db()
     cursor = conn.cursor()
@@ -143,6 +133,8 @@ def get_conversations():
 @app.route("/conversations/<int:conversation_id>/messages")
 def get_messages(conversation_id):
 
+    init_db()
+
     conn = get_db()
     cursor = conn.cursor()
 
@@ -171,12 +163,12 @@ def get_messages(conversation_id):
     ])
 
 
-# =========================
-# CHAT
-# =========================
-
 @app.route("/chat", methods=["POST"])
 def chat():
+
+    # مهم‌ترین قسمت
+    # قبل از هر کاری جدول‌ها را بساز
+    init_db()
 
     data = request.get_json(silent=True) or {}
 
@@ -288,6 +280,9 @@ def chat():
                 full_reply = "پاسخی دریافت نشد."
 
 
+            # دوباره جدول‌ها را تضمین کن
+            init_db()
+
             conn = get_db()
             cursor = conn.cursor()
 
@@ -350,15 +345,13 @@ def chat():
     )
 
 
-# =========================
-# DELETE ONE
-# =========================
-
 @app.route(
     "/conversations/<int:conversation_id>",
     methods=["DELETE"]
 )
 def delete_conversation(conversation_id):
+
+    init_db()
 
     conn = get_db()
     cursor = conn.cursor()
@@ -381,15 +374,13 @@ def delete_conversation(conversation_id):
     })
 
 
-# =========================
-# DELETE ALL
-# =========================
-
 @app.route(
     "/conversations",
     methods=["DELETE"]
 )
 def delete_all():
+
+    init_db()
 
     conn = get_db()
     cursor = conn.cursor()
@@ -405,11 +396,9 @@ def delete_all():
     })
 
 
-# =========================
-# LOCAL RUN
-# =========================
-
 if __name__ == "__main__":
+
+    init_db()
 
     port = int(
         os.environ.get(
@@ -417,13 +406,6 @@ if __name__ == "__main__":
             5000
         )
     )
-
-    print("==============================")
-    print("       WHALE AI")
-    print("==============================")
-    print("Server starting...")
-    print("PORT:", port)
-    print("==============================")
 
     app.run(
         host="0.0.0.0",
