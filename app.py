@@ -1,16 +1,14 @@
-from flask import Flask, request, jsonify, send_from_directory, Response
+from flask import Flask, request, jsonify, send_from_directory
 from openai import OpenAI
 from dotenv import load_dotenv
 import sqlite3
 import os
-import json
 
 # =========================
 # PATHS
 # =========================
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-
 load_dotenv(os.path.join(BASE_DIR, ".env"))
 
 # =========================
@@ -25,32 +23,29 @@ app = Flask(__name__)
 
 API_KEY = os.getenv("OPENROUTER_API_KEY")
 
+print("================================")
+print("WHALE AI")
 print("OPENROUTER KEY:", bool(API_KEY))
+print("================================")
 
 if API_KEY:
     client = OpenAI(
         api_key=API_KEY,
         base_url="https://openrouter.ai/api/v1",
-        timeout=60.0,
-        max_retries=1
+        timeout=120.0,
+        max_retries=2
     )
 else:
     client = None
 
-
 # =========================
 # DATABASE
 # =========================
-#
-# استفاده از /tmp باعث می‌شود دیتابیس قدیمی
-# موجود در image باعث مشکل نشود.
-#
 
 DB_FILE = os.path.join("/tmp", "whale_ai.db")
 
 
 def get_db():
-
     conn = sqlite3.connect(
         DB_FILE,
         timeout=30
@@ -58,7 +53,6 @@ def get_db():
 
     conn.row_factory = sqlite3.Row
 
-    # همیشه مطمئن شو جدول‌ها وجود دارند
     cursor = conn.cursor()
 
     cursor.execute("""
@@ -116,18 +110,6 @@ def create_conversation():
 @app.route("/")
 def index():
 
-    index_path = os.path.join(
-        BASE_DIR,
-        "index.html"
-    )
-
-    if not os.path.exists(index_path):
-
-        return (
-            "index.html پیدا نشد.",
-            404
-        )
-
     return send_from_directory(
         BASE_DIR,
         "index.html"
@@ -135,7 +117,7 @@ def index():
 
 
 # =========================
-# HEALTH CHECK
+# HEALTH
 # =========================
 
 @app.route("/health")
@@ -163,10 +145,7 @@ def health():
 
     except Exception as error:
 
-        print(
-            "HEALTH ERROR:",
-            repr(error)
-        )
+        print("HEALTH ERROR:", repr(error))
 
         return jsonify({
             "status": "error",
@@ -186,9 +165,7 @@ def new_conversation():
 
     try:
 
-        conversation_id = (
-            create_conversation()
-        )
+        conversation_id = create_conversation()
 
         return jsonify({
             "id": conversation_id,
@@ -197,10 +174,7 @@ def new_conversation():
 
     except Exception as error:
 
-        print(
-            "NEW CONVERSATION ERROR:",
-            repr(error)
-        )
+        print("NEW CONVERSATION ERROR:", repr(error))
 
         return jsonify({
             "error": "خطا در ساخت گفتگو."
@@ -230,7 +204,7 @@ def get_conversations():
                 COUNT(m.id) AS message_count
             FROM conversations c
             LEFT JOIN messages m
-            ON c.id = m.conversation_id
+                ON c.id = m.conversation_id
             GROUP BY c.id
             ORDER BY c.id DESC
         """)
@@ -251,10 +225,7 @@ def get_conversations():
 
     except Exception as error:
 
-        print(
-            "GET CONVERSATIONS ERROR:",
-            repr(error)
-        )
+        print("GET CONVERSATIONS ERROR:", repr(error))
 
         return jsonify({
             "error": "خطا در دریافت تاریخچه."
@@ -304,10 +275,7 @@ def get_messages(conversation_id):
 
     except Exception as error:
 
-        print(
-            "GET MESSAGES ERROR:",
-            repr(error)
-        )
+        print("GET MESSAGES ERROR:", repr(error))
 
         return jsonify({
             "error": "خطا در دریافت پیام‌ها."
@@ -326,26 +294,21 @@ def chat():
 
     try:
 
-        data = (
-            request.get_json(
-                silent=True
-            )
-            or {}
+        data = request.get_json(
+            silent=True
+        ) or {}
+
+        text = str(
+            data.get("message", "")
+        ).strip()
+
+        conversation_id = data.get(
+            "conversation_id"
         )
 
-        text = (
-            data.get(
-                "message",
-                ""
-            )
-            .strip()
-        )
-
-        conversation_id = (
-            data.get(
-                "conversation_id"
-            )
-        )
+        # -------------------------
+        # VALIDATION
+        # -------------------------
 
         if not text:
 
@@ -353,20 +316,19 @@ def chat():
                 "error": "پیامی دریافت نشد."
             }), 400
 
-        if not API_KEY:
+        if not API_KEY or not client:
 
             return jsonify({
-                "error":
-                    "OPENROUTER_API_KEY تنظیم نشده است."
+                "error": "OPENROUTER_API_KEY تنظیم نشده است."
             }), 500
 
-        # اگر conversation وجود ندارد،
-        # یک conversation جدید بساز
+        # -------------------------
+        # CONVERSATION
+        # -------------------------
+
         if not conversation_id:
 
-            conversation_id = (
-                create_conversation()
-            )
+            conversation_id = create_conversation()
 
         conn = get_db()
         cursor = conn.cursor()
@@ -380,24 +342,21 @@ def chat():
             (conversation_id,)
         )
 
-        conversation = (
-            cursor.fetchone()
-        )
+        conversation = cursor.fetchone()
 
         if not conversation:
 
-            # اگر ID قدیمی/نامعتبر بود
-            # یک گفتگوی جدید بساز
             conn.close()
 
-            conversation_id = (
-                create_conversation()
-            )
+            conversation_id = create_conversation()
 
             conn = get_db()
             cursor = conn.cursor()
 
-        # ذخیره پیام کاربر
+        # -------------------------
+        # SAVE USER MESSAGE
+        # -------------------------
+
         cursor.execute("""
             INSERT INTO messages
             (
@@ -414,7 +373,10 @@ def chat():
 
         conn.commit()
 
-        # دریافت تاریخچه
+        # -------------------------
+        # LOAD HISTORY
+        # -------------------------
+
         cursor.execute("""
             SELECT
                 role,
@@ -430,14 +392,17 @@ def chat():
 
         conn.close()
 
+        # -------------------------
+        # AI MESSAGES
+        # -------------------------
+
         messages = [
             {
                 "role": "system",
                 "content": (
                     "تو Whale AI هستی. "
-                    "دقیق، مفید و طبیعی پاسخ بده. "
-                    "اگر کاربر فارسی صحبت کرد، "
-                    "فارسی پاسخ بده."
+                    "دقیق، مفید، طبیعی و دوستانه پاسخ بده. "
+                    "اگر کاربر فارسی صحبت کرد، فارسی پاسخ بده."
                 )
             }
         ]
@@ -450,157 +415,137 @@ def chat():
             })
 
         # =========================
-        # STREAM RESPONSE
+        # OPENROUTER REQUEST
         # =========================
 
-        def generate():
+        print("================================")
+        print("SENDING REQUEST TO OPENROUTER")
+        print("MODEL: openrouter/free")
+        print("CONVERSATION:", conversation_id)
+        print("================================")
 
-            full_reply = ""
+        try:
 
-            try:
+            response = client.chat.completions.create(
+                model="openrouter/free",
+                messages=messages,
+                temperature=0.7,
+                stream=False
+            )
 
-                print(
-                    "در حال دریافت پاسخ..."
-                )
+        except Exception as error:
 
-                response = (
-                    client.chat.completions.create(
-                        model="openrouter/free",
-                        messages=messages,
-                        temperature=0.7,
-                        stream=True
-                    )
-                )
+            print("================================")
+            print("OPENROUTER REQUEST ERROR")
+            print("TYPE:", type(error).__name__)
+            print("ERROR:", str(error))
+            print("================================")
 
-                for chunk in response:
+            return jsonify({
+                "error": "ارتباط با سرویس هوش مصنوعی برقرار نشد.",
+                "details": str(error)
+            }), 502
 
-                    if not chunk.choices:
-                        continue
+        # =========================
+        # EXTRACT RESPONSE
+        # =========================
 
-                    delta = (
-                        chunk.choices[0]
-                        .delta
-                        .content
-                    )
+        try:
 
-                    if delta:
+            reply = response.choices[0].message.content
 
-                        full_reply += delta
+        except Exception as error:
 
-                        yield (
-                            json.dumps(
-                                {
-                                    "type": "text",
-                                    "content": delta
-                                },
-                                ensure_ascii=False
-                            )
-                            + "\n"
-                        )
+            print("RESPONSE PARSE ERROR:", repr(error))
 
-                if not full_reply:
+            return jsonify({
+                "error": "پاسخ نامعتبر از هوش مصنوعی دریافت شد."
+            }), 502
 
-                    full_reply = (
-                        "پاسخی دریافت نشد."
-                    )
+        if not reply:
 
-                # ذخیره پاسخ AI
-                conn = get_db()
-                cursor = conn.cursor()
+            reply = "پاسخی دریافت نشد."
 
-                cursor.execute("""
-                    INSERT INTO messages
-                    (
-                        conversation_id,
-                        role,
-                        content
-                    )
-                    VALUES (?, ?, ?)
-                """, (
-                    conversation_id,
-                    "assistant",
-                    full_reply
-                ))
+        reply = str(reply).strip()
 
-                # تعداد پیام‌ها
-                cursor.execute("""
-                    SELECT COUNT(*) AS count
-                    FROM messages
-                    WHERE conversation_id = ?
-                """, (
-                    conversation_id,
-                ))
+        # =========================
+        # SAVE AI RESPONSE
+        # =========================
 
-                count = (
-                    cursor.fetchone()["count"]
-                )
+        conn = get_db()
+        cursor = conn.cursor()
 
-                # عنوان گفتگو
-                if count == 2:
+        cursor.execute("""
+            INSERT INTO messages
+            (
+                conversation_id,
+                role,
+                content
+            )
+            VALUES (?, ?, ?)
+        """, (
+            conversation_id,
+            "assistant",
+            reply
+        ))
 
-                    title = text[:40]
+        # -------------------------
+        # MESSAGE COUNT
+        # -------------------------
 
-                    if len(text) > 40:
+        cursor.execute("""
+            SELECT COUNT(*) AS count
+            FROM messages
+            WHERE conversation_id = ?
+        """, (
+            conversation_id,
+        ))
 
-                        title += "..."
+        count = cursor.fetchone()["count"]
 
-                    cursor.execute("""
-                        UPDATE conversations
-                        SET title = ?
-                        WHERE id = ?
-                    """, (
-                        title,
-                        conversation_id
-                    ))
+        # -------------------------
+        # TITLE
+        # -------------------------
 
-                conn.commit()
-                conn.close()
+        if count == 2:
 
-                yield (
-                    json.dumps(
-                        {
-                            "type": "done",
-                            "conversation_id":
-                                conversation_id
-                        },
-                        ensure_ascii=False
-                    )
-                    + "\n"
-                )
+            title = text[:40]
 
-            except Exception as error:
+            if len(text) > 40:
+                title += "..."
 
-                print(
-                    "AI ERROR:",
-                    repr(error)
-                )
+            cursor.execute("""
+                UPDATE conversations
+                SET title = ?
+                WHERE id = ?
+            """, (
+                title,
+                conversation_id
+            ))
 
-                yield (
-                    json.dumps(
-                        {
-                            "type": "error",
-                            "content":
-                                "ارتباط با هوش مصنوعی برقرار نشد."
-                        },
-                        ensure_ascii=False
-                    )
-                    + "\n"
-                )
+        conn.commit()
+        conn.close()
 
-        return Response(
-            generate(),
-            mimetype="application/x-ndjson"
-        )
+        # =========================
+        # RESPONSE
+        # =========================
+
+        return jsonify({
+            "type": "done",
+            "content": reply,
+            "conversation_id": conversation_id
+        })
 
     except Exception as error:
 
-        print(
-            "CHAT ERROR:",
-            repr(error)
-        )
+        print("================================")
+        print("CHAT ERROR")
+        print("TYPE:", type(error).__name__)
+        print("ERROR:", str(error))
+        print("================================")
 
         return jsonify({
-            "error": str(error)
+            "error": "خطای داخلی سرور."
         }), 500
 
 
@@ -612,9 +557,7 @@ def chat():
     "/conversations/<int:conversation_id>",
     methods=["DELETE"]
 )
-def delete_conversation(
-    conversation_id
-):
+def delete_conversation(conversation_id):
 
     try:
 
@@ -646,10 +589,7 @@ def delete_conversation(
 
     except Exception as error:
 
-        print(
-            "DELETE ERROR:",
-            repr(error)
-        )
+        print("DELETE ERROR:", repr(error))
 
         return jsonify({
             "error": "خطا در حذف گفتگو."
@@ -688,14 +628,10 @@ def delete_all():
 
     except Exception as error:
 
-        print(
-            "DELETE ALL ERROR:",
-            repr(error)
-        )
+        print("DELETE ALL ERROR:", repr(error))
 
         return jsonify({
-            "error":
-                "خطا در حذف گفتگوها."
+            "error": "خطا در حذف گفتگوها."
         }), 500
 
 
@@ -717,7 +653,6 @@ if __name__ == "__main__":
     print("==============================")
     print("Server starting...")
     print("PORT:", port)
-    print("DATABASE:", DB_FILE)
     print("==============================")
 
     app.run(
