@@ -1,38 +1,43 @@
-```html
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#07111f">
 <title>Whale AI</title>
 
 <style>
-*{box-sizing:border-box}
-
-:root{
-    --bg:#050912;
-    --panel:#091321;
-    --panel2:#0d1a2a;
-    --panel3:#122238;
-    --border:rgba(255,255,255,.08);
-    --text:#f4f8ff;
-    --muted:#8295aa;
-    --blue:#278cff;
-    --blue2:#1263ca;
-    --danger:#ff5269;
-    --green:#32d583;
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
 }
 
-html,body{
+:root{
+    --bg:#050914;
+    --panel:#091522;
+    --panel2:#0c1b2b;
+    --border:rgba(255,255,255,.075);
+    --text:#f4f8ff;
+    --muted:#7e92a8;
+    --blue:#2997ff;
+    --blue2:#1268d4;
+    --cyan:#35d5ff;
+    --green:#43e49a;
+    --danger:#ff6477;
+}
+
+html,
+body{
     width:100%;
     height:100%;
-    margin:0;
     overflow:hidden;
 }
 
 body{
     font-family:
-        Inter,
+        "Vazirmatn",
+        "IRANSans",
         "Segoe UI",
         Tahoma,
         Arial,
@@ -42,33 +47,44 @@ body{
 
     background:
         radial-gradient(
-            circle at 50% -15%,
-            rgba(28,119,225,.25),
-            transparent 38%
+            circle at 50% -20%,
+            rgba(30,125,225,.20),
+            transparent 40%
         ),
         radial-gradient(
             circle at 100% 100%,
-            rgba(0,100,255,.08),
+            rgba(0,160,255,.07),
             transparent 35%
         ),
-        var(--bg);
+        linear-gradient(
+            145deg,
+            #030711 0%,
+            #07111f 52%,
+            #040913 100%
+        );
 }
 
 button,
 textarea{
-    font-family:inherit;
+    font:inherit;
 }
 
 button{
-    cursor:pointer;
     border:0;
+    cursor:pointer;
+    color:inherit;
 }
+
+/* =========================
+   APP
+========================= */
 
 .app{
     width:100%;
-    height:100vh;
+    height:100dvh;
     display:flex;
     overflow:hidden;
+    position:relative;
 }
 
 /* =========================
@@ -78,151 +94,242 @@ button{
 .sidebar{
     width:292px;
     flex:0 0 292px;
+    height:100%;
 
     display:flex;
     flex-direction:column;
 
-    background:rgba(7,15,26,.90);
+    background:
+        linear-gradient(
+            180deg,
+            rgba(9,20,34,.98),
+            rgba(5,13,24,.99)
+        );
 
     border-left:1px solid var(--border);
 
     backdrop-filter:blur(24px);
 
-    z-index:100;
-
-    transition:right .25s ease;
+    position:relative;
+    z-index:50;
 }
 
+.sidebar::after{
+    content:"";
+
+    position:absolute;
+    left:0;
+    top:0;
+
+    width:1px;
+    height:100%;
+
+    background:
+        linear-gradient(
+            transparent,
+            rgba(41,151,255,.35),
+            transparent
+        );
+}
+
+/* =========================
+   BRAND
+========================= */
+
 .brand{
-    height:82px;
-
-    padding:16px 19px;
-
+    padding:18px;
     display:flex;
     align-items:center;
-
     gap:12px;
 
     border-bottom:1px solid var(--border);
 }
 
 .logo{
-    width:48px;
-    height:48px;
+    width:46px;
+    height:46px;
+    flex:0 0 46px;
 
-    border-radius:16px;
+    border-radius:14px;
 
-    display:grid;
-    place-items:center;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    overflow:hidden;
 
     background:
         linear-gradient(
             145deg,
-            #2b98ff,
-            #084b9d
+            #2fa8ff,
+            #0754ad
         );
 
     box-shadow:
-        0 10px 35px
-        rgba(35,137,255,.28);
-
-    overflow:hidden;
+        0 10px 30px rgba(25,130,240,.23),
+        inset 0 1px rgba(255,255,255,.28);
 }
 
-.logo svg{
-    width:29px;
-    height:29px;
+.logo img{
+    width:32px;
+    height:32px;
+    object-fit:contain;
+    display:block;
 }
 
-.brand-title{
+.brand-name{
     font-size:19px;
-    font-weight:800;
+    font-weight:850;
+    letter-spacing:-.5px;
 }
 
-.brand-subtitle{
-    margin-top:4px;
+.brand-tag{
     color:var(--muted);
     font-size:10px;
+    margin-top:3px;
 }
 
-.new-chat{
-    margin:17px;
+/* =========================
+   NEW CHAT
+========================= */
 
-    padding:13px;
+.new-chat{
+    margin:16px;
+    height:46px;
 
     border-radius:13px;
 
-    color:#fff;
+    border:1px solid rgba(65,166,255,.22);
 
     background:
         linear-gradient(
             135deg,
-            var(--blue),
-            var(--blue2)
+            rgba(41,151,255,.96),
+            rgba(19,93,190,.96)
         );
 
-    box-shadow:
-        0 10px 30px
-        rgba(35,137,255,.18);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
 
-    font-size:13px;
-    font-weight:700;
+    font-size:12px;
+    font-weight:800;
+
+    box-shadow:
+        0 10px 28px rgba(25,120,220,.18);
 
     transition:.18s;
 }
 
 .new-chat:hover{
     transform:translateY(-1px);
-    filter:brightness(1.08);
 }
 
-.history-heading{
-    padding:
-        0
-        18px
-        10px;
+.new-chat:active{
+    transform:scale(.98);
+}
 
-    color:#71859b;
+.new-chat svg{
+    width:18px;
+}
 
+/* =========================
+   HISTORY
+========================= */
+
+.history-head{
+    padding:1px 17px 10px;
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.history-title{
+    color:#8da1b7;
     font-size:11px;
     font-weight:700;
+}
+
+.history-count{
+    color:#526a82;
+    font-size:9px;
 }
 
 #historyList{
     flex:1;
     overflow-y:auto;
-    padding:0 10px 15px;
+    padding:0 9px 12px;
 }
+
+.empty-history{
+    text-align:center;
+    color:#61768d;
+    font-size:11px;
+    padding:34px 12px;
+    line-height:2;
+}
+
+/* =========================
+   CONVERSATIONS
+========================= */
 
 .conversation{
     display:flex;
     align-items:center;
-
     gap:7px;
 
-    padding:11px;
+    min-height:53px;
 
-    margin-bottom:5px;
+    padding:7px 8px;
+    margin-bottom:4px;
 
     border-radius:12px;
+
+    border:1px solid transparent;
 
     transition:.18s;
 }
 
 .conversation:hover{
-    background:rgba(255,255,255,.045);
+    background:rgba(255,255,255,.04);
+    border-color:rgba(255,255,255,.045);
 }
 
 .conversation.active{
     background:
         linear-gradient(
             90deg,
-            rgba(35,137,255,.15),
-            rgba(35,137,255,.04)
+            rgba(41,151,255,.13),
+            rgba(41,151,255,.025)
         );
 
-    border:1px solid
-        rgba(35,137,255,.1);
+    border-color:rgba(41,151,255,.13);
+}
+
+.conv-icon{
+    width:32px;
+    height:32px;
+    flex:0 0 32px;
+
+    border-radius:9px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    color:#82b5df;
+    background:rgba(255,255,255,.045);
+}
+
+.conversation.active .conv-icon{
+    color:#48aaff;
+    background:rgba(41,151,255,.12);
+}
+
+.conv-icon svg{
+    width:15px;
 }
 
 .conversation-info{
@@ -232,58 +339,82 @@ button{
 }
 
 .conversation-title{
+    font-size:12px;
+    color:#dbe7f4;
+
     overflow:hidden;
     white-space:nowrap;
     text-overflow:ellipsis;
-
-    font-size:13px;
 }
 
 .conversation-count{
-    color:#61768b;
-    font-size:10px;
-
-    margin-top:4px;
+    margin-top:3px;
+    color:#536a82;
+    font-size:9px;
 }
 
 .delete-conversation{
-    padding:6px;
-
-    color:#62778c;
-
-    background:transparent;
+    width:28px;
+    height:28px;
+    flex:0 0 28px;
 
     border-radius:8px;
+
+    background:transparent;
+    color:#52677d;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    transition:.18s;
 }
 
 .delete-conversation:hover{
-    color:#ff6478;
-    background:rgba(255,60,80,.1);
+    color:#ff7180;
+    background:rgba(255,75,95,.1);
 }
 
-.sidebar-bottom{
-    padding:12px;
+.delete-conversation svg{
+    width:13px;
+}
 
+/* =========================
+   SIDEBAR BOTTOM
+========================= */
+
+.sidebar-bottom{
+    padding:10px;
     border-top:1px solid var(--border);
 }
 
 .clear-all{
     width:100%;
+    height:36px;
 
-    padding:10px;
-
-    color:#788ba0;
+    border-radius:9px;
 
     background:transparent;
+    color:#61778d;
 
-    border-radius:10px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:6px;
 
-    font-size:12px;
+    font-size:10px;
+
+    transition:.18s;
 }
 
 .clear-all:hover{
-    color:#ff6879;
-    background:rgba(255,255,255,.04);
+    background:rgba(255,70,90,.065);
+    color:#ff7180;
+}
+
+.clear-all svg{
+    width:13px;
+    height:13px;
 }
 
 /* =========================
@@ -293,6 +424,7 @@ button{
 .main{
     flex:1;
     min-width:0;
+    height:100%;
 
     display:flex;
     flex-direction:column;
@@ -300,27 +432,59 @@ button{
     position:relative;
 }
 
+/* =========================
+   TOPBAR
+========================= */
+
 .topbar{
-    height:72px;
-    flex:0 0 72px;
+    height:70px;
+    flex:0 0 70px;
+
+    padding:0 22px;
 
     display:flex;
     align-items:center;
     justify-content:space-between;
 
-    padding:0 24px;
-
-    background:rgba(5,11,19,.70);
-
     border-bottom:1px solid var(--border);
 
-    backdrop-filter:blur(20px);
+    background:rgba(5,12,21,.72);
+
+    backdrop-filter:blur(22px);
+
+    position:relative;
+    z-index:10;
 }
 
-.model-info{
+.top-left{
     display:flex;
     align-items:center;
-    gap:10px;
+    gap:11px;
+}
+
+.mobile-menu{
+    display:none;
+
+    width:39px;
+    height:39px;
+
+    border-radius:10px;
+
+    background:rgba(255,255,255,.05);
+    border:1px solid var(--border);
+
+    align-items:center;
+    justify-content:center;
+}
+
+.mobile-menu svg{
+    width:18px;
+}
+
+.status{
+    display:flex;
+    align-items:center;
+    gap:8px;
 }
 
 .status-dot{
@@ -332,21 +496,19 @@ button{
     background:var(--green);
 
     box-shadow:
-        0 0 13px
-        rgba(50,213,131,.7);
+        0 0 0 4px rgba(66,230,154,.07),
+        0 0 15px rgba(66,230,154,.6);
 }
 
-.model-name{
-    font-size:14px;
+.status-name{
+    font-size:13px;
     font-weight:800;
 }
 
-.model-status{
+.status-text{
+    color:#647a91;
+    font-size:9px;
     margin-top:3px;
-
-    color:var(--muted);
-
-    font-size:10px;
 }
 
 .top-actions{
@@ -354,26 +516,34 @@ button{
     gap:7px;
 }
 
-.top-btn,
-.mobile-menu{
-    padding:9px 12px;
+.top-btn{
+    height:37px;
+    padding:0 11px;
 
-    color:#c9d7e6;
+    display:flex;
+    align-items:center;
+    gap:6px;
 
-    background:rgba(255,255,255,.045);
+    border-radius:10px;
 
     border:1px solid var(--border);
 
-    border-radius:10px;
+    background:rgba(255,255,255,.04);
+
+    color:#b9c9da;
+
+    font-size:10px;
+
+    transition:.18s;
 }
 
-.top-btn:hover,
-.mobile-menu:hover{
-    background:rgba(255,255,255,.08);
+.top-btn:hover{
+    background:rgba(255,255,255,.07);
+    color:#fff;
 }
 
-.mobile-menu{
-    display:none;
+.top-btn svg{
+    width:14px;
 }
 
 /* =========================
@@ -387,93 +557,170 @@ button{
 
     padding:
         30px
-        max(20px,calc((100% - 920px)/2));
+        max(20px,calc((100% - 960px)/2))
+        145px;
 
     scroll-behavior:smooth;
 }
 
+/* =========================
+   WELCOME
+========================= */
+
 .welcome{
+    min-height:440px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-direction:column;
+
     text-align:center;
 
-    padding:
-        50px
-        20px
-        25px;
+    animation:welcomeIn .55s ease;
 }
 
 .welcome-logo{
-    width:92px;
-    height:92px;
+    width:88px;
+    height:88px;
 
-    margin:auto;
+    border-radius:26px;
 
-    display:grid;
-    place-items:center;
+    display:flex;
+    align-items:center;
+    justify-content:center;
 
-    border-radius:30px;
+    position:relative;
 
     background:
-        linear-gradient(
-            145deg,
-            #2997ff,
-            #07458e
+        radial-gradient(
+            circle at 30% 25%,
+            #58c2ff,
+            #1680e9 50%,
+            #08428c
         );
 
     box-shadow:
-        0 18px 55px
-        rgba(30,130,255,.22);
+        0 25px 65px rgba(19,123,229,.22),
+        inset 0 1px rgba(255,255,255,.35);
+
+    overflow:hidden;
 }
 
-.welcome-logo svg{
-    width:54px;
-    height:54px;
+.welcome-logo::before{
+    content:"";
+
+    position:absolute;
+    inset:-8px;
+
+    border-radius:32px;
+
+    border:1px solid rgba(57,169,255,.12);
+
+    animation:pulse 2.5s infinite;
+}
+
+.welcome-logo img{
+    width:60px;
+    height:60px;
+
+    object-fit:contain;
+
+    position:relative;
+    z-index:2;
+
+    filter:
+        brightness(0)
+        invert(1);
 }
 
 .welcome h1{
-    margin:20px 0 8px;
+    margin-top:23px;
 
     font-size:29px;
+    letter-spacing:-1px;
+    font-weight:900;
 }
 
 .welcome p{
-    margin:0;
-
-    color:var(--muted);
-
-    font-size:13px;
+    color:#72879e;
+    font-size:12px;
+    margin-top:8px;
 }
 
-.features{
-    margin-top:22px;
+/* =========================
+   QUICK ACTIONS
+========================= */
 
-    display:flex;
+.quick-actions{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:9px;
 
-    justify-content:center;
+    width:min(690px,100%);
 
-    flex-wrap:wrap;
-
-    gap:8px;
+    margin-top:30px;
 }
 
-.feature{
-    padding:8px 12px;
+.quick{
+    min-height:70px;
+
+    padding:11px;
+
+    text-align:right;
+
+    border-radius:13px;
 
     border:1px solid var(--border);
 
-    background:rgba(255,255,255,.035);
+    background:rgba(255,255,255,.025);
 
-    border-radius:10px;
+    color:#aebed0;
 
-    color:#8da0b4;
-
-    font-size:10px;
+    transition:.2s;
 }
 
-.feature.soon{
-    color:#6da9ef;
+.quick:hover{
+    background:rgba(41,151,255,.06);
+    border-color:rgba(41,151,255,.19);
 
-    border-color:
-        rgba(35,137,255,.16);
+    transform:translateY(-2px);
+}
+
+.quick-icon{
+    width:28px;
+    height:28px;
+
+    border-radius:8px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    margin-bottom:6px;
+
+    background:rgba(41,151,255,.09);
+    color:#4eafff;
+}
+
+.quick-icon svg{
+    width:15px;
+}
+
+.quick strong{
+    display:block;
+
+    font-size:10px;
+    color:#d4dfeb;
+}
+
+.quick span{
+    display:block;
+
+    font-size:8px;
+    color:#60768d;
+
+    margin-top:2px;
 }
 
 /* =========================
@@ -482,13 +729,11 @@ button{
 
 .message-row{
     display:flex;
+    width:100%;
 
-    margin:18px 0;
+    margin:17px 0;
 
-    animation:
-        messageIn
-        .20s
-        ease;
+    animation:messageIn .2s ease;
 }
 
 .user-row{
@@ -505,34 +750,59 @@ button{
 
     flex:0 0 34px;
 
-    margin:0 8px;
-
-    display:grid;
-    place-items:center;
-
     border-radius:11px;
-}
 
-.avatar svg{
-    width:20px;
-    height:20px;
+    margin:0 9px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
 }
 
 .user-avatar{
-    background:#145ca8;
+    background:
+        linear-gradient(
+            145deg,
+            #1b70cc,
+            #104e96
+        );
+
+    color:#cce8ff;
 }
 
 .bot-avatar{
     background:
         linear-gradient(
             145deg,
-            #162d47,
-            #0c1929
+            #15283f,
+            #0b1727
         );
+
+    border:1px solid rgba(255,255,255,.07);
+
+    color:#42aaff;
+
+    overflow:hidden;
 }
 
+.bot-avatar img{
+    width:22px;
+    height:22px;
+
+    object-fit:contain;
+
+    filter:
+        brightness(0)
+        invert(1);
+}
+
+/* =========================
+   MESSAGE
+========================= */
+
 .message-box{
-    max-width:min(78%,740px);
+    max-width:min(76%,760px);
+    min-width:0;
 }
 
 .message{
@@ -540,61 +810,83 @@ button{
 
     border-radius:17px;
 
-    line-height:1.85;
-
-    font-size:14px;
+    font-size:13px;
+    line-height:1.95;
 
     white-space:pre-wrap;
-
     word-break:break-word;
+
+    box-shadow:0 7px 25px rgba(0,0,0,.09);
 }
 
 .user-message{
+    color:#fff;
+
     background:
         linear-gradient(
             135deg,
-            #207fe7,
-            #1259ad
+            #217fe8,
+            #125bb5
         );
 
     border-bottom-left-radius:5px;
 }
 
 .bot-message{
-    background:rgba(14,28,45,.92);
+    color:#dbe7f3;
 
-    border:1px solid
-        rgba(255,255,255,.065);
+    background:
+        linear-gradient(
+            145deg,
+            rgba(16,31,49,.96),
+            rgba(9,21,35,.96)
+        );
+
+    border:1px solid rgba(255,255,255,.065);
 
     border-bottom-right-radius:5px;
 }
 
-.message-actions{
-    display:flex;
+/* =========================
+   MESSAGE ACTIONS
+========================= */
 
+.message-actions{
     direction:ltr;
 
+    display:flex;
     gap:4px;
 
     margin-top:5px;
+    padding-left:3px;
 }
 
-.action-btn{
-    padding:4px 7px;
+.message-action{
+    height:26px;
 
-    color:#8195aa;
-
-    background:transparent;
+    padding:0 7px;
 
     border-radius:7px;
 
-    font-size:10px;
+    background:transparent;
+    color:#647b92;
+
+    display:flex;
+    align-items:center;
+    gap:4px;
+
+    font-size:9px;
+
+    transition:.15s;
 }
 
-.action-btn:hover{
-    color:#c9d7e6;
+.message-action:hover{
+    color:#a8bed3;
+    background:rgba(255,255,255,.045);
+}
 
-    background:rgba(255,255,255,.05);
+.message-action svg{
+    width:12px;
 }
 
 /* =========================
@@ -604,26 +896,25 @@ button{
 #typing{
     display:none;
 
+    justify-content:flex-end;
     align-items:center;
 
-    justify-content:flex-end;
+    color:#667c92;
 
-    margin:
-        7px
-        0
-        15px;
+    font-size:10px;
 
-    color:#73869a;
+    margin:4px 43px 18px 0;
+}
 
-    font-size:11px;
+.typing-box{
+    display:flex;
+    align-items:center;
+    gap:9px;
 }
 
 .typing-dots{
     display:flex;
-
     gap:4px;
-
-    margin-right:8px;
 }
 
 .typing-dots span{
@@ -632,12 +923,9 @@ button{
 
     border-radius:50%;
 
-    background:#7891ac;
+    background:#5f7d9b;
 
-    animation:
-        bounce
-        1s
-        infinite;
+    animation:typing 1.1s infinite;
 }
 
 .typing-dots span:nth-child(2){
@@ -652,59 +940,93 @@ button{
    INPUT
 ========================= */
 
-.input-wrapper{
-    flex:none;
+.input-area{
+    position:absolute;
 
-    padding:
-        12px
-        20px
-        19px;
+    left:0;
+    right:0;
+    bottom:0;
+
+    z-index:20;
+
+    padding:28px 20px 15px;
 
     background:
         linear-gradient(
             transparent,
-            rgba(4,9,16,.98) 35%
+            rgba(4,9,16,.91) 35%,
+            rgba(4,9,16,.98)
         );
 }
 
-.input-box{
-    max-width:920px;
-
+.input-container{
+    width:min(900px,100%);
     margin:auto;
+}
 
+.input-box{
     display:flex;
-
     align-items:flex-end;
-
     gap:8px;
 
-    padding:9px;
+    padding:8px;
 
-    background:
-        rgba(13,27,44,.96);
-
-    border:
-        1px solid
-        rgba(255,255,255,.09);
+    min-height:60px;
 
     border-radius:18px;
 
+    background:
+        linear-gradient(
+            145deg,
+            rgba(16,32,51,.97),
+            rgba(9,20,34,.97)
+        );
+
+    border:1px solid rgba(255,255,255,.09);
+
     box-shadow:
-        0 18px 50px
-        rgba(0,0,0,.28);
+        0 20px 65px rgba(0,0,0,.38),
+        inset 0 1px rgba(255,255,255,.025);
 
     transition:.2s;
 }
 
 .input-box:focus-within{
-    border-color:
-        rgba(35,137,255,.5);
+    border-color:rgba(42,151,255,.43);
 
     box-shadow:
-        0 0 0 3px
-        rgba(35,137,255,.07),
-        0 18px 50px
-        rgba(0,0,0,.28);
+        0 20px 65px rgba(0,0,0,.4),
+        0 0 0 3px rgba(42,151,255,.055);
+}
+
+.input-side{
+    display:flex;
+    gap:5px;
+}
+
+.input-tool{
+    width:38px;
+    height:38px;
+
+    flex:0 0 38px;
+
+    border-radius:10px;
+
+    background:rgba(255,255,255,.045);
+    color:#7990a8;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.input-tool:hover{
+    color:#b8c9da;
+    background:rgba(255,255,255,.07);
+}
+
+.input-tool svg{
+    width:16px;
 }
 
 #input{
@@ -712,96 +1034,110 @@ button{
 
     min-width:0;
 
-    max-height:150px;
+    max-height:145px;
 
     resize:none;
 
     outline:none;
-
     border:0;
 
     background:transparent;
 
-    color:white;
+    color:#f5f8fc;
 
-    padding:9px 10px;
+    font-size:13px;
+    line-height:1.7;
 
-    line-height:1.6;
-
-    font-size:14px;
+    padding:8px 9px;
 }
 
 #input::placeholder{
-    color:#657a91;
+    color:#5e748b;
 }
 
-/* SEND / STOP */
+/* =========================
+   SEND / STOP BUTTON
+========================= */
 
 #send{
-    width:44px;
-    height:44px;
+    width:43px;
+    height:43px;
 
-    flex:0 0 44px;
+    flex:0 0 43px;
 
-    display:grid;
-    place-items:center;
+    border-radius:12px;
 
-    border-radius:13px;
-
-    color:white;
+    display:flex;
+    align-items:center;
+    justify-content:center;
 
     background:
         linear-gradient(
             145deg,
-            #2995ff,
-            #1163c9
+            #32a4ff,
+            #1468d2
         );
 
     box-shadow:
-        0 7px 20px
-        rgba(30,130,255,.2);
+        0 8px 22px rgba(30,125,230,.23);
 
     transition:
-        transform .18s,
-        filter .18s,
-        background .18s;
+        transform .15s,
+        background .15s,
+        opacity .15s;
 }
 
-#send:hover:not(:disabled){
-    transform:translateY(-1px);
-    filter:brightness(1.08);
+#send:hover{
+    transform:translateY(-1px) scale(1.025);
+}
+
+#send:active{
+    transform:scale(.95);
 }
 
 #send.stop{
     background:
         linear-gradient(
             145deg,
-            #ff6477,
-            #d52d45
+            #ff6476,
+            #d83c53
         );
-
-    box-shadow:
-        0 7px 20px
-        rgba(255,70,90,.16);
-}
-
-#send:disabled{
-    cursor:not-allowed;
 }
 
 #send svg{
-    width:21px;
-    height:21px;
+    width:18px;
+    height:18px;
 }
 
-.hint{
-    margin-top:8px;
-
+.input-hint{
     text-align:center;
 
-    color:#52677c;
+    color:#43576c;
 
     font-size:9px;
+
+    margin-top:7px;
+}
+
+/* =========================
+   OVERLAY
+========================= */
+
+.overlay{
+    display:none;
+
+    position:fixed;
+    inset:0;
+
+    background:rgba(0,0,0,.48);
+
+    backdrop-filter:blur(3px);
+
+    z-index:40;
+}
+
+.overlay.show{
+    display:block;
 }
 
 /* =========================
@@ -810,6 +1146,7 @@ button{
 
 ::-webkit-scrollbar{
     width:6px;
+    height:6px;
 }
 
 ::-webkit-scrollbar-track{
@@ -817,34 +1154,59 @@ button{
 }
 
 ::-webkit-scrollbar-thumb{
-    background:#1b3046;
-
+    background:#1a2d43;
     border-radius:20px;
 }
 
 /* =========================
-   ANIMATION
+   ANIMATIONS
 ========================= */
 
-@keyframes messageIn{
+@keyframes welcomeIn{
     from{
         opacity:0;
-        transform:translateY(5px);
+        transform:translateY(14px);
     }
 
     to{
         opacity:1;
-        transform:translateY(0);
+        transform:none;
     }
 }
 
-@keyframes bounce{
+@keyframes messageIn{
+    from{
+        opacity:0;
+        transform:translateY(6px);
+    }
+
+    to{
+        opacity:1;
+        transform:none;
+    }
+}
+
+@keyframes typing{
     0%,60%,100%{
         transform:translateY(0);
+        opacity:.5;
     }
 
     30%{
         transform:translateY(-4px);
+        opacity:1;
+    }
+}
+
+@keyframes pulse{
+    0%,100%{
+        transform:scale(.95);
+        opacity:.35;
+    }
+
+    50%{
+        transform:scale(1.06);
+        opacity:.1;
     }
 }
 
@@ -852,20 +1214,21 @@ button{
    MOBILE
 ========================= */
 
-@media(max-width:750px){
+@media(max-width:800px){
 
     .sidebar{
         position:fixed;
 
+        right:-300px;
         top:0;
-        right:-305px;
 
-        height:100vh;
+        width:292px;
+        height:100%;
+
+        transition:right .25s ease;
 
         box-shadow:
-            -20px 0
-            60px
-            rgba(0,0,0,.45);
+            -25px 0 70px rgba(0,0,0,.45);
     }
 
     .sidebar.open{
@@ -873,42 +1236,127 @@ button{
     }
 
     .mobile-menu{
-        display:grid;
-        place-items:center;
+        display:flex;
     }
 
     .topbar{
-        height:65px;
-        padding:0 12px;
+        height:64px;
+        flex-basis:64px;
+
+        padding:0 11px;
     }
 
-    .top-btn{
+    .top-actions .top-btn span{
         display:none;
     }
 
+    .top-btn{
+        width:38px;
+        justify-content:center;
+        padding:0;
+    }
+
     #chat{
-        padding:20px 10px;
+        padding:
+            20px
+            10px
+            132px;
+    }
+
+    .welcome{
+        min-height:420px;
+        padding:10px;
+    }
+
+    .welcome-logo{
+        width:76px;
+        height:76px;
+        border-radius:23px;
+    }
+
+    .welcome-logo img{
+        width:49px;
+        height:49px;
+    }
+
+    .welcome h1{
+        font-size:22px;
+    }
+
+    .quick-actions{
+        grid-template-columns:1fr;
+
+        width:100%;
+        max-width:390px;
+
+        margin-top:24px;
+    }
+
+    .quick{
+        min-height:59px;
     }
 
     .message-box{
         max-width:84%;
     }
 
-    .welcome{
-        padding-top:38px;
+    .message{
+        font-size:12px;
+        padding:11px 13px;
+    }
+
+    .avatar{
+        width:30px;
+        height:30px;
+        flex-basis:30px;
+        margin:0 6px;
+    }
+
+    .bot-avatar img{
+        width:19px;
+        height:19px;
+    }
+
+    .input-area{
+        padding:21px 9px 9px;
+    }
+
+    .input-box{
+        min-height:56px;
+        border-radius:15px;
+    }
+
+    .input-tool{
+        display:none;
+    }
+
+    #send{
+        width:41px;
+        height:41px;
+        flex-basis:41px;
+    }
+
+    .input-hint{
+        font-size:8px;
+    }
+}
+
+@media(max-width:430px){
+
+    .brand{
+        padding:16px;
     }
 
     .welcome h1{
-        font-size:23px;
+        font-size:21px;
     }
 
-    .welcome-logo{
-        width:78px;
-        height:78px;
+    .message-box{
+        max-width:87%;
     }
 
-    .input-wrapper{
-        padding:9px;
+    .status-text{
+        display:none;
     }
 }
 </style>
@@ -918,72 +1366,54 @@ button{
 
 <div class="app">
 
-<!-- SIDEBAR -->
-
 <aside class="sidebar" id="sidebar">
 
     <div class="brand">
 
         <div class="logo">
-            <svg viewBox="0 0 64 64" fill="none">
-                <path
-                    d="M9 35c7-18 27-24 43-14
-                    6 4 7 11 2 16
-                    -5 5-13 8-23 8H17
-                    c-7 0-11-4-8-10Z"
-                    fill="white"
-                />
-
-                <path
-                    d="M43 22c3-7 9-10 13-10
-                    -1 7-4 11-10 14"
-                    fill="white"
-                />
-
-                <circle
-                    cx="45"
-                    cy="29"
-                    r="2.5"
-                    fill="#268cff"
-                />
-
-                <path
-                    d="M15 45c9 5 22 6 33 1"
-                    stroke="#268cff"
-                    stroke-width="3"
-                    stroke-linecap="round"
-                />
-            </svg>
+            <img id="brandWhale" alt="Whale">
         </div>
 
         <div>
-            <div class="brand-title">
-                Whale AI
-            </div>
-
-            <div class="brand-subtitle">
-                دستیار هوشمند نسل جدید
-            </div>
+            <div class="brand-name">Whale AI</div>
+            <div class="brand-tag">دستیار هوشمند نسل جدید</div>
         </div>
 
     </div>
 
+    <button class="new-chat" id="newChatButton">
 
-    <button
-        class="new-chat"
-        id="newChatButton"
-    >
-        ＋ گفت‌وگوی جدید
+        <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+        >
+            <path d="M12 5v14"/>
+            <path d="M5 12h14"/>
+        </svg>
+
+        گفت‌وگوی جدید
+
     </button>
 
+    <div class="history-head">
 
-    <div class="history-heading">
-        گفت‌وگوهای اخیر
+        <div class="history-title">
+            گفت‌وگوهای اخیر
+        </div>
+
+        <div
+            class="history-count"
+            id="historyCount"
+        >
+            ۰ گفتگو
+        </div>
+
     </div>
 
-
     <div id="historyList"></div>
-
 
     <div class="sidebar-bottom">
 
@@ -991,50 +1421,81 @@ button{
             class="clear-all"
             id="clearAll"
         >
-            🗑 حذف همه گفتگوها
+
+            <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+            >
+                <path d="M3 6h18"/>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/>
+                <path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/>
+                <path d="M10 11v6"/>
+                <path d="M14 11v6"/>
+            </svg>
+
+            حذف همه گفتگوها
+
         </button>
 
     </div>
 
 </aside>
 
-
-<!-- MAIN -->
+<div
+    class="overlay"
+    id="overlay"
+></div>
 
 <main class="main">
 
 <header class="topbar">
 
-    <div class="model-info">
+    <div class="top-left">
 
         <button
             class="mobile-menu"
             id="mobileMenu"
         >
-            ☰
+
+            <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+            >
+                <path d="M4 6h16"/>
+                <path d="M4 12h16"/>
+                <path d="M4 18h16"/>
+            </svg>
+
         </button>
 
+        <div class="status">
 
-        <div class="status-dot"></div>
+            <div class="status-dot"></div>
 
+            <div>
 
-        <div>
+                <div class="status-name">
+                    Whale AI
+                </div>
 
-            <div class="model-name">
-                Whale AI
-            </div>
+                <div
+                    class="status-text"
+                    id="statusText"
+                >
+                    آماده پاسخ‌گویی
+                </div>
 
-            <div
-                class="model-status"
-                id="modelStatus"
-            >
-                آماده پاسخ‌گویی
             </div>
 
         </div>
 
     </div>
-
 
     <div class="top-actions">
 
@@ -1042,13 +1503,25 @@ button{
             class="top-btn"
             id="historyButton"
         >
-            🗂 تاریخچه
+
+            <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+            >
+                <path d="M12 8v4l3 3"/>
+                <path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"/>
+            </svg>
+
+            <span>تاریخچه</span>
+
         </button>
 
     </div>
 
 </header>
-
 
 <section id="chat">
 
@@ -1058,88 +1531,130 @@ button{
     >
 
         <div class="welcome-logo">
-
-            <svg viewBox="0 0 64 64" fill="none">
-
-                <path
-                    d="M9 35c7-18 27-24 43-14
-                    6 4 7 11 2 16
-                    -5 5-13 8-23 8H17
-                    c-7 0-11-4-8-10Z"
-                    fill="white"
-                />
-
-                <path
-                    d="M43 22c3-7 9-10 13-10
-                    -1 7-4 11-10 14"
-                    fill="white"
-                />
-
-                <circle
-                    cx="45"
-                    cy="29"
-                    r="2.5"
-                    fill="#268cff"
-                />
-
-                <path
-                    d="M15 45c9 5 22 6 33 1"
-                    stroke="#268cff"
-                    stroke-width="3"
-                    stroke-linecap="round"
-                />
-
-            </svg>
-
+            <img id="welcomeWhale" alt="Whale">
         </div>
-
 
         <h1>
             به Whale AI خوش آمدی
         </h1>
 
-
         <p>
-            یک دستیار هوشمند برای فکر کردن، ساختن و یادگیری
+            فکر کن، بپرس، بساز — Whale AI همراه توست.
         </p>
 
+        <div class="quick-actions">
 
-        <div class="features">
+            <button
+                class="quick"
+                data-prompt="یک ایده خلاقانه برای یک پروژه هوش مصنوعی به من بده"
+            >
 
-            <div class="feature">
-                💬 گفت‌وگوی هوشمند
-            </div>
+                <div class="quick-icon">
 
-            <div class="feature">
-                📚 تحلیل و یادگیری
-            </div>
+                    <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                        stroke-linecap="round"
+                    >
+                        <path d="M9 18h6"/>
+                        <path d="M10 22h4"/>
+                        <path d="M12 2v1"/>
+                        <path d="M4.22 4.22l.71.71"/>
+                        <path d="M1 12h1"/>
+                        <path d="M19.78 4.22l-.71.71"/>
+                        <path d="M23 12h-1"/>
+                        <path d="M12 6a6 6 0 0 0-4 10.5V18h8v-1.5A6 6 0 0 0 12 6z"/>
+                    </svg>
 
-            <div class="feature">
-                🌐 جست‌وجوی وب
-            </div>
+                </div>
 
-            <div class="feature">
-                🇬🇧 زبان انگلیسی
-            </div>
+                <strong>
+                    ایده‌پردازی
+                </strong>
 
-            <div class="feature soon">
-                ✨ امکانات بیشتر • به‌زودی
-            </div>
+                <span>
+                    یک ایده جدید بساز
+                </span>
+
+            </button>
+
+            <button
+                class="quick"
+                data-prompt="این موضوع را مرحله به مرحله و ساده برای من توضیح بده"
+            >
+
+                <div class="quick-icon">
+
+                    <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                        stroke-linecap="round"
+                    >
+                        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+                        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+                    </svg>
+
+                </div>
+
+                <strong>
+                    یادگیری
+                </strong>
+
+                <span>
+                    موضوعی را عمیق بفهم
+                </span>
+
+            </button>
+
+            <button
+                class="quick"
+                data-prompt="یک برنامه حرفه‌ای پایتون برای من بنویس و کد را توضیح بده"
+            >
+
+                <div class="quick-icon">
+
+                    <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                        stroke-linecap="round"
+                    >
+                        <polyline points="16 18 22 12 16 6"/>
+                        <polyline points="8 6 2 12 8 18"/>
+                    </svg>
+
+                </div>
+
+                <strong>
+                    توسعه
+                </strong>
+
+                <span>
+                    کد بنویس و دیباگ کن
+                </span>
+
+            </button>
 
         </div>
 
     </div>
 
-
     <div id="typing">
 
-        در حال نوشتن
+        <div class="typing-box">
 
-        <div class="typing-dots">
+            Whale AI در حال فکر کردن
 
-            <span></span>
-            <span></span>
-            <span></span>
+            <div class="typing-dots">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
 
         </div>
 
@@ -1147,49 +1662,66 @@ button{
 
 </section>
 
+<div class="input-area">
 
-<!-- INPUT -->
+    <div class="input-container">
 
-<div class="input-wrapper">
+        <div class="input-box">
 
-    <div class="input-box">
+            <div class="input-side">
 
-        <textarea
-            id="input"
-            rows="1"
-            placeholder="پیامت را بنویس..."
-            autocomplete="off"
-        ></textarea>
+                <button
+                    class="input-tool"
+                    title="پیوست"
+                >
 
+                    <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                        stroke-linecap="round"
+                    >
+                        <path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l7.88-7.88"/>
+                    </svg>
 
-        <button
-            id="send"
-            type="button"
-            aria-label="ارسال"
-        >
+                </button>
 
-            <!-- SEND ICON -->
+            </div>
 
-            <svg
-                id="sendIcon"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
+            <textarea
+                id="input"
+                rows="1"
+                autocomplete="off"
+                placeholder="از Whale AI چیزی بپرس..."
+            ></textarea>
+
+            <button
+                id="send"
+                title="ارسال"
+                type="button"
             >
-                <path d="M22 2 11 13"/>
-                <path d="m22 2-7 20-4-9-9-4Z"/>
-            </svg>
 
-        </button>
+                <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                >
+                    <path d="M22 2 11 13"/>
+                    <path d="m22 2-7 20-4-9-9-4Z"/>
+                </svg>
 
-    </div>
+            </button>
 
+        </div>
 
-    <div class="hint">
-        Enter برای ارسال • Shift + Enter برای خط جدید • هنگام پاسخ برای توقف کلیک کن
+        <div class="input-hint">
+            Enter برای ارسال • Shift + Enter برای خط جدید
+        </div>
+
     </div>
 
 </div>
@@ -1198,32 +1730,42 @@ button{
 
 </div>
 
-
 <script>
 
-/* =====================================================
+/* =========================================================
+   WEB WHALE ICON
+   URL intentionally assembled so the HTML remains portable.
+========================================================= */
+
+const WHALE_IMAGE =
+    [
+        "https://",
+        "cdn-icons-png.flaticon.com/",
+        "512/8827/8827658.png"
+    ].join("");
+
+document.getElementById("brandWhale").src = WHALE_IMAGE;
+document.getElementById("welcomeWhale").src = WHALE_IMAGE;
+
+
+/* =========================================================
    STATE
-===================================================== */
+========================================================= */
 
 let currentConversationId = null;
-
 let isSending = false;
+let abortController = null;
 
-let currentController = null;
 
-
-/* =====================================================
+/* =========================================================
    ELEMENTS
-===================================================== */
+========================================================= */
 
 const input =
     document.getElementById("input");
 
 const send =
     document.getElementById("send");
-
-const sendIcon =
-    document.getElementById("sendIcon");
 
 const chat =
     document.getElementById("chat");
@@ -1234,133 +1776,188 @@ const typing =
 const welcome =
     document.getElementById("welcome");
 
-const historyButton =
-    document.getElementById("historyButton");
-
 const historyList =
     document.getElementById("historyList");
 
-const newChatButton =
-    document.getElementById("newChatButton");
-
-const clearAll =
-    document.getElementById("clearAll");
-
-const mobileMenu =
-    document.getElementById("mobileMenu");
+const historyCount =
+    document.getElementById("historyCount");
 
 const sidebar =
     document.getElementById("sidebar");
 
-const modelStatus =
-    document.getElementById("modelStatus");
+const overlay =
+    document.getElementById("overlay");
+
+const statusText =
+    document.getElementById("statusText");
 
 
-/* =====================================================
+/* =========================================================
    ICONS
-===================================================== */
+========================================================= */
 
-const SEND_ICON = `
-<svg
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    stroke-width="2"
-    stroke-linecap="round"
-    stroke-linejoin="round"
->
-    <path d="M22 2 11 13"/>
-    <path d="m22 2-7 20-4-9-9-4Z"/>
-</svg>
-`;
+const icons = {
 
-const STOP_ICON = `
-<svg
-    viewBox="0 0 24 24"
-    fill="currentColor"
->
-    <rect
-        x="6"
-        y="6"
-        width="12"
-        height="12"
-        rx="2"
-    />
-</svg>
-`;
+    user: `
+        <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+        >
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+        </svg>
+    `,
+
+    copy: `
+        <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+        >
+            <rect x="9" y="9" width="13" height="13" rx="2"/>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+        </svg>
+    `,
+
+    chat: `
+        <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.7"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+        >
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+        </svg>
+    `,
+
+    trash: `
+        <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+        >
+            <path d="M3 6h18"/>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/>
+            <path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/>
+            <path d="M10 11v6"/>
+            <path d="M14 11v6"/>
+        </svg>
+    `,
+
+    stop: `
+        <svg
+            viewBox="0 0 24 24"
+            fill="currentColor"
+        >
+            <rect
+                x="6"
+                y="6"
+                width="12"
+                height="12"
+                rx="2.5"
+            />
+        </svg>
+    `,
+
+    send: `
+        <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+        >
+            <path d="M22 2 11 13"/>
+            <path d="m22 2-7 20-4-9-9-4Z"/>
+        </svg>
+    `
+};
 
 
-/* =====================================================
-   UI STATE
-===================================================== */
+/* =========================================================
+   UI HELPERS
+========================================================= */
 
-function setSendingState(state){
+function showWelcome(){
+    welcome.style.display = "flex";
+}
 
-    isSending = state;
+function hideWelcome(){
+    welcome.style.display = "none";
+}
 
-    if(state){
+function scrollBottom(){
+
+    requestAnimationFrame(() => {
+        chat.scrollTop = chat.scrollHeight;
+    });
+
+}
+
+
+/* =========================================================
+   SEND BUTTON
+   مهم: هر بار وضعیت پایان پاسخ به این تابع برمی‌گردد.
+========================================================= */
+
+function setSendingUI(value){
+
+    isSending = Boolean(value);
+
+    if(isSending){
 
         send.classList.add("stop");
 
-        send.innerHTML = STOP_ICON;
+        send.title = "توقف";
 
         send.setAttribute(
             "aria-label",
             "توقف پاسخ"
         );
 
-        modelStatus.textContent =
-            "در حال پاسخ‌گویی...";
+        send.innerHTML = icons.stop;
 
-        typing.style.display =
-            "flex";
+        statusText.textContent =
+            "در حال پاسخ‌گویی...";
 
     }else{
 
         send.classList.remove("stop");
 
-        send.innerHTML = SEND_ICON;
+        send.title = "ارسال";
 
         send.setAttribute(
             "aria-label",
-            "ارسال"
+            "ارسال پیام"
         );
 
-        modelStatus.textContent =
+        send.innerHTML = icons.send;
+
+        statusText.textContent =
             "آماده پاسخ‌گویی";
 
-        typing.style.display =
-            "none";
     }
+
 }
 
 
-/* =====================================================
-   WELCOME
-===================================================== */
-
-function showWelcome(){
-
-    welcome.style.display =
-        "block";
-}
-
-
-function hideWelcome(){
-
-    welcome.style.display =
-        "none";
-}
-
-
-/* =====================================================
+/* =========================================================
    ADD MESSAGE
-===================================================== */
+========================================================= */
 
-function addMessage(
-    text,
-    type
-){
+function addMessage(text,type){
 
     hideWelcome();
 
@@ -1369,60 +1966,35 @@ function addMessage(
 
     row.className =
         "message-row " +
-        (
-            type === "user"
-                ? "user-row"
-                : "bot-row"
-        );
-
+        (type === "user"
+            ? "user-row"
+            : "bot-row");
 
     const avatar =
         document.createElement("div");
 
     avatar.className =
         "avatar " +
-        (
-            type === "user"
-                ? "user-avatar"
-                : "bot-avatar"
-        );
-
+        (type === "user"
+            ? "user-avatar"
+            : "bot-avatar");
 
     if(type === "user"){
 
-        avatar.textContent = "👤";
+        avatar.innerHTML =
+            icons.user;
 
     }else{
 
-        avatar.innerHTML = `
-            <svg
-                viewBox="0 0 64 64"
-                fill="none"
-            >
-                <path
-                    d="M9 35c7-18 27-24 43-14
-                    6 4 7 11 2 16
-                    -5 5-13 8-23 8H17
-                    c-7 0-11-4-8-10Z"
-                    fill="white"
-                />
+        const image =
+            document.createElement("img");
 
-                <path
-                    d="M43 22c3-7 9-10 13-10
-                    -1 7-4 11-10 14"
-                    fill="white"
-                />
+        image.src = WHALE_IMAGE;
+        image.alt = "Whale";
 
-                <circle
-                    cx="45"
-                    cy="29"
-                    r="2.5"
-                    fill="#268cff"
-                />
-            </svg>
-        `;
+        avatar.appendChild(image);
+
     }
-
 
     const box =
         document.createElement("div");
@@ -1430,21 +2002,16 @@ function addMessage(
     box.className =
         "message-box";
 
-
     const message =
         document.createElement("div");
 
     message.className =
         "message " +
-        (
-            type === "user"
-                ? "user-message"
-                : "bot-message"
-        );
+        (type === "user"
+            ? "user-message"
+            : "bot-message");
 
-    message.textContent =
-        text;
-
+    message.textContent = text;
 
     box.appendChild(message);
 
@@ -1457,36 +2024,36 @@ function addMessage(
         actions.className =
             "message-actions";
 
-
         const copy =
             document.createElement("button");
 
         copy.className =
-            "action-btn";
+            "message-action";
 
-        copy.textContent =
-            "📋 کپی";
-
+        copy.innerHTML =
+            icons.copy +
+            "<span>کپی</span>";
 
         copy.onclick =
             async () => {
 
                 try{
 
-                    await navigator.clipboard.writeText(
-                        message.textContent
-                    );
+                    await navigator.clipboard
+                        .writeText(
+                            message.textContent
+                        );
 
-                    copy.textContent =
-                        "✓ کپی شد";
+                    copy.innerHTML =
+                        "✓ <span>کپی شد</span>";
 
-                    setTimeout(
-                        () => {
-                            copy.textContent =
-                                "📋 کپی";
-                        },
-                        1500
-                    );
+                    setTimeout(() => {
+
+                        copy.innerHTML =
+                            icons.copy +
+                            "<span>کپی</span>";
+
+                    },1500);
 
                 }catch(error){
 
@@ -1496,10 +2063,10 @@ function addMessage(
 
             };
 
-
         actions.appendChild(copy);
 
         box.appendChild(actions);
+
     }
 
 
@@ -1515,43 +2082,36 @@ function addMessage(
 
     }
 
-
     chat.insertBefore(
         row,
         typing
     );
 
-
-    chat.scrollTop =
-        chat.scrollHeight;
-
+    scrollBottom();
 
     return message;
+
 }
 
 
-/* =====================================================
+/* =========================================================
    CLEAR CHAT
-===================================================== */
+========================================================= */
 
 function clearChat(){
 
     chat
-        .querySelectorAll(
-            ".message-row"
-        )
-        .forEach(
-            element =>
-                element.remove()
-        );
+        .querySelectorAll(".message-row")
+        .forEach(el => el.remove());
 
     showWelcome();
+
 }
 
 
-/* =====================================================
-   CREATE CONVERSATION
-===================================================== */
+/* =========================================================
+   NEW CONVERSATION
+========================================================= */
 
 async function createNewConversation(){
 
@@ -1565,129 +2125,74 @@ async function createNewConversation(){
                 }
             );
 
-
         if(!response.ok){
 
             throw new Error(
-                "خطا در ساخت گفت‌وگو"
+                "خطا در ساخت گفتگو"
             );
-        }
 
+        }
 
         const data =
             await response.json();
 
-
         currentConversationId =
             data.id;
 
-
         clearChat();
 
-
-        sidebar.classList.remove(
-            "open"
-        );
-
+        closeSidebar();
 
         await loadConversations();
 
-
         input.focus();
-
 
     }catch(error){
 
         console.error(error);
 
     }
+
 }
 
 
-/* =====================================================
-   STOP RESPONSE
-===================================================== */
-
-function stopGeneration(){
-
-    if(
-        currentController
-    ){
-
-        currentController.abort();
-
-        currentController =
-            null;
-    }
-
-    setSendingState(false);
-
-    input.disabled = false;
-
-    send.disabled = false;
-
-    input.focus();
-}
-
-
-/* =====================================================
+/* =========================================================
    SEND MESSAGE
-===================================================== */
+========================================================= */
 
 async function sendMessage(){
-
-    /*
-       اگر در حال پاسخ است:
-       همین دکمه = توقف
-    */
 
     if(isSending){
 
         stopGeneration();
 
         return;
-    }
 
+    }
 
     const text =
         input.value.trim();
 
-
     if(!text){
-
-        input.focus();
-
         return;
     }
 
 
-    /*
-       کنترل جدید برای هر درخواست
-    */
-
-    currentController =
-        new AbortController();
-
-
-    setSendingState(true);
-
-
-    send.disabled = false;
-
-    input.disabled = false;
-
+    setSendingUI(true);
 
     addMessage(
         text,
         "user"
     );
 
-
     input.value = "";
 
-    input.style.height =
-        "auto";
+    input.style.height = "auto";
 
+    typing.style.display = "flex";
+
+    abortController =
+        new AbortController();
 
     let botMessage = null;
 
@@ -1706,16 +2211,13 @@ async function sendMessage(){
                     },
 
                     body:JSON.stringify({
-
                         message:text,
-
                         conversation_id:
                             currentConversationId
-
                     }),
 
                     signal:
-                        currentController.signal
+                        abortController.signal
                 }
             );
 
@@ -1725,25 +2227,26 @@ async function sendMessage(){
             const errorData =
                 await response
                     .json()
-                    .catch(
-                        () => ({})
-                    );
-
+                    .catch(() => ({}));
 
             throw new Error(
                 errorData.error ||
                 "خطا در ارتباط با سرور"
             );
+
         }
 
 
         if(!response.body){
 
             throw new Error(
-                "پاسخی از سرور دریافت نشد."
+                "سرور جریان پاسخ را ارسال نکرد."
             );
+
         }
 
+
+        typing.style.display = "none";
 
         botMessage =
             addMessage(
@@ -1755,12 +2258,8 @@ async function sendMessage(){
         const reader =
             response.body.getReader();
 
-
         const decoder =
-            new TextDecoder(
-                "utf-8"
-            );
-
+            new TextDecoder("utf-8");
 
         let buffer = "";
 
@@ -1773,7 +2272,15 @@ async function sendMessage(){
 
             if(result.done){
 
+                /*
+                    مهم:
+                    حتی اگر سرور پیام done
+                    نفرستد، پایان stream باعث
+                    برگشت دکمه می‌شود.
+                */
+
                 break;
+
             }
 
 
@@ -1789,217 +2296,189 @@ async function sendMessage(){
             const lines =
                 buffer.split("\n");
 
-
             buffer =
-                lines.pop() || "";
+                lines.pop();
 
 
-            for(
-                const line of lines
-            ){
+            for(const line of lines){
 
-                const cleanLine =
+                const clean =
                     line.trim();
 
-
-                if(!cleanLine){
-
+                if(!clean){
                     continue;
                 }
-
-
-                let data;
 
 
                 try{
 
-                    data =
-                        JSON.parse(
-                            cleanLine
-                        );
+                    const data =
+                        JSON.parse(clean);
+
+
+                    if(data.type === "text"){
+
+                        if(botMessage){
+
+                            botMessage.textContent +=
+                                data.content || "";
+
+                            scrollBottom();
+
+                        }
+
+                    }
+
+
+                    if(data.type === "done"){
+
+                        if(
+                            data.conversation_id !==
+                            undefined
+                        ){
+
+                            currentConversationId =
+                                data.conversation_id;
+
+                        }
+
+                    }
+
+
+                    if(data.type === "error"){
+
+                        if(botMessage){
+
+                            botMessage.textContent =
+                                data.content ||
+                                "خطای نامشخص";
+
+                        }
+
+                    }
 
                 }catch(parseError){
 
-                    console.warn(
+                    console.debug(
                         "Invalid stream line:",
-                        cleanLine
+                        clean
                     );
 
-                    continue;
-                }
-
-
-                if(
-                    data.type ===
-                    "text"
-                ){
-
-                    if(!botMessage){
-
-                        botMessage =
-                            addMessage(
-                                "",
-                                "bot"
-                            );
-                    }
-
-
-                    botMessage.textContent +=
-                        data.content || "";
-
-
-                    chat.scrollTop =
-                        chat.scrollHeight;
-                }
-
-
-                else if(
-                    data.type ===
-                    "done"
-                ){
-
-                    if(
-                        data.conversation_id
-                    ){
-
-                        currentConversationId =
-                            data.conversation_id;
-                    }
-                }
-
-
-                else if(
-                    data.type ===
-                    "error"
-                ){
-
-                    if(!botMessage){
-
-                        botMessage =
-                            addMessage(
-                                "",
-                                "bot"
-                            );
-                    }
-
-
-                    botMessage.textContent =
-                        data.content ||
-                        "خطایی رخ داد.";
                 }
 
             }
+
         }
 
 
         /*
-           پردازش باقی‌مانده buffer
+            پاسخ کامل شده.
+            دکمه همین‌جا به ارسال برمی‌گردد.
         */
 
-        const lastLine =
-            buffer.trim();
+        typing.style.display = "none";
 
-
-        if(lastLine){
-
-            try{
-
-                const data =
-                    JSON.parse(
-                        lastLine
-                    );
-
-
-                if(
-                    data.type === "done" &&
-                    data.conversation_id
-                ){
-
-                    currentConversationId =
-                        data.conversation_id;
-                }
-
-            }catch(error){
-
-                /* ignore incomplete line */
-            }
-        }
-
+        setSendingUI(false);
 
         await loadConversations();
 
 
     }catch(error){
 
-        /*
-           AbortError خطا نیست؛
-           یعنی کاربر خودش پاسخ را متوقف کرده.
-        */
+        typing.style.display = "none";
 
-        if(
-            error.name ===
-            "AbortError"
-        ){
 
-            if(
-                botMessage &&
-                !botMessage.textContent.trim()
-            ){
+        if(error.name === "AbortError"){
 
-                botMessage.textContent =
-                    "پاسخ متوقف شد.";
+            if(botMessage){
+
+                if(
+                    !botMessage.textContent.trim()
+                ){
+
+                    botMessage.textContent =
+                        "پاسخ متوقف شد.";
+
+                }else{
+
+                    botMessage.textContent +=
+                        "\n\n— پاسخ متوقف شد —";
+
+                }
+
             }
 
         }else{
 
-            console.error(
-                "CHAT ERROR:",
-                error
-            );
+            if(botMessage){
 
-
-            if(!botMessage){
-
-                botMessage =
-                    addMessage(
-                        "",
-                        "bot"
+                botMessage.textContent =
+                    "خطا: " +
+                    (
+                        error.message ||
+                        "ارتباط با سرور برقرار نشد."
                     );
+
+            }else{
+
+                addMessage(
+                    error.message ||
+                    "ارتباط با سرور برقرار نشد.",
+                    "bot"
+                );
+
             }
 
+            console.error(error);
 
-            botMessage.textContent =
-                error.message ||
-                "ارتباط با سرور برقرار نشد.";
         }
 
     }finally{
 
         /*
-           بسیار مهم:
-           در هر حالت، حتی خطا یا توقف،
-           وضعیت ارسال آزاد می‌شود.
+            این بخش تضمین می‌کند
+            دکمه هیچ‌وقت روی STOP گیر نکند.
         */
 
-        currentController =
-            null;
+        typing.style.display = "none";
 
-        setSendingState(false);
+        abortController = null;
 
-        input.disabled =
-            false;
-
-        send.disabled =
-            false;
+        setSendingUI(false);
 
         input.focus();
+
     }
+
 }
 
 
-/* =====================================================
+/* =========================================================
+   STOP GENERATION
+========================================================= */
+
+function stopGeneration(){
+
+    if(
+        abortController
+    ){
+
+        abortController.abort();
+
+        abortController = null;
+
+    }
+
+    typing.style.display = "none";
+
+    setSendingUI(false);
+
+}
+
+
+/* =========================================================
    LOAD CONVERSATIONS
-===================================================== */
+========================================================= */
 
 async function loadConversations(){
 
@@ -2007,46 +2486,39 @@ async function loadConversations(){
 
         const response =
             await fetch(
-                "/conversations",
-                {
-                    cache:"no-store"
-                }
+                "/conversations"
             );
-
 
         if(!response.ok){
 
             throw new Error(
-                "خطا در دریافت تاریخچه"
+                "خطا در تاریخچه"
             );
-        }
 
+        }
 
         const data =
             await response.json();
 
+        historyList.innerHTML = "";
 
-        historyList.innerHTML =
-            "";
+        historyCount.textContent =
+            data.length +
+            " گفتگو";
 
 
-        if(!Array.isArray(data) ||
-           data.length === 0){
+        if(!data.length){
 
             historyList.innerHTML = `
-                <div
-                    style="
-                        padding:15px;
-                        color:#71869d;
-                        font-size:12px;
-                        text-align:center;
-                    "
-                >
+                <div class="empty-history">
                     هنوز گفت‌وگویی وجود ندارد.
+                    <br>
+                    اولین گفت‌وگوی خودت را شروع کن.
                 </div>
             `;
 
             return;
+
         }
 
 
@@ -2070,7 +2542,20 @@ async function loadConversations(){
                     row.classList.add(
                         "active"
                     );
+
                 }
+
+
+                const icon =
+                    document.createElement(
+                        "div"
+                    );
+
+                icon.className =
+                    "conv-icon";
+
+                icon.innerHTML =
+                    icons.chat;
 
 
                 const info =
@@ -2133,8 +2618,11 @@ async function loadConversations(){
                 deleteButton.className =
                     "delete-conversation";
 
-                deleteButton.textContent =
-                    "🗑";
+                deleteButton.innerHTML =
+                    icons.trash;
+
+                deleteButton.title =
+                    "حذف گفتگو";
 
 
                 deleteButton.onclick =
@@ -2145,47 +2633,33 @@ async function loadConversations(){
                         deleteConversation(
                             conversation.id
                         );
+
                     };
 
 
+                row.appendChild(icon);
                 row.appendChild(info);
-
-                row.appendChild(
-                    deleteButton
-                );
-
+                row.appendChild(deleteButton);
 
                 historyList.appendChild(row);
+
             }
         );
 
-
     }catch(error){
 
-        console.error(
-            "HISTORY ERROR:",
-            error
-        );
+        console.error(error);
+
     }
+
 }
 
 
-/* =====================================================
+/* =========================================================
    OPEN CONVERSATION
-===================================================== */
+========================================================= */
 
 async function openConversation(id){
-
-    /*
-       اگر پاسخ قبلی در حال اجراست،
-       اول متوقفش می‌کنیم.
-    */
-
-    if(isSending){
-
-        stopGeneration();
-    }
-
 
     try{
 
@@ -2193,72 +2667,55 @@ async function openConversation(id){
             await fetch(
                 "/conversations/" +
                 id +
-                "/messages",
-                {
-                    cache:"no-store"
-                }
+                "/messages"
             );
-
 
         if(!response.ok){
 
             throw new Error(
-                "خطا در دریافت گفت‌وگو"
+                "خطا در دریافت گفتگو"
             );
-        }
 
+        }
 
         const data =
             await response.json();
 
-
-        currentConversationId =
-            id;
-
+        currentConversationId = id;
 
         clearChat();
 
 
-        if(Array.isArray(data)){
+        data.forEach(message => {
 
-            data.forEach(
-                message => {
-
-                    addMessage(
-                        message.content,
-                        message.role === "user"
-                            ? "user"
-                            : "bot"
-                    );
-                }
+            addMessage(
+                message.content,
+                message.role === "user"
+                    ? "user"
+                    : "bot"
             );
-        }
+
+        });
 
 
-        sidebar.classList.remove(
-            "open"
-        );
-
+        closeSidebar();
 
         await loadConversations();
 
-
         input.focus();
-
 
     }catch(error){
 
-        console.error(
-            "OPEN ERROR:",
-            error
-        );
+        console.error(error);
+
     }
+
 }
 
 
-/* =====================================================
-   DELETE CONVERSATION
-===================================================== */
+/* =========================================================
+   DELETE ONE CONVERSATION
+========================================================= */
 
 async function deleteConversation(id){
 
@@ -2269,6 +2726,7 @@ async function deleteConversation(id){
     ){
 
         return;
+
     }
 
 
@@ -2287,8 +2745,9 @@ async function deleteConversation(id){
         if(!response.ok){
 
             throw new Error(
-                "خطا در حذف گفت‌وگو"
+                "خطا در حذف گفتگو"
             );
+
         }
 
 
@@ -2300,121 +2759,127 @@ async function deleteConversation(id){
                 null;
 
             clearChat();
+
         }
 
 
         await loadConversations();
 
-
     }catch(error){
 
-        console.error(
-            "DELETE ERROR:",
-            error
-        );
+        console.error(error);
+
     }
+
 }
 
 
-/* =====================================================
+/* =========================================================
    DELETE ALL
-===================================================== */
+========================================================= */
 
-clearAll.onclick =
-    async () => {
+async function deleteAll(){
 
-        if(
-            !confirm(
-                "همه گفت‌وگوها حذف شوند؟"
-            )
-        ){
+    if(
+        !confirm(
+            "همه گفت‌وگوها حذف شوند؟"
+        )
+    ){
 
-            return;
-        }
+        return;
 
-
-        /*
-           اگر پاسخ در حال اجراست،
-           اول آن را متوقف می‌کنیم.
-        */
-
-        if(isSending){
-
-            stopGeneration();
-        }
+    }
 
 
-        try{
+    try{
 
-            const response =
-                await fetch(
-                    "/conversations",
-                    {
-                        method:"DELETE"
-                    }
-                );
-
-
-            if(!response.ok){
-
-                throw new Error(
-                    "خطا در حذف گفتگوها"
-                );
-            }
-
-
-            currentConversationId =
-                null;
-
-
-            clearChat();
-
-
-            await loadConversations();
-
-
-        }catch(error){
-
-            console.error(
-                "CLEAR ERROR:",
-                error
+        const response =
+            await fetch(
+                "/conversations",
+                {
+                    method:"DELETE"
+                }
             );
+
+
+        if(!response.ok){
+
+            throw new Error(
+                "خطا در حذف گفتگوها"
+            );
+
         }
-    };
 
 
-/* =====================================================
-   BUTTON EVENTS
-===================================================== */
+        currentConversationId =
+            null;
 
-newChatButton.onclick =
-    createNewConversation;
+        clearChat();
+
+        await loadConversations();
+
+    }catch(error){
+
+        console.error(error);
+
+    }
+
+}
 
 
-historyButton.onclick =
+/* =========================================================
+   SIDEBAR
+========================================================= */
+
+function openSidebar(){
+
+    sidebar.classList.add(
+        "open"
+    );
+
+    overlay.classList.add(
+        "show"
+    );
+
+}
+
+function closeSidebar(){
+
+    sidebar.classList.remove(
+        "open"
+    );
+
+    overlay.classList.remove(
+        "show"
+    );
+
+}
+
+
+/* =========================================================
+   INPUT AUTO RESIZE
+========================================================= */
+
+input.addEventListener(
+    "input",
     () => {
 
-        sidebar.classList.add(
-            "open"
-        );
+        input.style.height =
+            "auto";
 
-        loadConversations();
-    };
+        input.style.height =
+            Math.min(
+                input.scrollHeight,
+                145
+            ) + "px";
 
-
-mobileMenu.onclick =
-    () => {
-
-        sidebar.classList.toggle(
-            "open"
-        );
-    };
+    }
+);
 
 
-/*
-   مهم:
-   یک listener بیشتر برای Enter نداریم.
-*/
+/* =========================================================
+   ENTER
+========================================================= */
 
 input.addEventListener(
     "keydown",
@@ -2428,70 +2893,101 @@ input.addEventListener(
             event.preventDefault();
 
             sendMessage();
+
         }
+
     }
 );
 
 
-/* =====================================================
-   AUTO RESIZE
-===================================================== */
+/* =========================================================
+   BUTTON EVENTS
+========================================================= */
 
-input.addEventListener(
-    "input",
+send.addEventListener(
+    "click",
     () => {
-
-        input.style.height =
-            "auto";
-
-
-        input.style.height =
-            Math.min(
-                input.scrollHeight,
-                150
-            ) +
-            "px";
-    }
-);
-
-
-/* =====================================================
-   SEND BUTTON
-===================================================== */
-
-send.onclick =
-    () => {
-
-        /*
-           همین دکمه:
-           ارسال عادی
-           یا توقف پاسخ
-        */
 
         sendMessage();
-    };
 
-
-/* =====================================================
-   INITIALIZATION
-===================================================== */
-
-(async function init(){
-
-    try{
-
-        await loadConversations();
-
-    }catch(error){
-
-        console.error(error);
     }
+);
 
-    input.focus();
 
-})();
+document.getElementById(
+    "newChatButton"
+).addEventListener(
+    "click",
+    createNewConversation
+);
+
+
+document.getElementById(
+    "clearAll"
+).addEventListener(
+    "click",
+    deleteAll
+);
+
+
+document.getElementById(
+    "mobileMenu"
+).addEventListener(
+    "click",
+    openSidebar
+);
+
+
+document.getElementById(
+    "historyButton"
+).addEventListener(
+    "click",
+    openSidebar
+);
+
+
+overlay.addEventListener(
+    "click",
+    closeSidebar
+);
+
+
+/* =========================================================
+   QUICK PROMPTS
+========================================================= */
+
+document
+    .querySelectorAll(".quick")
+    .forEach(button => {
+
+        button.addEventListener(
+            "click",
+            () => {
+
+                input.value =
+                    button.dataset.prompt;
+
+                input.dispatchEvent(
+                    new Event("input")
+                );
+
+                input.focus();
+
+            }
+        );
+
+    });
+
+
+/* =========================================================
+   INITIAL LOAD
+========================================================= */
+
+loadConversations();
+
+input.focus();
+
 </script>
 
 </body>
 </html>
-```
