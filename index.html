@@ -4,81 +4,71 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#050912">
-
 <title>Whale AI</title>
 
 <style>
-*{
-    box-sizing:border-box;
-}
+*{box-sizing:border-box}
 
 :root{
     --bg:#050912;
-    --panel:#08111f;
-    --panel2:#0d1929;
-    --panel3:#111f32;
+    --panel:#091321;
+    --panel2:#0d1a2a;
+    --panel3:#122238;
     --border:rgba(255,255,255,.08);
-    --border2:rgba(255,255,255,.12);
-    --text:#f5f8ff;
-    --muted:#8da1b7;
+    --text:#f4f8ff;
+    --muted:#8295aa;
     --blue:#278cff;
-    --blue2:#1266d2;
-    --danger:#ff5368;
-    --user:#176fd3;
-    --bot:#101d2d;
+    --blue2:#1263ca;
+    --danger:#ff5269;
+    --green:#32d583;
 }
 
-html,
-body{
+html,body{
     width:100%;
     height:100%;
     margin:0;
+    overflow:hidden;
 }
 
 body{
-    overflow:hidden;
-    color:var(--text);
     font-family:
+        Inter,
         "Segoe UI",
         Tahoma,
         Arial,
         sans-serif;
 
+    color:var(--text);
+
     background:
         radial-gradient(
-            circle at 50% -20%,
-            rgba(25,91,161,.42),
-            transparent 42%
+            circle at 50% -15%,
+            rgba(28,119,225,.25),
+            transparent 38%
         ),
         radial-gradient(
-            circle at 90% 100%,
-            rgba(20,80,150,.15),
+            circle at 100% 100%,
+            rgba(0,100,255,.08),
             transparent 35%
         ),
-        linear-gradient(
-            135deg,
-            #030711,
-            #071321 55%,
-            #040a12
-        );
+        var(--bg);
 }
 
 button,
-textarea,
-input{
-    font:inherit;
+textarea{
+    font-family:inherit;
 }
 
 button{
-    border:0;
     cursor:pointer;
+    border:0;
 }
 
 .app{
     width:100%;
-    height:100%;
+    height:100vh;
     display:flex;
+    overflow:hidden;
 }
 
 /* =========================
@@ -86,72 +76,83 @@ button{
 ========================= */
 
 .sidebar{
-    width:290px;
-    height:100%;
-    flex-shrink:0;
+    width:292px;
+    flex:0 0 292px;
 
     display:flex;
     flex-direction:column;
 
-    background:rgba(6,15,27,.94);
+    background:rgba(7,15,26,.90);
+
     border-left:1px solid var(--border);
 
-    backdrop-filter:blur(22px);
+    backdrop-filter:blur(24px);
 
-    z-index:50;
+    z-index:100;
+
+    transition:right .25s ease;
 }
 
 .brand{
-    padding:20px;
+    height:82px;
+
+    padding:16px 19px;
+
     display:flex;
     align-items:center;
-    gap:13px;
+
+    gap:12px;
 
     border-bottom:1px solid var(--border);
 }
 
-.brand-logo{
-    width:50px;
-    height:50px;
+.logo{
+    width:48px;
+    height:48px;
 
-    border-radius:17px;
+    border-radius:16px;
 
-    display:flex;
-    align-items:center;
-    justify-content:center;
-
-    font-size:28px;
+    display:grid;
+    place-items:center;
 
     background:
         linear-gradient(
             145deg,
-            #2c96ff,
-            #0c438f
+            #2b98ff,
+            #084b9d
         );
 
     box-shadow:
-        0 12px 35px rgba(35,137,255,.25),
-        inset 0 1px rgba(255,255,255,.25);
+        0 10px 35px
+        rgba(35,137,255,.28);
+
+    overflow:hidden;
+}
+
+.logo svg{
+    width:29px;
+    height:29px;
 }
 
 .brand-title{
-    font-size:20px;
+    font-size:19px;
     font-weight:800;
 }
 
 .brand-subtitle{
-    color:var(--muted);
-    font-size:11px;
     margin-top:4px;
+    color:var(--muted);
+    font-size:10px;
 }
 
 .new-chat{
     margin:17px;
+
     padding:13px;
 
     border-radius:13px;
 
-    color:white;
+    color:#fff;
 
     background:
         linear-gradient(
@@ -160,12 +161,14 @@ button{
             var(--blue2)
         );
 
+    box-shadow:
+        0 10px 30px
+        rgba(35,137,255,.18);
+
+    font-size:13px;
     font-weight:700;
 
-    box-shadow:
-        0 10px 30px rgba(35,137,255,.18);
-
-    transition:.2s;
+    transition:.18s;
 }
 
 .new-chat:hover{
@@ -174,17 +177,21 @@ button{
 }
 
 .history-heading{
-    padding:0 18px 10px;
+    padding:
+        0
+        18px
+        10px;
 
-    color:var(--muted);
-    font-size:12px;
+    color:#71859b;
+
+    font-size:11px;
+    font-weight:700;
 }
 
 #historyList{
     flex:1;
     overflow-y:auto;
-
-    padding:0 11px 15px;
+    padding:0 10px 15px;
 }
 
 .conversation{
@@ -193,7 +200,7 @@ button{
 
     gap:7px;
 
-    padding:10px;
+    padding:11px;
 
     margin-bottom:5px;
 
@@ -203,15 +210,19 @@ button{
 }
 
 .conversation:hover{
-    background:rgba(255,255,255,.055);
+    background:rgba(255,255,255,.045);
 }
 
 .conversation.active{
     background:
-        rgba(35,137,255,.13);
+        linear-gradient(
+            90deg,
+            rgba(35,137,255,.15),
+            rgba(35,137,255,.04)
+        );
 
     border:1px solid
-        rgba(35,137,255,.08);
+        rgba(35,137,255,.1);
 }
 
 .conversation-info{
@@ -229,43 +240,50 @@ button{
 }
 
 .conversation-count{
-    margin-top:4px;
-    color:var(--muted);
+    color:#61768b;
     font-size:10px;
+
+    margin-top:4px;
 }
 
 .delete-conversation{
     padding:6px;
 
-    color:#71869d;
+    color:#62778c;
+
     background:transparent;
 
-    border-radius:7px;
+    border-radius:8px;
 }
 
 .delete-conversation:hover{
-    color:#ff7180;
-    background:rgba(255,70,90,.12);
+    color:#ff6478;
+    background:rgba(255,60,80,.1);
 }
 
 .sidebar-bottom{
     padding:12px;
+
     border-top:1px solid var(--border);
 }
 
 .clear-all{
     width:100%;
+
     padding:10px;
+
+    color:#788ba0;
+
+    background:transparent;
 
     border-radius:10px;
 
-    color:#8398ae;
-    background:transparent;
+    font-size:12px;
 }
 
 .clear-all:hover{
-    color:#ff7180;
-    background:rgba(255,255,255,.05);
+    color:#ff6879;
+    background:rgba(255,255,255,.04);
 }
 
 /* =========================
@@ -276,30 +294,25 @@ button{
     flex:1;
     min-width:0;
 
-    height:100%;
-
     display:flex;
     flex-direction:column;
+
+    position:relative;
 }
 
-/* =========================
-   TOPBAR
-========================= */
-
 .topbar{
-    height:76px;
-    flex-shrink:0;
+    height:72px;
+    flex:0 0 72px;
 
     display:flex;
     align-items:center;
     justify-content:space-between;
 
-    padding:0 25px;
+    padding:0 24px;
+
+    background:rgba(5,11,19,.70);
 
     border-bottom:1px solid var(--border);
-
-    background:
-        rgba(5,12,21,.72);
 
     backdrop-filter:blur(20px);
 }
@@ -311,15 +324,16 @@ button{
 }
 
 .status-dot{
-    width:9px;
-    height:9px;
+    width:8px;
+    height:8px;
 
     border-radius:50%;
 
-    background:#31d67b;
+    background:var(--green);
 
     box-shadow:
-        0 0 13px rgba(49,214,123,.75);
+        0 0 13px
+        rgba(50,213,131,.7);
 }
 
 .model-name{
@@ -331,25 +345,31 @@ button{
     margin-top:3px;
 
     color:var(--muted);
-    font-size:11px;
+
+    font-size:10px;
 }
 
 .top-actions{
     display:flex;
-    gap:8px;
+    gap:7px;
 }
 
-.top-actions button,
+.top-btn,
 .mobile-menu{
     padding:9px 12px;
 
-    border-radius:10px;
+    color:#c9d7e6;
 
-    color:#d7e4f3;
+    background:rgba(255,255,255,.045);
 
     border:1px solid var(--border);
 
-    background:rgba(255,255,255,.055);
+    border-radius:10px;
+}
+
+.top-btn:hover,
+.mobile-menu:hover{
+    background:rgba(255,255,255,.08);
 }
 
 .mobile-menu{
@@ -366,8 +386,8 @@ button{
     overflow-y:auto;
 
     padding:
-        35px
-        max(25px,calc((100% - 900px)/2));
+        30px
+        max(20px,calc((100% - 920px)/2));
 
     scroll-behavior:smooth;
 }
@@ -375,39 +395,43 @@ button{
 .welcome{
     text-align:center;
 
-    padding:55px 20px 25px;
-
-    animation:fadeIn .5s ease;
+    padding:
+        50px
+        20px
+        25px;
 }
 
 .welcome-logo{
-    width:90px;
-    height:90px;
+    width:92px;
+    height:92px;
 
     margin:auto;
 
-    display:flex;
-    align-items:center;
-    justify-content:center;
+    display:grid;
+    place-items:center;
 
-    border-radius:29px;
-
-    font-size:46px;
+    border-radius:30px;
 
     background:
         linear-gradient(
             145deg,
-            #2994ff,
-            #0a3978
+            #2997ff,
+            #07458e
         );
 
     box-shadow:
-        0 18px 55px rgba(35,137,255,.25),
-        inset 0 1px rgba(255,255,255,.2);
+        0 18px 55px
+        rgba(30,130,255,.22);
 }
 
-.welcome h2{
+.welcome-logo svg{
+    width:54px;
+    height:54px;
+}
+
+.welcome h1{
     margin:20px 0 8px;
+
     font-size:29px;
 }
 
@@ -419,20 +443,59 @@ button{
     font-size:13px;
 }
 
+.features{
+    margin-top:22px;
+
+    display:flex;
+
+    justify-content:center;
+
+    flex-wrap:wrap;
+
+    gap:8px;
+}
+
+.feature{
+    padding:8px 12px;
+
+    border:1px solid var(--border);
+
+    background:rgba(255,255,255,.035);
+
+    border-radius:10px;
+
+    color:#8da0b4;
+
+    font-size:10px;
+}
+
+.feature.soon{
+    color:#6da9ef;
+
+    border-color:
+        rgba(35,137,255,.16);
+}
+
+/* =========================
+   MESSAGES
+========================= */
+
 .message-row{
     display:flex;
 
-    margin:17px 0;
+    margin:18px 0;
 
     animation:
-        messageIn .22s ease;
+        messageIn
+        .20s
+        ease;
 }
 
-.message-row.user-row{
+.user-row{
     justify-content:flex-start;
 }
 
-.message-row.bot-row{
+.bot-row{
     justify-content:flex-end;
 }
 
@@ -444,25 +507,32 @@ button{
 
     margin:0 8px;
 
+    display:grid;
+    place-items:center;
+
     border-radius:11px;
+}
 
-    display:flex;
-    align-items:center;
-    justify-content:center;
-
-    font-size:16px;
+.avatar svg{
+    width:20px;
+    height:20px;
 }
 
 .user-avatar{
-    background:#145ca9;
+    background:#145ca8;
 }
 
 .bot-avatar{
-    background:#16283d;
+    background:
+        linear-gradient(
+            145deg,
+            #162d47,
+            #0c1929
+        );
 }
 
 .message-box{
-    max-width:min(75%,720px);
+    max-width:min(78%,740px);
 }
 
 .message{
@@ -472,30 +542,29 @@ button{
 
     line-height:1.85;
 
+    font-size:14px;
+
     white-space:pre-wrap;
 
     word-break:break-word;
-
-    font-size:14px;
 }
 
 .user-message{
     background:
         linear-gradient(
             135deg,
-            #1c78df,
-            #145eb5
+            #207fe7,
+            #1259ad
         );
 
     border-bottom-left-radius:5px;
 }
 
 .bot-message{
-    background:
-        rgba(16,30,48,.94);
+    background:rgba(14,28,45,.92);
 
     border:1px solid
-        rgba(255,255,255,.06);
+        rgba(255,255,255,.065);
 
     border-bottom-right-radius:5px;
 }
@@ -503,31 +572,28 @@ button{
 .message-actions{
     display:flex;
 
-    justify-content:flex-start;
+    direction:ltr;
 
-    gap:5px;
+    gap:4px;
 
     margin-top:5px;
-
-    direction:ltr;
 }
 
-.copy-btn{
-    opacity:.5;
-
+.action-btn{
     padding:4px 7px;
 
-    border-radius:6px;
-
-    color:#9bb0c6;
+    color:#8195aa;
 
     background:transparent;
 
-    font-size:11px;
+    border-radius:7px;
+
+    font-size:10px;
 }
 
-.copy-btn:hover{
-    opacity:1;
+.action-btn:hover{
+    color:#c9d7e6;
+
     background:rgba(255,255,255,.05);
 }
 
@@ -539,18 +605,24 @@ button{
     display:none;
 
     align-items:center;
+
     justify-content:flex-end;
 
-    margin:8px 0 15px;
+    margin:
+        7px
+        0
+        15px;
 
-    color:var(--muted);
+    color:#73869a;
 
-    font-size:12px;
+    font-size:11px;
 }
 
 .typing-dots{
     display:flex;
+
     gap:4px;
+
     margin-right:8px;
 }
 
@@ -560,9 +632,12 @@ button{
 
     border-radius:50%;
 
-    background:#7e9ab6;
+    background:#7891ac;
 
-    animation:bounce 1s infinite;
+    animation:
+        bounce
+        1s
+        infinite;
 }
 
 .typing-dots span:nth-child(2){
@@ -578,59 +653,71 @@ button{
 ========================= */
 
 .input-wrapper{
-    padding:15px 20px 20px;
+    flex:none;
+
+    padding:
+        12px
+        20px
+        19px;
 
     background:
         linear-gradient(
             transparent,
-            rgba(4,10,17,.96) 35%
+            rgba(4,9,16,.98) 35%
         );
 }
 
 .input-box{
-    max-width:900px;
+    max-width:920px;
 
     margin:auto;
 
     display:flex;
+
     align-items:flex-end;
 
-    gap:9px;
+    gap:8px;
 
     padding:9px;
 
     background:
-        rgba(13,28,45,.96);
+        rgba(13,27,44,.96);
 
-    border:1px solid
+    border:
+        1px solid
         rgba(255,255,255,.09);
 
-    border-radius:17px;
+    border-radius:18px;
 
     box-shadow:
-        0 15px 45px rgba(0,0,0,.25);
+        0 18px 50px
+        rgba(0,0,0,.28);
 
     transition:.2s;
 }
 
 .input-box:focus-within{
     border-color:
-        rgba(35,137,255,.55);
+        rgba(35,137,255,.5);
 
     box-shadow:
         0 0 0 3px
-        rgba(35,137,255,.08);
+        rgba(35,137,255,.07),
+        0 18px 50px
+        rgba(0,0,0,.28);
 }
 
 #input{
     flex:1;
+
     min-width:0;
 
-    max-height:140px;
+    max-height:150px;
 
     resize:none;
 
     outline:none;
+
     border:0;
 
     background:transparent;
@@ -639,14 +726,16 @@ button{
 
     padding:9px 10px;
 
-    font-size:14px;
-
     line-height:1.6;
+
+    font-size:14px;
 }
 
 #input::placeholder{
-    color:#6e849b;
+    color:#657a91;
 }
+
+/* SEND / STOP */
 
 #send{
     width:44px;
@@ -654,9 +743,8 @@ button{
 
     flex:0 0 44px;
 
-    display:flex;
-    align-items:center;
-    justify-content:center;
+    display:grid;
+    place-items:center;
 
     border-radius:13px;
 
@@ -665,53 +753,55 @@ button{
     background:
         linear-gradient(
             145deg,
-            #248dff,
-            #1265ca
+            #2995ff,
+            #1163c9
         );
 
-    font-size:18px;
+    box-shadow:
+        0 7px 20px
+        rgba(30,130,255,.2);
 
     transition:
-        transform .15s,
-        background .2s,
-        opacity .2s;
+        transform .18s,
+        filter .18s,
+        background .18s;
 }
 
-#send:hover{
-    transform:scale(1.04);
+#send:hover:not(:disabled){
+    transform:translateY(-1px);
+    filter:brightness(1.08);
 }
 
-#send.stop-mode{
+#send.stop{
     background:
         linear-gradient(
             145deg,
-            #ff6173,
-            #d82e45
+            #ff6477,
+            #d52d45
         );
-}
 
-#send.stop-mode:hover{
-    background:
-        linear-gradient(
-            145deg,
-            #ff7180,
-            #e5364d
-        );
+    box-shadow:
+        0 7px 20px
+        rgba(255,70,90,.16);
 }
 
 #send:disabled{
-    opacity:.55;
     cursor:not-allowed;
 }
 
-.hint{
-    text-align:center;
+#send svg{
+    width:21px;
+    height:21px;
+}
 
+.hint{
     margin-top:8px;
 
-    color:#53687c;
+    text-align:center;
 
-    font-size:10px;
+    color:#52677c;
+
+    font-size:9px;
 }
 
 /* =========================
@@ -719,7 +809,7 @@ button{
 ========================= */
 
 ::-webkit-scrollbar{
-    width:7px;
+    width:6px;
 }
 
 ::-webkit-scrollbar-track{
@@ -727,25 +817,14 @@ button{
 }
 
 ::-webkit-scrollbar-thumb{
-    background:#1c3045;
-    border-radius:10px;
+    background:#1b3046;
+
+    border-radius:20px;
 }
 
 /* =========================
    ANIMATION
 ========================= */
-
-@keyframes fadeIn{
-    from{
-        opacity:0;
-        transform:translateY(10px);
-    }
-
-    to{
-        opacity:1;
-        transform:translateY(0);
-    }
-}
 
 @keyframes messageIn{
     from{
@@ -778,13 +857,15 @@ button{
     .sidebar{
         position:fixed;
 
-        right:-300px;
         top:0;
+        right:-305px;
 
-        transition:right .25s ease;
+        height:100vh;
 
         box-shadow:
-            -20px 0 50px rgba(0,0,0,.35);
+            -20px 0
+            60px
+            rgba(0,0,0,.45);
     }
 
     .sidebar.open{
@@ -792,31 +873,42 @@ button{
     }
 
     .mobile-menu{
-        display:block;
+        display:grid;
+        place-items:center;
     }
 
     .topbar{
-        padding:0 14px;
+        height:65px;
+        padding:0 12px;
+    }
+
+    .top-btn{
+        display:none;
     }
 
     #chat{
-        padding:20px 12px;
+        padding:20px 10px;
     }
 
     .message-box{
-        max-width:82%;
+        max-width:84%;
     }
 
     .welcome{
-        padding-top:40px;
+        padding-top:38px;
     }
 
-    .welcome h2{
+    .welcome h1{
         font-size:23px;
     }
 
+    .welcome-logo{
+        width:78px;
+        height:78px;
+    }
+
     .input-wrapper{
-        padding:10px;
+        padding:9px;
     }
 }
 </style>
@@ -826,16 +918,42 @@ button{
 
 <div class="app">
 
-<!-- =========================
-     SIDEBAR
-========================= -->
+<!-- SIDEBAR -->
 
 <aside class="sidebar" id="sidebar">
 
     <div class="brand">
 
-        <div class="brand-logo">
-            🐋
+        <div class="logo">
+            <svg viewBox="0 0 64 64" fill="none">
+                <path
+                    d="M9 35c7-18 27-24 43-14
+                    6 4 7 11 2 16
+                    -5 5-13 8-23 8H17
+                    c-7 0-11-4-8-10Z"
+                    fill="white"
+                />
+
+                <path
+                    d="M43 22c3-7 9-10 13-10
+                    -1 7-4 11-10 14"
+                    fill="white"
+                />
+
+                <circle
+                    cx="45"
+                    cy="29"
+                    r="2.5"
+                    fill="#268cff"
+                />
+
+                <path
+                    d="M15 45c9 5 22 6 33 1"
+                    stroke="#268cff"
+                    stroke-width="3"
+                    stroke-linecap="round"
+                />
+            </svg>
         </div>
 
         <div>
@@ -844,7 +962,7 @@ button{
             </div>
 
             <div class="brand-subtitle">
-                دستیار هوشمند شما
+                دستیار هوشمند نسل جدید
             </div>
         </div>
 
@@ -881,9 +999,7 @@ button{
 </aside>
 
 
-<!-- =========================
-     MAIN
-========================= -->
+<!-- MAIN -->
 
 <main class="main">
 
@@ -898,7 +1014,9 @@ button{
             ☰
         </button>
 
+
         <div class="status-dot"></div>
+
 
         <div>
 
@@ -920,7 +1038,10 @@ button{
 
     <div class="top-actions">
 
-        <button id="historyButton">
+        <button
+            class="top-btn"
+            id="historyButton"
+        >
             🗂 تاریخچه
         </button>
 
@@ -937,16 +1058,75 @@ button{
     >
 
         <div class="welcome-logo">
-            🐋
+
+            <svg viewBox="0 0 64 64" fill="none">
+
+                <path
+                    d="M9 35c7-18 27-24 43-14
+                    6 4 7 11 2 16
+                    -5 5-13 8-23 8H17
+                    c-7 0-11-4-8-10Z"
+                    fill="white"
+                />
+
+                <path
+                    d="M43 22c3-7 9-10 13-10
+                    -1 7-4 11-10 14"
+                    fill="white"
+                />
+
+                <circle
+                    cx="45"
+                    cy="29"
+                    r="2.5"
+                    fill="#268cff"
+                />
+
+                <path
+                    d="M15 45c9 5 22 6 33 1"
+                    stroke="#268cff"
+                    stroke-width="3"
+                    stroke-linecap="round"
+                />
+
+            </svg>
+
         </div>
 
-        <h2>
+
+        <h1>
             به Whale AI خوش آمدی
-        </h2>
+        </h1>
+
 
         <p>
-            هر چیزی می‌خواهی بپرس؛ من آماده‌ام.
+            یک دستیار هوشمند برای فکر کردن، ساختن و یادگیری
         </p>
+
+
+        <div class="features">
+
+            <div class="feature">
+                💬 گفت‌وگوی هوشمند
+            </div>
+
+            <div class="feature">
+                📚 تحلیل و یادگیری
+            </div>
+
+            <div class="feature">
+                🌐 جست‌وجوی وب
+            </div>
+
+            <div class="feature">
+                🇬🇧 زبان انگلیسی
+            </div>
+
+            <div class="feature soon">
+                ✨ امکانات بیشتر • به‌زودی
+            </div>
+
+        </div>
 
     </div>
 
@@ -968,6 +1148,8 @@ button{
 </section>
 
 
+<!-- INPUT -->
+
 <div class="input-wrapper">
 
     <div class="input-box">
@@ -985,14 +1167,29 @@ button{
             type="button"
             aria-label="ارسال"
         >
-            ➤
+
+            <!-- SEND ICON -->
+
+            <svg
+                id="sendIcon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+            >
+                <path d="M22 2 11 13"/>
+                <path d="m22 2-7 20-4-9-9-4Z"/>
+            </svg>
+
         </button>
 
     </div>
 
 
     <div class="hint">
-        Enter برای ارسال • Shift + Enter برای خط جدید
+        Enter برای ارسال • Shift + Enter برای خط جدید • هنگام پاسخ برای توقف کلیک کن
     </div>
 
 </div>
@@ -1004,22 +1201,29 @@ button{
 
 <script>
 
+/* =====================================================
+   STATE
+===================================================== */
+
 let currentConversationId = null;
 
 let isSending = false;
 
-let abortController = null;
+let currentController = null;
 
 
-/* =========================
+/* =====================================================
    ELEMENTS
-========================= */
+===================================================== */
 
 const input =
     document.getElementById("input");
 
 const send =
     document.getElementById("send");
+
+const sendIcon =
+    document.getElementById("sendIcon");
 
 const chat =
     document.getElementById("chat");
@@ -1052,15 +1256,93 @@ const modelStatus =
     document.getElementById("modelStatus");
 
 
-/* =========================
+/* =====================================================
+   ICONS
+===================================================== */
+
+const SEND_ICON = `
+<svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+>
+    <path d="M22 2 11 13"/>
+    <path d="m22 2-7 20-4-9-9-4Z"/>
+</svg>
+`;
+
+const STOP_ICON = `
+<svg
+    viewBox="0 0 24 24"
+    fill="currentColor"
+>
+    <rect
+        x="6"
+        y="6"
+        width="12"
+        height="12"
+        rx="2"
+    />
+</svg>
+`;
+
+
+/* =====================================================
+   UI STATE
+===================================================== */
+
+function setSendingState(state){
+
+    isSending = state;
+
+    if(state){
+
+        send.classList.add("stop");
+
+        send.innerHTML = STOP_ICON;
+
+        send.setAttribute(
+            "aria-label",
+            "توقف پاسخ"
+        );
+
+        modelStatus.textContent =
+            "در حال پاسخ‌گویی...";
+
+        typing.style.display =
+            "flex";
+
+    }else{
+
+        send.classList.remove("stop");
+
+        send.innerHTML = SEND_ICON;
+
+        send.setAttribute(
+            "aria-label",
+            "ارسال"
+        );
+
+        modelStatus.textContent =
+            "آماده پاسخ‌گویی";
+
+        typing.style.display =
+            "none";
+    }
+}
+
+
+/* =====================================================
    WELCOME
-========================= */
+===================================================== */
 
 function showWelcome(){
 
     welcome.style.display =
         "block";
-
 }
 
 
@@ -1068,82 +1350,12 @@ function hideWelcome(){
 
     welcome.style.display =
         "none";
-
 }
 
 
-/* =========================
-   SEND BUTTON STATE
-========================= */
-
-function setSendingState(){
-
-    send.classList.add(
-        "stop-mode"
-    );
-
-    send.textContent =
-        "■";
-
-    send.setAttribute(
-        "aria-label",
-        "توقف"
-    );
-
-    input.disabled = false;
-
-    modelStatus.textContent =
-        "در حال پاسخ‌گویی...";
-
-}
-
-
-function setIdleState(){
-
-    send.classList.remove(
-        "stop-mode"
-    );
-
-    send.textContent =
-        "➤";
-
-    send.setAttribute(
-        "aria-label",
-        "ارسال"
-    );
-
-    input.disabled = false;
-
-    send.disabled = false;
-
-    modelStatus.textContent =
-        "آماده پاسخ‌گویی";
-
-}
-
-
-/* =========================
-   STOP AI
-========================= */
-
-function stopGeneration(){
-
-    if(
-        abortController
-    ){
-
-        abortController.abort();
-
-        abortController = null;
-
-    }
-
-}
-
-
-/* =========================
+/* =====================================================
    ADD MESSAGE
-========================= */
+===================================================== */
 
 function addMessage(
     text,
@@ -1152,12 +1364,8 @@ function addMessage(
 
     hideWelcome();
 
-
     const row =
-        document.createElement(
-            "div"
-        );
-
+        document.createElement("div");
 
     row.className =
         "message-row " +
@@ -1169,10 +1377,7 @@ function addMessage(
 
 
     const avatar =
-        document.createElement(
-            "div"
-        );
-
+        document.createElement("div");
 
     avatar.className =
         "avatar " +
@@ -1183,27 +1388,51 @@ function addMessage(
         );
 
 
-    avatar.textContent =
-        type === "user"
-            ? "👤"
-            : "🐋";
+    if(type === "user"){
+
+        avatar.textContent = "👤";
+
+    }else{
+
+        avatar.innerHTML = `
+            <svg
+                viewBox="0 0 64 64"
+                fill="none"
+            >
+                <path
+                    d="M9 35c7-18 27-24 43-14
+                    6 4 7 11 2 16
+                    -5 5-13 8-23 8H17
+                    c-7 0-11-4-8-10Z"
+                    fill="white"
+                />
+
+                <path
+                    d="M43 22c3-7 9-10 13-10
+                    -1 7-4 11-10 14"
+                    fill="white"
+                />
+
+                <circle
+                    cx="45"
+                    cy="29"
+                    r="2.5"
+                    fill="#268cff"
+                />
+            </svg>
+        `;
+    }
 
 
     const box =
-        document.createElement(
-            "div"
-        );
-
+        document.createElement("div");
 
     box.className =
         "message-box";
 
 
     const message =
-        document.createElement(
-            "div"
-        );
-
+        document.createElement("div");
 
     message.className =
         "message " +
@@ -1213,44 +1442,34 @@ function addMessage(
                 : "bot-message"
         );
 
-
     message.textContent =
         text;
 
 
-    box.appendChild(
-        message
-    );
+    box.appendChild(message);
 
 
     if(type === "bot"){
 
         const actions =
-            document.createElement(
-                "div"
-            );
-
+            document.createElement("div");
 
         actions.className =
             "message-actions";
 
 
         const copy =
-            document.createElement(
-                "button"
-            );
-
+            document.createElement("button");
 
         copy.className =
-            "copy-btn";
-
+            "action-btn";
 
         copy.textContent =
             "📋 کپی";
 
 
         copy.onclick =
-            async function(){
+            async () => {
 
                 try{
 
@@ -1262,56 +1481,37 @@ function addMessage(
                         "✓ کپی شد";
 
                     setTimeout(
-                        function(){
-
+                        () => {
                             copy.textContent =
                                 "📋 کپی";
-
                         },
                         1500
                     );
 
                 }catch(error){
 
-                    console.error(
-                        error
-                    );
+                    console.error(error);
 
                 }
 
             };
 
 
-        actions.appendChild(
-            copy
-        );
+        actions.appendChild(copy);
 
-        box.appendChild(
-            actions
-        );
-
+        box.appendChild(actions);
     }
 
 
     if(type === "user"){
 
-        row.appendChild(
-            box
-        );
-
-        row.appendChild(
-            avatar
-        );
+        row.appendChild(box);
+        row.appendChild(avatar);
 
     }else{
 
-        row.appendChild(
-            avatar
-        );
-
-        row.appendChild(
-            box
-        );
+        row.appendChild(avatar);
+        row.appendChild(box);
 
     }
 
@@ -1327,13 +1527,12 @@ function addMessage(
 
 
     return message;
-
 }
 
 
-/* =========================
+/* =====================================================
    CLEAR CHAT
-========================= */
+===================================================== */
 
 function clearChat(){
 
@@ -1347,22 +1546,14 @@ function clearChat(){
         );
 
     showWelcome();
-
 }
 
 
-/* =========================
-   NEW CONVERSATION
-========================= */
+/* =====================================================
+   CREATE CONVERSATION
+===================================================== */
 
 async function createNewConversation(){
-
-    if(isSending){
-
-        stopGeneration();
-
-    }
-
 
     try{
 
@@ -1378,9 +1569,8 @@ async function createNewConversation(){
         if(!response.ok){
 
             throw new Error(
-                "خطا در ساخت گفتگو"
+                "خطا در ساخت گفت‌وگو"
             );
-
         }
 
 
@@ -1400,40 +1590,62 @@ async function createNewConversation(){
         );
 
 
-        input.focus();
-
-
         await loadConversations();
+
+
+        input.focus();
 
 
     }catch(error){
 
-        console.error(
-            error
-        );
+        console.error(error);
 
     }
-
 }
 
 
-/* =========================
+/* =====================================================
+   STOP RESPONSE
+===================================================== */
+
+function stopGeneration(){
+
+    if(
+        currentController
+    ){
+
+        currentController.abort();
+
+        currentController =
+            null;
+    }
+
+    setSendingState(false);
+
+    input.disabled = false;
+
+    send.disabled = false;
+
+    input.focus();
+}
+
+
+/* =====================================================
    SEND MESSAGE
-========================= */
+===================================================== */
 
 async function sendMessage(){
 
     /*
-     * اگر در حال پاسخ هستیم،
-     * کلیک روی همان دکمه = توقف
-     */
+       اگر در حال پاسخ است:
+       همین دکمه = توقف
+    */
 
     if(isSending){
 
         stopGeneration();
 
         return;
-
     }
 
 
@@ -1443,18 +1655,26 @@ async function sendMessage(){
 
     if(!text){
 
-        return;
+        input.focus();
 
+        return;
     }
 
 
-    isSending = true;
+    /*
+       کنترل جدید برای هر درخواست
+    */
 
-    abortController =
+    currentController =
         new AbortController();
 
 
-    setSendingState();
+    setSendingState(true);
+
+
+    send.disabled = false;
+
+    input.disabled = false;
 
 
     addMessage(
@@ -1469,13 +1689,7 @@ async function sendMessage(){
         "auto";
 
 
-    typing.style.display =
-        "flex";
-
-
     let botMessage = null;
-
-    let streamFinished = false;
 
 
     try{
@@ -1488,10 +1702,7 @@ async function sendMessage(){
 
                     headers:{
                         "Content-Type":
-                            "application/json",
-
-                        "Accept":
-                            "application/x-ndjson"
+                            "application/json"
                     },
 
                     body:JSON.stringify({
@@ -1504,53 +1715,34 @@ async function sendMessage(){
                     }),
 
                     signal:
-                        abortController.signal
+                        currentController.signal
                 }
             );
 
 
         if(!response.ok){
 
-            let errorMessage =
-                "خطا در ارتباط با سرور.";
-
-
-            try{
-
-                const errorData =
-                    await response.json();
-
-
-                if(
-                    errorData.error
-                ){
-
-                    errorMessage =
-                        errorData.error;
-
-                }
-
-            }catch(_){}
+            const errorData =
+                await response
+                    .json()
+                    .catch(
+                        () => ({})
+                    );
 
 
             throw new Error(
-                errorMessage
+                errorData.error ||
+                "خطا در ارتباط با سرور"
             );
-
         }
 
 
         if(!response.body){
 
             throw new Error(
-                "سرور پاسخی ارسال نکرد."
+                "پاسخی از سرور دریافت نشد."
             );
-
         }
-
-
-        typing.style.display =
-            "none";
 
 
         botMessage =
@@ -1581,11 +1773,7 @@ async function sendMessage(){
 
             if(result.done){
 
-                streamFinished =
-                    true;
-
                 break;
-
             }
 
 
@@ -1617,7 +1805,6 @@ async function sendMessage(){
                 if(!cleanLine){
 
                     continue;
-
                 }
 
 
@@ -1631,15 +1818,14 @@ async function sendMessage(){
                             cleanLine
                         );
 
-                }catch(error){
+                }catch(parseError){
 
                     console.warn(
-                        "Invalid stream data:",
+                        "Invalid stream line:",
                         cleanLine
                     );
 
                     continue;
-
                 }
 
 
@@ -1655,7 +1841,6 @@ async function sendMessage(){
                                 "",
                                 "bot"
                             );
-
                     }
 
 
@@ -1665,7 +1850,6 @@ async function sendMessage(){
 
                     chat.scrollTop =
                         chat.scrollHeight;
-
                 }
 
 
@@ -1680,9 +1864,7 @@ async function sendMessage(){
 
                         currentConversationId =
                             data.conversation_id;
-
                     }
-
                 }
 
 
@@ -1698,74 +1880,49 @@ async function sendMessage(){
                                 "",
                                 "bot"
                             );
-
                     }
 
 
                     botMessage.textContent =
                         data.content ||
                         "خطایی رخ داد.";
-
                 }
 
             }
-
         }
 
 
         /*
-         * آخرین داده باقی‌مانده
-         */
+           پردازش باقی‌مانده buffer
+        */
 
-        if(buffer.trim()){
+        const lastLine =
+            buffer.trim();
+
+
+        if(lastLine){
 
             try{
 
                 const data =
                     JSON.parse(
-                        buffer.trim()
+                        lastLine
                     );
 
 
                 if(
-                    data.type ===
-                    "text"
-                    &&
-                    botMessage
-                ){
-
-                    botMessage.textContent +=
-                        data.content || "";
-
-                }
-
-
-                if(
-                    data.type ===
-                    "done"
-                    &&
+                    data.type === "done" &&
                     data.conversation_id
                 ){
 
                     currentConversationId =
                         data.conversation_id;
-
                 }
 
-            }catch(_){}
+            }catch(error){
 
-        }
-
-
-        if(
-            botMessage
-            &&
-            !botMessage.textContent.trim()
-        ){
-
-            botMessage.textContent =
-                "پاسخی دریافت نشد.";
-
+                /* ignore incomplete line */
+            }
         }
 
 
@@ -1775,48 +1932,25 @@ async function sendMessage(){
     }catch(error){
 
         /*
-         * AbortError یعنی کاربر
-         * خودش پاسخ را متوقف کرده.
-         */
+           AbortError خطا نیست؛
+           یعنی کاربر خودش پاسخ را متوقف کرده.
+        */
 
         if(
             error.name ===
             "AbortError"
         ){
 
-            typing.style.display =
-                "none";
+            if(
+                botMessage &&
+                !botMessage.textContent.trim()
+            ){
 
-
-            if(botMessage){
-
-                if(
-                    botMessage.textContent.trim()
-                ){
-
-                    botMessage.textContent +=
-                        "\n\n⏹ پاسخ متوقف شد.";
-
-                }else{
-
-                    botMessage.textContent =
-                        "⏹ پاسخ متوقف شد.";
-
-                }
-
-            }else{
-
-                botMessage =
-                    addMessage(
-                        "⏹ پاسخ متوقف شد.",
-                        "bot"
-                    );
-
+                botMessage.textContent =
+                    "پاسخ متوقف شد.";
             }
 
-        }
-
-        else{
+        }else{
 
             console.error(
                 "CHAT ERROR:",
@@ -1824,67 +1958,48 @@ async function sendMessage(){
             );
 
 
-            typing.style.display =
-                "none";
+            if(!botMessage){
 
-
-            const message =
-                error.message ||
-                "ارتباط با سرور برقرار نشد.";
-
-
-            if(botMessage){
-
-                botMessage.textContent =
-                    message;
-
-            }else{
-
-                addMessage(
-                    message,
-                    "bot"
-                );
-
+                botMessage =
+                    addMessage(
+                        "",
+                        "bot"
+                    );
             }
 
+
+            botMessage.textContent =
+                error.message ||
+                "ارتباط با سرور برقرار نشد.";
         }
 
     }finally{
 
         /*
-         * بسیار مهم:
-         * بعد از هر حالت، ارسال دوباره
-         * آزاد می‌شود.
-         */
+           بسیار مهم:
+           در هر حالت، حتی خطا یا توقف،
+           وضعیت ارسال آزاد می‌شود.
+        */
 
-        typing.style.display =
-            "none";
-
-
-        isSending = false;
-
-
-        abortController =
+        currentController =
             null;
 
+        setSendingState(false);
 
-        setIdleState();
+        input.disabled =
+            false;
 
+        send.disabled =
+            false;
 
         input.focus();
-
-
-        chat.scrollTop =
-            chat.scrollHeight;
-
     }
-
 }
 
 
-/* =========================
+/* =====================================================
    LOAD CONVERSATIONS
-========================= */
+===================================================== */
 
 async function loadConversations(){
 
@@ -1892,7 +2007,10 @@ async function loadConversations(){
 
         const response =
             await fetch(
-                "/conversations"
+                "/conversations",
+                {
+                    cache:"no-store"
+                }
             );
 
 
@@ -1901,7 +2019,6 @@ async function loadConversations(){
             throw new Error(
                 "خطا در دریافت تاریخچه"
             );
-
         }
 
 
@@ -1913,26 +2030,23 @@ async function loadConversations(){
             "";
 
 
-        if(
-            !data.length
-        ){
+        if(!Array.isArray(data) ||
+           data.length === 0){
 
-            historyList.innerHTML =
-                `
+            historyList.innerHTML = `
                 <div
                     style="
-                    padding:15px;
-                    color:#71869d;
-                    font-size:12px;
-                    text-align:center;
+                        padding:15px;
+                        color:#71869d;
+                        font-size:12px;
+                        text-align:center;
                     "
                 >
                     هنوز گفت‌وگویی وجود ندارد.
                 </div>
-                `;
+            `;
 
             return;
-
         }
 
 
@@ -1943,7 +2057,6 @@ async function loadConversations(){
                     document.createElement(
                         "div"
                     );
-
 
                 row.className =
                     "conversation";
@@ -1957,7 +2070,6 @@ async function loadConversations(){
                     row.classList.add(
                         "active"
                     );
-
                 }
 
 
@@ -1965,7 +2077,6 @@ async function loadConversations(){
                     document.createElement(
                         "div"
                     );
-
 
                 info.className =
                     "conversation-info";
@@ -1976,10 +2087,8 @@ async function loadConversations(){
                         "div"
                     );
 
-
                 title.className =
                     "conversation-title";
-
 
                 title.textContent =
                     conversation.title ||
@@ -1991,27 +2100,23 @@ async function loadConversations(){
                         "div"
                     );
 
-
                 count.className =
                     "conversation-count";
 
-
                 count.textContent =
-                    conversation.message_count +
+                    (
+                        conversation.message_count ||
+                        0
+                    ) +
                     " پیام";
 
 
-                info.appendChild(
-                    title
-                );
-
-                info.appendChild(
-                    count
-                );
+                info.appendChild(title);
+                info.appendChild(count);
 
 
                 info.onclick =
-                    function(){
+                    () => {
 
                         openConversation(
                             conversation.id
@@ -2025,41 +2130,32 @@ async function loadConversations(){
                         "button"
                     );
 
-
                 deleteButton.className =
                     "delete-conversation";
-
 
                 deleteButton.textContent =
                     "🗑";
 
 
                 deleteButton.onclick =
-                    function(event){
+                    event => {
 
                         event.stopPropagation();
-
 
                         deleteConversation(
                             conversation.id
                         );
-
                     };
 
 
-                row.appendChild(
-                    info
-                );
+                row.appendChild(info);
 
                 row.appendChild(
                     deleteButton
                 );
 
 
-                historyList.appendChild(
-                    row
-                );
-
+                historyList.appendChild(row);
             }
         );
 
@@ -2067,26 +2163,27 @@ async function loadConversations(){
     }catch(error){
 
         console.error(
+            "HISTORY ERROR:",
             error
         );
-
     }
-
 }
 
 
-/* =========================
+/* =====================================================
    OPEN CONVERSATION
-========================= */
+===================================================== */
 
-async function openConversation(
-    id
-){
+async function openConversation(id){
+
+    /*
+       اگر پاسخ قبلی در حال اجراست،
+       اول متوقفش می‌کنیم.
+    */
 
     if(isSending){
 
         stopGeneration();
-
     }
 
 
@@ -2096,16 +2193,18 @@ async function openConversation(
             await fetch(
                 "/conversations/" +
                 id +
-                "/messages"
+                "/messages",
+                {
+                    cache:"no-store"
+                }
             );
 
 
         if(!response.ok){
 
             throw new Error(
-                "خطا در دریافت گفتگو"
+                "خطا در دریافت گفت‌وگو"
             );
-
         }
 
 
@@ -2120,19 +2219,20 @@ async function openConversation(
         clearChat();
 
 
-        data.forEach(
-            message => {
+        if(Array.isArray(data)){
 
-                addMessage(
-                    message.content,
-                    message.role ===
-                    "user"
-                        ? "user"
-                        : "bot"
-                );
+            data.forEach(
+                message => {
 
-            }
-        );
+                    addMessage(
+                        message.content,
+                        message.role === "user"
+                            ? "user"
+                            : "bot"
+                    );
+                }
+            );
+        }
 
 
         sidebar.classList.remove(
@@ -2149,21 +2249,18 @@ async function openConversation(
     }catch(error){
 
         console.error(
+            "OPEN ERROR:",
             error
         );
-
     }
-
 }
 
 
-/* =========================
-   DELETE
-========================= */
+/* =====================================================
+   DELETE CONVERSATION
+===================================================== */
 
-async function deleteConversation(
-    id
-){
+async function deleteConversation(id){
 
     if(
         !confirm(
@@ -2172,7 +2269,6 @@ async function deleteConversation(
     ){
 
         return;
-
     }
 
 
@@ -2191,22 +2287,19 @@ async function deleteConversation(
         if(!response.ok){
 
             throw new Error(
-                "خطا در حذف گفتگو"
+                "خطا در حذف گفت‌وگو"
             );
-
         }
 
 
         if(
-            currentConversationId ===
-            id
+            currentConversationId === id
         ){
 
             currentConversationId =
                 null;
 
             clearChat();
-
         }
 
 
@@ -2216,27 +2309,19 @@ async function deleteConversation(
     }catch(error){
 
         console.error(
+            "DELETE ERROR:",
             error
         );
-
     }
-
 }
 
 
-/* =========================
+/* =====================================================
    DELETE ALL
-========================= */
+===================================================== */
 
 clearAll.onclick =
-    async function(){
-
-        if(isSending){
-
-            stopGeneration();
-
-        }
-
+    async () => {
 
         if(
             !confirm(
@@ -2245,7 +2330,17 @@ clearAll.onclick =
         ){
 
             return;
+        }
 
+
+        /*
+           اگر پاسخ در حال اجراست،
+           اول آن را متوقف می‌کنیم.
+        */
+
+        if(isSending){
+
+            stopGeneration();
         }
 
 
@@ -2265,7 +2360,6 @@ clearAll.onclick =
                 throw new Error(
                     "خطا در حذف گفتگوها"
                 );
-
             }
 
 
@@ -2282,79 +2376,70 @@ clearAll.onclick =
         }catch(error){
 
             console.error(
+                "CLEAR ERROR:",
                 error
             );
-
         }
-
     };
 
 
-/* =========================
-   EVENTS
-========================= */
+/* =====================================================
+   BUTTON EVENTS
+===================================================== */
 
 newChatButton.onclick =
     createNewConversation;
 
 
 historyButton.onclick =
-    function(){
+    () => {
 
         sidebar.classList.add(
             "open"
         );
 
         loadConversations();
-
     };
 
 
 mobileMenu.onclick =
-    function(){
+    () => {
 
         sidebar.classList.toggle(
             "open"
         );
-
     };
 
 
 /*
- * یک دکمه برای دو کار:
- *
- * حالت عادی → ارسال
- *
- * هنگام پاسخ → توقف
- */
-
-send.onclick =
-    sendMessage;
-
+   مهم:
+   یک listener بیشتر برای Enter نداریم.
+*/
 
 input.addEventListener(
     "keydown",
-    function(event){
+    event => {
 
         if(
-            event.key === "Enter"
-            &&
+            event.key === "Enter" &&
             !event.shiftKey
         ){
 
             event.preventDefault();
 
             sendMessage();
-
         }
-
     }
 );
 
 
+/* =====================================================
+   AUTO RESIZE
+===================================================== */
+
 input.addEventListener(
     "input",
-    function(){
+    () => {
 
         input.style.height =
             "auto";
@@ -2363,21 +2448,48 @@ input.addEventListener(
         input.style.height =
             Math.min(
                 input.scrollHeight,
-                140
-            ) + "px";
-
+                150
+            ) +
+            "px";
     }
 );
 
 
-/* =========================
-   START
-========================= */
+/* =====================================================
+   SEND BUTTON
+===================================================== */
 
-loadConversations();
+send.onclick =
+    () => {
 
-input.focus();
+        /*
+           همین دکمه:
+           ارسال عادی
+           یا توقف پاسخ
+        */
 
+        sendMessage();
+    };
+
+
+/* =====================================================
+   INITIALIZATION
+===================================================== */
+
+(async function init(){
+
+    try{
+
+        await loadConversations();
+
+    }catch(error){
+
+        console.error(error);
+    }
+
+    input.focus();
+
+})();
 </script>
 
 </body>
