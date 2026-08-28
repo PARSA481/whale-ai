@@ -1,630 +1,1098 @@
-```html
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Whale AI</title>
-
-    <style>
-        * {
-            box-sizing: border-box;
-        }
-
-        :root {
-            --bg: #050b14;
-            --panel: #0a1422;
-            --panel2: #0e1b2c;
-            --border: rgba(255,255,255,.08);
-            --text: #f4f8ff;
-            --muted: #8ea3ba;
-            --blue: #2389ff;
-            --blue2: #1466d8;
-            --user: #176fd1;
-            --bot: #101e30;
-        }
-
-        body {
-            margin: 0;
-            height: 100vh;
-            overflow: hidden;
-            font-family: Arial, "Segoe UI", sans-serif;
-            background:
-                radial-gradient(circle at 50% -20%, #12345b 0, transparent 45%),
-                linear-gradient(135deg, #030811, #071321 60%, #040a12);
-            color: var(--text);
-        }
-
-        button,
-        input,
-        textarea {
-            font-family: inherit;
-        }
-
-        button {
-            border: 0;
-            cursor: pointer;
-        }
-
-        .app {
-            width: 100%;
-            height: 100vh;
-            display: flex;
-            overflow: hidden;
-        }
-
-        /* SIDEBAR */
-
-        .sidebar {
-            width: 290px;
-            background: rgba(7, 17, 29, .92);
-            border-left: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-            backdrop-filter: blur(18px);
-            z-index: 20;
-        }
-
-        .brand {
-            padding: 22px;
-            display: flex;
-            align-items: center;
-            gap: 13px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .brand-logo {
-            width: 48px;
-            height: 48px;
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 27px;
-            background: linear-gradient(145deg, #248dff, #104b9e);
-            box-shadow: 0 8px 25px rgba(35,137,255,.25);
-        }
-
-        .brand-title {
-            font-size: 20px;
-            font-weight: 800;
-        }
-
-        .brand-subtitle {
-            color: var(--muted);
-            font-size: 11px;
-            margin-top: 4px;
-        }
-
-        .new-chat {
-            margin: 18px;
-            padding: 13px;
-            border-radius: 13px;
-            background: linear-gradient(135deg, var(--blue), var(--blue2));
-            color: white;
-            font-size: 14px;
-            font-weight: bold;
-            box-shadow: 0 8px 25px rgba(35,137,255,.18);
-            transition: .2s;
-        }
-
-        .new-chat:hover {
-            transform: translateY(-1px);
-            filter: brightness(1.1);
-        }
-
-        .history-heading {
-            padding: 0 18px 10px;
-            color: var(--muted);
-            font-size: 12px;
-        }
-
-        #historyList {
-            flex: 1;
-            overflow-y: auto;
-            padding: 0 12px 15px;
-        }
-
-        .conversation {
-            display: flex;
-            align-items: center;
-            gap: 7px;
-            padding: 10px;
-            margin-bottom: 6px;
-            border-radius: 11px;
-            transition: .2s;
-        }
-
-        .conversation:hover {
-            background: rgba(255,255,255,.055);
-        }
-
-        .conversation.active {
-            background: rgba(35,137,255,.13);
-        }
-
-        .conversation-info {
-            flex: 1;
-            min-width: 0;
-            cursor: pointer;
-        }
-
-        .conversation-title {
-            overflow: hidden;
-            white-space: nowrap;
-            text-overflow: ellipsis;
-            font-size: 13px;
-        }
-
-        .conversation-count {
-            margin-top: 4px;
-            color: var(--muted);
-            font-size: 10px;
-        }
-
-        .delete-conversation {
-            background: transparent;
-            color: #71869d;
-            padding: 6px;
-            border-radius: 7px;
-        }
-
-        .delete-conversation:hover {
-            background: rgba(255,70,90,.12);
-            color: #ff6b7c;
-        }
-
-        .sidebar-bottom {
-            border-top: 1px solid var(--border);
-            padding: 12px;
-        }
-
-        .clear-all {
-            width: 100%;
-            padding: 10px;
-            border-radius: 10px;
-            background: transparent;
-            color: #8398ae;
-        }
-
-        .clear-all:hover {
-            background: rgba(255,255,255,.05);
-            color: #ff7180;
-        }
-
-        /* MAIN */
-
-        .main {
-            flex: 1;
-            min-width: 0;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-        }
-
-        .topbar {
-            height: 76px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 25px;
-            border-bottom: 1px solid var(--border);
-            background: rgba(5,12,21,.72);
-            backdrop-filter: blur(18px);
-        }
-
-        .mobile-menu {
-            display: none;
-            background: rgba(255,255,255,.06);
-            color: white;
-            border-radius: 10px;
-            padding: 9px 11px;
-            font-size: 18px;
-        }
-
-        .model-info {
-            display: flex;
-            align-items: center;
-            gap: 9px;
-        }
-
-        .status-dot {
-            width: 9px;
-            height: 9px;
-            border-radius: 50%;
-            background: #31d67b;
-            box-shadow: 0 0 12px rgba(49,214,123,.7);
-        }
-
-        .model-name {
-            font-size: 14px;
-            font-weight: bold;
-        }
-
-        .model-status {
-            color: var(--muted);
-            font-size: 11px;
-            margin-top: 3px;
-        }
-
-        .top-actions button {
-            background: rgba(255,255,255,.055);
-            color: #d7e4f3;
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 9px 12px;
-        }
-
-        /* CHAT */
-
-        #chat {
-            flex: 1;
-            overflow-y: auto;
-            padding: 35px max(25px, calc((100% - 900px) / 2));
-            scroll-behavior: smooth;
-        }
-
-        .welcome {
-            text-align: center;
-            padding: 55px 20px 25px;
-            animation: fadeIn .5s ease;
-        }
-
-        .welcome-logo {
-            width: 82px;
-            height: 82px;
-            margin: auto;
-            border-radius: 27px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 43px;
-            background: linear-gradient(145deg, #248dff, #0c3977);
-            box-shadow:
-                0 15px 45px rgba(35,137,255,.25),
-                inset 0 1px rgba(255,255,255,.2);
-        }
-
-        .welcome h2 {
-            margin: 20px 0 8px;
-            font-size: 28px;
-        }
-
-        .welcome p {
-            margin: 0;
-            color: var(--muted);
-            font-size: 13px;
-        }
-
-        .message-row {
-            display: flex;
-            margin: 17px 0;
-            animation: messageIn .25s ease;
-        }
-
-        .message-row.user-row {
-            justify-content: flex-start;
-        }
-
-        .message-row.bot-row {
-            justify-content: flex-end;
-        }
-
-        .avatar {
-            width: 32px;
-            height: 32px;
-            flex: 0 0 32px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 8px;
-            font-size: 16px;
-        }
-
-        .user-avatar {
-            background: #145ca9;
-        }
-
-        .bot-avatar {
-            background: #16283d;
-        }
-
-        .message-box {
-            max-width: min(75%, 720px);
-        }
-
-        .message {
-            padding: 13px 16px;
-            border-radius: 17px;
-            line-height: 1.8;
-            white-space: pre-wrap;
-            word-break: break-word;
-            font-size: 14px;
-        }
-
-        .user-message {
-            background: linear-gradient(135deg, #1c78df, #145eb5);
-            border-bottom-left-radius: 5px;
-        }
-
-        .bot-message {
-            background: rgba(16,30,48,.92);
-            border: 1px solid rgba(255,255,255,.06);
-            border-bottom-right-radius: 5px;
-        }
-
-        .message-actions {
-            display: flex;
-            justify-content: flex-start;
-            gap: 5px;
-            margin-top: 5px;
-            direction: ltr;
-        }
-
-        .copy-btn {
-            opacity: .5;
-            background: transparent;
-            color: #9bb0c6;
-            padding: 4px 7px;
-            border-radius: 6px;
-            font-size: 11px;
-        }
-
-        .copy-btn:hover {
-            opacity: 1;
-            background: rgba(255,255,255,.05);
-        }
-
-        #typing {
-            display: none;
-            align-items: center;
-            justify-content: flex-end;
-            color: var(--muted);
-            font-size: 12px;
-            margin: 8px 0 15px;
-        }
-
-        .typing-dots {
-            display: flex;
-            gap: 4px;
-            margin-right: 8px;
-        }
-
-        .typing-dots span {
-            width: 5px;
-            height: 5px;
-            background: #7e9ab6;
-            border-radius: 50%;
-            animation: bounce 1s infinite;
-        }
-
-        .typing-dots span:nth-child(2) {
-            animation-delay: .15s;
-        }
-
-        .typing-dots span:nth-child(3) {
-            animation-delay: .3s;
-        }
-
-        /* INPUT */
-
-        .input-wrapper {
-            padding: 15px 20px 20px;
-            background: linear-gradient(transparent, rgba(4,10,17,.96) 35%);
-        }
-
-        .input-box {
-            max-width: 900px;
-            margin: auto;
-            display: flex;
-            align-items: flex-end;
-            gap: 9px;
-            padding: 9px;
-            background: rgba(13,28,45,.95);
-            border: 1px solid rgba(255,255,255,.09);
-            border-radius: 17px;
-            box-shadow: 0 15px 45px rgba(0,0,0,.25);
-            transition: .2s;
-        }
-
-        .input-box:focus-within {
-            border-color: rgba(35,137,255,.55);
-            box-shadow: 0 0 0 3px rgba(35,137,255,.08);
-        }
-
-        #input {
-            flex: 1;
-            min-width: 0;
-            max-height: 140px;
-            resize: none;
-            border: 0;
-            outline: 0;
-            background: transparent;
-            color: white;
-            padding: 9px 10px;
-            font-size: 14px;
-            line-height: 1.6;
-        }
-
-        #input::placeholder {
-            color: #6e849b;
-        }
-
-        #send {
-            width: 43px;
-            height: 43px;
-            flex: 0 0 43px;
-            border-radius: 12px;
-            background: linear-gradient(145deg, #248dff, #1265ca);
-            color: white;
-            font-size: 18px;
-            transition: .2s;
-        }
-
-        #send:hover {
-            transform: scale(1.04);
-        }
-
-        #send:disabled {
-            opacity: .45;
-            transform: none;
-            cursor: not-allowed;
-        }
-
-        .hint {
-            text-align: center;
-            color: #53687c;
-            font-size: 10px;
-            margin-top: 8px;
-        }
-
-        /* SCROLLBAR */
-
-        ::-webkit-scrollbar {
-            width: 7px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: #1c3045;
-            border-radius: 10px;
-        }
-
-        /* ANIMATIONS */
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes messageIn {
-            from {
-                opacity: 0;
-                transform: translateY(5px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes bounce {
-            0%, 60%, 100% {
-                transform: translateY(0);
-            }
-
-            30% {
-                transform: translateY(-4px);
-            }
-        }
-
-        /* MOBILE */
-
-        @media (max-width: 750px) {
-
-            .sidebar {
-                position: fixed;
-                right: -300px;
-                top: 0;
-                height: 100vh;
-                transition: right .25s ease;
-                box-shadow: -20px 0 50px rgba(0,0,0,.35);
-            }
-
-            .sidebar.open {
-                right: 0;
-            }
-
-            .mobile-menu {
-                display: block;
-            }
-
-            .topbar {
-                padding: 0 14px;
-            }
-
-            #chat {
-                padding: 20px 12px;
-            }
-
-            .message-box {
-                max-width: 82%;
-            }
-
-            .welcome {
-                padding-top: 40px;
-            }
-
-            .welcome h2 {
-                font-size: 23px;
-            }
-
-            .input-wrapper {
-                padding: 10px;
-            }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#07111f">
+<title>Whale AI</title>
+
+<style>
+*{box-sizing:border-box}
+
+:root{
+    --bg:#050914;
+    --bg2:#08111f;
+    --panel:rgba(10,20,35,.78);
+    --panel2:rgba(15,29,48,.9);
+    --border:rgba(255,255,255,.08);
+    --border2:rgba(255,255,255,.13);
+    --text:#f4f8ff;
+    --muted:#8499b0;
+    --blue:#278cff;
+    --blue2:#1263d1;
+    --cyan:#42c8ff;
+    --user:#1675df;
+    --bot:#0d1b2d;
+    --danger:#ff6577;
+    --shadow:0 20px 60px rgba(0,0,0,.3);
+}
+
+html,body{
+    width:100%;
+    height:100%;
+    margin:0;
+}
+
+body{
+    overflow:hidden;
+    color:var(--text);
+    font-family:
+        "Segoe UI",
+        Tahoma,
+        Arial,
+        sans-serif;
+
+    background:
+        radial-gradient(
+            circle at 50% -10%,
+            rgba(25,104,185,.35),
+            transparent 38%
+        ),
+        radial-gradient(
+            circle at 90% 80%,
+            rgba(20,70,140,.15),
+            transparent 30%
+        ),
+        linear-gradient(
+            135deg,
+            #030711,
+            #071321 55%,
+            #030811
+        );
+}
+
+button,
+textarea,
+input{
+    font-family:inherit;
+}
+
+button{
+    border:0;
+    cursor:pointer;
+}
+
+.app{
+    width:100%;
+    height:100vh;
+    display:flex;
+}
+
+/* =========================
+   SIDEBAR
+========================= */
+
+.sidebar{
+    width:292px;
+    height:100vh;
+    flex:0 0 292px;
+    display:flex;
+    flex-direction:column;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(7,16,29,.96),
+            rgba(5,12,22,.94)
+        );
+
+    border-left:1px solid var(--border);
+    backdrop-filter:blur(25px);
+
+    z-index:100;
+    transition:.28s ease;
+}
+
+.brand{
+    padding:20px 19px;
+    display:flex;
+    align-items:center;
+    gap:13px;
+    border-bottom:1px solid var(--border);
+}
+
+.brand-logo{
+    width:49px;
+    height:49px;
+    flex:0 0 49px;
+    border-radius:16px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-size:27px;
+
+    background:
+        radial-gradient(
+            circle at 30% 20%,
+            #62c9ff,
+            transparent 35%
+        ),
+        linear-gradient(
+            145deg,
+            #278dff,
+            #0b397b
+        );
+
+    box-shadow:
+        0 10px 35px rgba(35,137,255,.3),
+        inset 0 1px 1px rgba(255,255,255,.25);
+}
+
+.brand-title{
+    font-size:20px;
+    font-weight:800;
+    letter-spacing:.2px;
+}
+
+.brand-subtitle{
+    margin-top:4px;
+    color:var(--muted);
+    font-size:11px;
+}
+
+.new-chat{
+    margin:17px;
+    padding:14px 15px;
+
+    border-radius:14px;
+
+    color:white;
+    font-size:13px;
+    font-weight:700;
+
+    background:
+        linear-gradient(
+            135deg,
+            #278eff,
+            #125fca
+        );
+
+    box-shadow:
+        0 10px 30px rgba(35,137,255,.2);
+
+    transition:.2s;
+}
+
+.new-chat:hover{
+    transform:translateY(-1px);
+    filter:brightness(1.08);
+}
+
+.new-chat:active{
+    transform:scale(.98);
+}
+
+.history-heading{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    padding:0 18px 10px;
+
+    color:var(--muted);
+    font-size:11px;
+    font-weight:600;
+}
+
+#historyList{
+    flex:1;
+    overflow-y:auto;
+    padding:0 10px 15px;
+}
+
+.conversation{
+    position:relative;
+
+    display:flex;
+    align-items:center;
+    gap:8px;
+
+    padding:11px 10px;
+    margin-bottom:5px;
+
+    border:1px solid transparent;
+    border-radius:12px;
+
+    transition:.18s;
+}
+
+.conversation:hover{
+    background:rgba(255,255,255,.045);
+    border-color:rgba(255,255,255,.04);
+}
+
+.conversation.active{
+    background:
+        linear-gradient(
+            90deg,
+            rgba(35,137,255,.15),
+            rgba(35,137,255,.04)
+        );
+
+    border-color:rgba(35,137,255,.12);
+}
+
+.conversation-info{
+    min-width:0;
+    flex:1;
+    cursor:pointer;
+}
+
+.conversation-title{
+    overflow:hidden;
+    white-space:nowrap;
+    text-overflow:ellipsis;
+
+    font-size:12px;
+}
+
+.conversation-count{
+    margin-top:4px;
+    color:#647a91;
+    font-size:10px;
+}
+
+.delete-conversation{
+    padding:6px;
+    border-radius:8px;
+
+    background:transparent;
+    color:#667c92;
+
+    opacity:.45;
+    transition:.2s;
+}
+
+.conversation:hover .delete-conversation{
+    opacity:1;
+}
+
+.delete-conversation:hover{
+    color:var(--danger);
+    background:rgba(255,80,100,.1);
+}
+
+.sidebar-bottom{
+    padding:12px;
+    border-top:1px solid var(--border);
+}
+
+.clear-all{
+    width:100%;
+    padding:10px;
+
+    border-radius:10px;
+
+    color:#788da3;
+    background:transparent;
+
+    font-size:11px;
+}
+
+.clear-all:hover{
+    color:var(--danger);
+    background:rgba(255,255,255,.04);
+}
+
+/* =========================
+   MAIN
+========================= */
+
+.main{
+    min-width:0;
+    flex:1;
+    height:100vh;
+
+    display:flex;
+    flex-direction:column;
+
+    position:relative;
+}
+
+/* =========================
+   TOPBAR
+========================= */
+
+.topbar{
+    height:72px;
+    flex:0 0 72px;
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    padding:0 24px;
+
+    background:rgba(5,12,21,.65);
+    border-bottom:1px solid var(--border);
+
+    backdrop-filter:blur(22px);
+
+    z-index:10;
+}
+
+.model-info{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.status-dot{
+    width:9px;
+    height:9px;
+
+    border-radius:50%;
+
+    background:#35db82;
+
+    box-shadow:
+        0 0 12px rgba(53,219,130,.75);
+}
+
+.model-name{
+    font-size:14px;
+    font-weight:800;
+}
+
+.model-status{
+    margin-top:3px;
+    color:var(--muted);
+    font-size:10px;
+}
+
+.top-actions{
+    display:flex;
+    align-items:center;
+    gap:8px;
+}
+
+.top-button{
+    padding:9px 12px;
+
+    border-radius:10px;
+
+    color:#c8d8e8;
+
+    background:rgba(255,255,255,.045);
+    border:1px solid var(--border);
+
+    transition:.2s;
+}
+
+.top-button:hover{
+    background:rgba(255,255,255,.08);
+    border-color:var(--border2);
+}
+
+.mobile-menu{
+    display:none;
+
+    width:39px;
+    height:39px;
+
+    border-radius:11px;
+
+    color:white;
+    background:rgba(255,255,255,.06);
+    border:1px solid var(--border);
+
+    font-size:17px;
+}
+
+/* =========================
+   CHAT
+========================= */
+
+#chat{
+    flex:1;
+    overflow-y:auto;
+
+    padding:
+        35px
+        max(20px, calc((100% - 920px) / 2))
+        30px;
+}
+
+.welcome{
+    max-width:700px;
+    margin:auto;
+
+    padding:55px 20px 35px;
+
+    text-align:center;
+
+    animation:fadeIn .5s ease;
+}
+
+.welcome-logo{
+    width:94px;
+    height:94px;
+
+    margin:auto;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    border-radius:30px;
+
+    font-size:48px;
+
+    background:
+        radial-gradient(
+            circle at 30% 20%,
+            #58c7ff,
+            transparent 30%
+        ),
+        linear-gradient(
+            145deg,
+            #258cff,
+            #0a397b
+        );
+
+    box-shadow:
+        0 20px 60px rgba(35,137,255,.25),
+        inset 0 1px 2px rgba(255,255,255,.25);
+}
+
+.welcome h1{
+    margin:22px 0 8px;
+
+    font-size:30px;
+    letter-spacing:-.5px;
+}
+
+.welcome p{
+    margin:0;
+
+    color:var(--muted);
+    font-size:13px;
+}
+
+.quick-actions{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:10px;
+
+    max-width:690px;
+
+    margin:30px auto 0;
+}
+
+.quick-card{
+    padding:15px 12px;
+
+    text-align:right;
+
+    border-radius:14px;
+
+    color:#cbd9e7;
+
+    background:rgba(255,255,255,.035);
+    border:1px solid var(--border);
+
+    transition:.2s;
+}
+
+.quick-card:hover{
+    transform:translateY(-2px);
+    background:rgba(35,137,255,.07);
+    border-color:rgba(35,137,255,.2);
+}
+
+.quick-icon{
+    font-size:20px;
+    margin-bottom:8px;
+}
+
+.quick-title{
+    font-size:12px;
+    font-weight:700;
+}
+
+.quick-desc{
+    margin-top:4px;
+    color:#6e849b;
+    font-size:10px;
+}
+
+/* =========================
+   MESSAGES
+========================= */
+
+.message-row{
+    display:flex;
+    margin:17px 0;
+
+    animation:
+        messageIn
+        .25s
+        ease;
+}
+
+.message-row.user-row{
+    justify-content:flex-start;
+}
+
+.message-row.bot-row{
+    justify-content:flex-end;
+}
+
+.avatar{
+    width:34px;
+    height:34px;
+    flex:0 0 34px;
+
+    margin:0 8px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    border-radius:11px;
+
+    font-size:16px;
+}
+
+.user-avatar{
+    background:
+        linear-gradient(
+            145deg,
+            #237fe3,
+            #124c91
+        );
+}
+
+.bot-avatar{
+    background:
+        linear-gradient(
+            145deg,
+            #172b43,
+            #0d1929
+        );
+
+    border:1px solid rgba(255,255,255,.07);
+}
+
+.message-box{
+    max-width:min(78%,740px);
+}
+
+.message{
+    padding:14px 17px;
+
+    border-radius:18px;
+
+    line-height:1.85;
+
+    white-space:pre-wrap;
+    word-break:break-word;
+
+    font-size:14px;
+}
+
+.user-message{
+    background:
+        linear-gradient(
+            135deg,
+            #1c7be2,
+            #125eaf
+        );
+
+    border-bottom-left-radius:5px;
+
+    box-shadow:
+        0 8px 25px rgba(20,100,190,.12);
+}
+
+.bot-message{
+    background:
+        linear-gradient(
+            145deg,
+            rgba(16,31,49,.95),
+            rgba(11,23,38,.95)
+        );
+
+    border:1px solid rgba(255,255,255,.065);
+
+    border-bottom-right-radius:5px;
+}
+
+.message-actions{
+    display:flex;
+    gap:5px;
+
+    margin-top:5px;
+
+    direction:ltr;
+}
+
+.copy-btn{
+    padding:4px 8px;
+
+    border-radius:7px;
+
+    background:transparent;
+
+    color:#8096ad;
+
+    font-size:10px;
+
+    opacity:.6;
+}
+
+.copy-btn:hover{
+    opacity:1;
+    background:rgba(255,255,255,.05);
+}
+
+/* =========================
+   TYPING
+========================= */
+
+#typing{
+    display:none;
+
+    align-items:center;
+    justify-content:flex-end;
+
+    margin:10px 0 16px;
+
+    color:var(--muted);
+
+    font-size:11px;
+}
+
+.typing-dots{
+    display:flex;
+    gap:4px;
+
+    margin-right:8px;
+}
+
+.typing-dots span{
+    width:5px;
+    height:5px;
+
+    border-radius:50%;
+
+    background:#7892ad;
+
+    animation:bounce 1s infinite;
+}
+
+.typing-dots span:nth-child(2){
+    animation-delay:.15s;
+}
+
+.typing-dots span:nth-child(3){
+    animation-delay:.3s;
+}
+
+/* =========================
+   COMPOSER
+========================= */
+
+.input-wrapper{
+    padding:12px 20px 18px;
+
+    background:
+        linear-gradient(
+            transparent,
+            rgba(4,10,17,.98) 35%
+        );
+}
+
+.input-box{
+    max-width:920px;
+
+    margin:auto;
+
+    display:flex;
+    align-items:flex-end;
+    gap:8px;
+
+    padding:9px;
+
+    border-radius:19px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(16,32,51,.97),
+            rgba(9,22,37,.97)
+        );
+
+    border:1px solid rgba(255,255,255,.1);
+
+    box-shadow:
+        0 18px 55px rgba(0,0,0,.3);
+
+    transition:.2s;
+}
+
+.input-box:focus-within{
+    border-color:rgba(39,140,255,.48);
+
+    box-shadow:
+        0 0 0 3px rgba(39,140,255,.07),
+        0 18px 55px rgba(0,0,0,.3);
+}
+
+.tool-buttons{
+    display:flex;
+    gap:5px;
+    padding-bottom:1px;
+}
+
+.tool-button{
+    width:38px;
+    height:38px;
+
+    border-radius:11px;
+
+    color:#91a7bd;
+
+    background:rgba(255,255,255,.035);
+    border:1px solid rgba(255,255,255,.05);
+
+    transition:.2s;
+}
+
+.tool-button:hover{
+    color:white;
+    background:rgba(255,255,255,.08);
+}
+
+#input{
+    flex:1;
+    min-width:0;
+
+    max-height:145px;
+
+    resize:none;
+
+    outline:none;
+    border:0;
+
+    background:transparent;
+
+    color:white;
+
+    padding:9px 8px;
+
+    font-size:14px;
+    line-height:1.7;
+}
+
+#input::placeholder{
+    color:#647b92;
+}
+
+#send{
+    width:43px;
+    height:43px;
+    flex:0 0 43px;
+
+    border-radius:13px;
+
+    color:white;
+
+    background:
+        linear-gradient(
+            145deg,
+            #2993ff,
+            #1263c7
+        );
+
+    font-size:18px;
+
+    box-shadow:
+        0 8px 22px rgba(35,137,255,.2);
+
+    transition:.2s;
+}
+
+#send:hover{
+    transform:scale(1.04);
+}
+
+#send:active{
+    transform:scale(.97);
+}
+
+#send:disabled{
+    opacity:.45;
+    cursor:not-allowed;
+    transform:none;
+}
+
+.hint{
+    text-align:center;
+
+    margin-top:8px;
+
+    color:#4e6378;
+
+    font-size:9px;
+}
+
+/* =========================
+   SCROLLBAR
+========================= */
+
+::-webkit-scrollbar{
+    width:6px;
+}
+
+::-webkit-scrollbar-track{
+    background:transparent;
+}
+
+::-webkit-scrollbar-thumb{
+    background:#1b3047;
+    border-radius:10px;
+}
+
+/* =========================
+   ANIMATIONS
+========================= */
+
+@keyframes fadeIn{
+    from{
+        opacity:0;
+        transform:translateY(12px);
+    }
+
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+
+@keyframes messageIn{
+    from{
+        opacity:0;
+        transform:translateY(6px);
+    }
+
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+
+@keyframes bounce{
+    0%,60%,100%{
+        transform:translateY(0);
+    }
+
+    30%{
+        transform:translateY(-5px);
+    }
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media(max-width:750px){
+
+    .sidebar{
+        position:fixed;
+
+        right:-305px;
+        top:0;
+
+        width:292px;
+
+        box-shadow:
+            -25px 0 60px rgba(0,0,0,.4);
+    }
+
+    .sidebar.open{
+        right:0;
+    }
+
+    .mobile-menu{
+        display:block;
+    }
+
+    .topbar{
+        height:65px;
+        flex-basis:65px;
+
+        padding:0 12px;
+    }
+
+    .top-button{
+        font-size:11px;
+        padding:8px 9px;
+    }
+
+    #chat{
+        padding:20px 11px 20px;
+    }
+
+    .welcome{
+        padding-top:38px;
+    }
+
+    .welcome-logo{
+        width:78px;
+        height:78px;
+        border-radius:25px;
+        font-size:39px;
+    }
+
+    .welcome h1{
+        font-size:23px;
+    }
+
+    .quick-actions{
+        grid-template-columns:1fr;
+        gap:8px;
+    }
+
+    .quick-card{
+        padding:12px;
+    }
+
+    .message-box{
+        max-width:84%;
+    }
+
+    .message{
+        font-size:13px;
+        padding:12px 14px;
+    }
+
+    .input-wrapper{
+        padding:8px 8px 12px;
+    }
+
+    .tool-button{
+        display:none;
+    }
+
+    .input-box{
+        border-radius:16px;
+    }
+
+    .hint{
+        font-size:8px;
+    }
+}
+
+@media(max-width:420px){
+
+    .model-status{
+        display:none;
+    }
+
+    .history-button-text{
+        display:none;
+    }
+
+    .message-box{
+        max-width:88%;
+    }
+
+    .avatar{
+        width:30px;
+        height:30px;
+        flex-basis:30px;
+        margin:0 5px;
+    }
+}
+</style>
 </head>
 
 <body>
 
 <div class="app">
 
+    <!-- ================= SIDEBAR ================= -->
+
     <aside class="sidebar" id="sidebar">
 
         <div class="brand">
-            <div class="brand-logo">🐋</div>
+
+            <div class="brand-logo">
+                🐋
+            </div>
 
             <div>
-                <div class="brand-title">Whale AI</div>
-                <div class="brand-subtitle">دستیار هوشمند شما</div>
+                <div class="brand-title">
+                    Whale AI
+                </div>
+
+                <div class="brand-subtitle">
+                    دستیار هوشمند شما
+                </div>
             </div>
+
         </div>
 
-        <button class="new-chat" id="newChatButton">
+
+        <button
+            class="new-chat"
+            id="newChatButton"
+        >
             ＋ گفت‌وگوی جدید
         </button>
 
+
         <div class="history-heading">
-            گفت‌وگوهای اخیر
+            <span>گفت‌وگوهای اخیر</span>
         </div>
 
-        <div id="historyList"></div>
+
+        <div id="historyList">
+
+        </div>
+
 
         <div class="sidebar-bottom">
-            <button class="clear-all" id="clearAll">
+
+            <button
+                class="clear-all"
+                id="clearAll"
+            >
                 🗑 حذف همه گفتگوها
             </button>
+
         </div>
 
     </aside>
 
 
+    <!-- ================= MAIN ================= -->
+
     <main class="main">
+
+
+        <!-- TOPBAR -->
 
         <header class="topbar">
 
             <div class="model-info">
 
-                <button class="mobile-menu" id="mobileMenu">
+                <button
+                    class="mobile-menu"
+                    id="mobileMenu"
+                >
                     ☰
                 </button>
 
+
                 <div class="status-dot"></div>
 
+
                 <div>
+
                     <div class="model-name">
                         Whale AI
                     </div>
@@ -632,46 +1100,135 @@
                     <div class="model-status">
                         آماده پاسخ‌گویی
                     </div>
+
                 </div>
 
             </div>
 
+
             <div class="top-actions">
-                <button id="historyButton">
-                    🗂 تاریخچه
+
+                <button
+                    class="top-button"
+                    id="historyButton"
+                >
+                    🗂
+                    <span class="history-button-text">
+                        تاریخچه
+                    </span>
                 </button>
+
             </div>
 
         </header>
 
 
+        <!-- CHAT -->
+
         <section id="chat">
 
-            <div class="welcome" id="welcome">
+
+            <!-- WELCOME -->
+
+            <div
+                class="welcome"
+                id="welcome"
+            >
 
                 <div class="welcome-logo">
                     🐋
                 </div>
 
-                <h2>
+
+                <h1>
                     به Whale AI خوش آمدی
-                </h2>
+                </h1>
+
 
                 <p>
-                    هر چیزی می‌خواهی بپرس؛ من آماده‌ام.
+                    فکر کن، بپرس، کشف کن.
+                    Whale AI آماده است.
                 </p>
+
+
+                <div class="quick-actions">
+
+                    <button
+                        class="quick-card"
+                        onclick="usePrompt('یک موضوع جالب برای یادگیری امروز پیشنهاد بده')"
+                    >
+
+                        <div class="quick-icon">
+                            💡
+                        </div>
+
+                        <div class="quick-title">
+                            ایده بگیر
+                        </div>
+
+                        <div class="quick-desc">
+                            یک موضوع جدید برای یادگیری
+                        </div>
+
+                    </button>
+
+
+                    <button
+                        class="quick-card"
+                        onclick="usePrompt('این موضوع را به زبان ساده توضیح بده')"
+                    >
+
+                        <div class="quick-icon">
+                            🧠
+                        </div>
+
+                        <div class="quick-title">
+                            یاد بگیر
+                        </div>
+
+                        <div class="quick-desc">
+                            مفاهیم سخت را ساده کن
+                        </div>
+
+                    </button>
+
+
+                    <button
+                        class="quick-card"
+                        onclick="usePrompt('برای من یک برنامه مطالعه مناسب طراحی کن')"
+                    >
+
+                        <div class="quick-icon">
+                            📚
+                        </div>
+
+                        <div class="quick-title">
+                            برنامه‌ریزی
+                        </div>
+
+                        <div class="quick-desc">
+                            برنامه‌ای متناسب با هدف تو
+                        </div>
+
+                    </button>
+
+                </div>
 
             </div>
 
+
+            <!-- TYPING -->
 
             <div id="typing">
 
                 در حال نوشتن
 
                 <div class="typing-dots">
+
                     <span></span>
                     <span></span>
                     <span></span>
+
                 </div>
 
             </div>
@@ -679,25 +1236,61 @@
         </section>
 
 
+        <!-- INPUT -->
+
         <div class="input-wrapper">
 
             <div class="input-box">
 
+
+                <div class="tool-buttons">
+
+                    <!-- فعلاً UI هستند -->
+
+                    <button
+                        class="tool-button"
+                        id="fileButton"
+                        title="افزودن فایل — به‌زودی"
+                        type="button"
+                    >
+                        📎
+                    </button>
+
+
+                    <button
+                        class="tool-button"
+                        id="webButton"
+                        title="جست‌وجوی وب — به‌زودی"
+                        type="button"
+                    >
+                        🌐
+                    </button>
+
+                </div>
+
+
                 <textarea
                     id="input"
                     rows="1"
-                    placeholder="پیامت را بنویس..."
+                    placeholder="پیامت را برای Whale AI بنویس..."
                     autocomplete="off"
                 ></textarea>
 
-                <button id="send">
+
+                <button
+                    id="send"
+                    title="ارسال"
+                >
                     ➤
                 </button>
 
             </div>
 
+
             <div class="hint">
-                Enter برای ارسال • Shift + Enter برای خط جدید
+                Enter برای ارسال
+                •
+                Shift + Enter برای خط جدید
             </div>
 
         </div>
@@ -709,8 +1302,17 @@
 
 <script>
 
+/* =========================
+   STATE
+========================= */
+
 let currentConversationId = null;
 let isSending = false;
+
+
+/* =========================
+   ELEMENTS
+========================= */
 
 const input =
     document.getElementById("input");
@@ -745,29 +1347,71 @@ const mobileMenu =
 const sidebar =
     document.getElementById("sidebar");
 
+const fileButton =
+    document.getElementById("fileButton");
 
-function showWelcome() {
+const webButton =
+    document.getElementById("webButton");
+
+
+/* =========================
+   WELCOME
+========================= */
+
+function showWelcome(){
+
     welcome.style.display = "block";
+
 }
 
 
-function hideWelcome() {
+function hideWelcome(){
+
     welcome.style.display = "none";
+
 }
 
 
-function addMessage(text, type) {
+/* =========================
+   QUICK PROMPTS
+========================= */
+
+function usePrompt(text){
+
+    input.value = text;
+
+    input.style.height = "auto";
+
+    input.style.height =
+        Math.min(
+            input.scrollHeight,
+            145
+        ) + "px";
+
+    input.focus();
+
+}
+
+
+/* =========================
+   MESSAGE
+========================= */
+
+function addMessage(text,type){
 
     hideWelcome();
+
 
     const row =
         document.createElement("div");
 
     row.className =
         "message-row " +
-        (type === "user"
-            ? "user-row"
-            : "bot-row");
+        (
+            type === "user"
+                ? "user-row"
+                : "bot-row"
+        );
 
 
     const avatar =
@@ -775,9 +1419,12 @@ function addMessage(text, type) {
 
     avatar.className =
         "avatar " +
-        (type === "user"
-            ? "user-avatar"
-            : "bot-avatar");
+        (
+            type === "user"
+                ? "user-avatar"
+                : "bot-avatar"
+        );
+
 
     avatar.textContent =
         type === "user"
@@ -797,18 +1444,20 @@ function addMessage(text, type) {
 
     message.className =
         "message " +
-        (type === "user"
-            ? "user-message"
-            : "bot-message");
+        (
+            type === "user"
+                ? "user-message"
+                : "bot-message"
+        );
 
-    message.textContent =
-        text;
+
+    message.textContent = text;
 
 
     box.appendChild(message);
 
 
-    if (type === "bot") {
+    if(type === "bot"){
 
         const actions =
             document.createElement("div");
@@ -827,31 +1476,36 @@ function addMessage(text, type) {
             "📋 کپی";
 
 
-        copy.onclick = async () => {
+        copy.onclick =
+            async () => {
 
-            try {
+                try{
 
-                await navigator.clipboard.writeText(
-                    message.textContent
-                );
-
-                copy.textContent =
-                    "✓ کپی شد";
-
-                setTimeout(() => {
+                    await navigator.clipboard.writeText(
+                        message.textContent
+                    );
 
                     copy.textContent =
-                        "📋 کپی";
+                        "✓ کپی شد";
 
-                }, 1500);
 
-            } catch (error) {
+                    setTimeout(
+                        () => {
 
-                console.error(error);
+                            copy.textContent =
+                                "📋 کپی";
 
-            }
+                        },
+                        1500
+                    );
 
-        };
+                }catch(error){
+
+                    console.error(error);
+
+                }
+
+            };
 
 
         actions.appendChild(copy);
@@ -861,12 +1515,12 @@ function addMessage(text, type) {
     }
 
 
-    if (type === "user") {
+    if(type === "user"){
 
         row.appendChild(box);
         row.appendChild(avatar);
 
-    } else {
+    }else{
 
         row.appendChild(avatar);
         row.appendChild(box);
@@ -879,43 +1533,60 @@ function addMessage(text, type) {
         typing
     );
 
+
     chat.scrollTop =
         chat.scrollHeight;
 
 
     return message;
+
 }
 
 
-function clearChat() {
+/* =========================
+   CLEAR CHAT
+========================= */
 
-    chat.querySelectorAll(
-        ".message-row"
-    ).forEach(
-        element => element.remove()
-    );
+function clearChat(){
+
+    chat
+        .querySelectorAll(
+            ".message-row"
+        )
+        .forEach(
+            element =>
+                element.remove()
+        );
+
 
     showWelcome();
+
 }
 
 
-async function createNewConversation() {
+/* =========================
+   NEW CONVERSATION
+========================= */
 
-    try {
+async function createNewConversation(){
+
+    try{
 
         const response =
             await fetch(
                 "/conversations",
                 {
-                    method: "POST"
+                    method:"POST"
                 }
             );
 
 
-        if (!response.ok) {
+        if(!response.ok){
+
             throw new Error(
                 "خطا در ساخت گفتگو"
             );
+
         }
 
 
@@ -929,26 +1600,33 @@ async function createNewConversation() {
 
         clearChat();
 
+
         sidebar.classList.remove(
             "open"
         );
 
+
         input.focus();
+
 
         await loadConversations();
 
-
-    } catch (error) {
+    }catch(error){
 
         console.error(error);
 
     }
+
 }
 
 
-async function sendMessage() {
+/* =========================
+   SEND MESSAGE
+========================= */
 
-    if (isSending) {
+async function sendMessage(){
+
+    if(isSending){
         return;
     }
 
@@ -957,7 +1635,7 @@ async function sendMessage() {
         input.value.trim();
 
 
-    if (!text) {
+    if(!text){
         return;
     }
 
@@ -983,22 +1661,22 @@ async function sendMessage() {
         "flex";
 
 
-    try {
+    try{
 
         const response =
             await fetch(
                 "/chat",
                 {
-                    method: "POST",
+                    method:"POST",
 
-                    headers: {
+                    headers:{
                         "Content-Type":
                             "application/json"
                     },
 
-                    body: JSON.stringify({
+                    body:JSON.stringify({
 
-                        message: text,
+                        message:text,
 
                         conversation_id:
                             currentConversationId
@@ -1008,7 +1686,7 @@ async function sendMessage() {
             );
 
 
-        if (!response.ok) {
+        if(!response.ok){
 
             const errorData =
                 await response
@@ -1037,8 +1715,18 @@ async function sendMessage() {
             );
 
 
+        if(!response.body){
+
+            throw new Error(
+                "پاسخی از سرور دریافت نشد."
+            );
+
+        }
+
+
         const reader =
             response.body.getReader();
+
 
         const decoder =
             new TextDecoder(
@@ -1049,13 +1737,13 @@ async function sendMessage() {
         let buffer = "";
 
 
-        while (true) {
+        while(true){
 
             const result =
                 await reader.read();
 
 
-            if (result.done) {
+            if(result.done){
                 break;
             }
 
@@ -1064,7 +1752,7 @@ async function sendMessage() {
                 decoder.decode(
                     result.value,
                     {
-                        stream: true
+                        stream:true
                     }
                 );
 
@@ -1077,20 +1765,20 @@ async function sendMessage() {
                 lines.pop();
 
 
-            for (
+            for(
                 const line of lines
-            ) {
+            ){
 
                 const cleanLine =
                     line.trim();
 
 
-                if (!cleanLine) {
+                if(!cleanLine){
                     continue;
                 }
 
 
-                try {
+                try{
 
                     const data =
                         JSON.parse(
@@ -1098,13 +1786,14 @@ async function sendMessage() {
                         );
 
 
-                    if (
+                    if(
                         data.type ===
                         "text"
-                    ) {
+                    ){
 
                         botMessage.textContent +=
                             data.content;
+
 
                         chat.scrollTop =
                             chat.scrollHeight;
@@ -1112,10 +1801,10 @@ async function sendMessage() {
                     }
 
 
-                    if (
+                    if(
                         data.type ===
                         "done"
-                    ) {
+                    ){
 
                         currentConversationId =
                             data.conversation_id;
@@ -1123,18 +1812,17 @@ async function sendMessage() {
                     }
 
 
-                    if (
+                    if(
                         data.type ===
                         "error"
-                    ) {
+                    ){
 
                         botMessage.textContent =
                             data.content;
 
                     }
 
-
-                } catch (error) {
+                }catch(error){
 
                     console.log(
                         "داده نامعتبر:",
@@ -1151,7 +1839,7 @@ async function sendMessage() {
         await loadConversations();
 
 
-    } catch (error) {
+    }catch(error){
 
         typing.style.display =
             "none";
@@ -1182,9 +1870,13 @@ async function sendMessage() {
 }
 
 
-async function loadConversations() {
+/* =========================
+   LOAD CONVERSATIONS
+========================= */
 
-    try {
+async function loadConversations(){
+
+    try{
 
         const response =
             await fetch(
@@ -1192,10 +1884,12 @@ async function loadConversations() {
             );
 
 
-        if (!response.ok) {
+        if(!response.ok){
+
             throw new Error(
                 "خطا در دریافت تاریخچه"
             );
+
         }
 
 
@@ -1207,12 +1901,21 @@ async function loadConversations() {
             "";
 
 
-        if (
-            data.length === 0
-        ) {
+        if(data.length === 0){
 
             historyList.innerHTML =
-                '<div style="padding:15px;color:#71869d;font-size:12px;text-align:center;">هنوز گفت‌وگویی وجود ندارد.</div>';
+                `
+                <div
+                    style="
+                    padding:18px 10px;
+                    color:#637990;
+                    font-size:11px;
+                    text-align:center;
+                    "
+                >
+                    هنوز گفت‌وگویی وجود ندارد.
+                </div>
+                `;
 
             return;
 
@@ -1232,10 +1935,10 @@ async function loadConversations() {
                     "conversation";
 
 
-                if (
+                if(
                     conversation.id ===
                     currentConversationId
-                ) {
+                ){
 
                     row.classList.add(
                         "active"
@@ -1284,13 +1987,9 @@ async function loadConversations() {
                     " پیام";
 
 
-                info.appendChild(
-                    title
-                );
+                info.appendChild(title);
 
-                info.appendChild(
-                    count
-                );
+                info.appendChild(count);
 
 
                 info.onclick =
@@ -1322,6 +2021,7 @@ async function loadConversations() {
 
                         event.stopPropagation();
 
+
                         deleteConversation(
                             conversation.id
                         );
@@ -1329,9 +2029,7 @@ async function loadConversations() {
                     };
 
 
-                row.appendChild(
-                    info
-                );
+                row.appendChild(info);
 
                 row.appendChild(
                     deleteButton
@@ -1345,8 +2043,7 @@ async function loadConversations() {
             }
         );
 
-
-    } catch (error) {
+    }catch(error){
 
         console.error(error);
 
@@ -1355,9 +2052,13 @@ async function loadConversations() {
 }
 
 
-async function openConversation(id) {
+/* =========================
+   OPEN CONVERSATION
+========================= */
 
-    try {
+async function openConversation(id){
+
+    try{
 
         const response =
             await fetch(
@@ -1367,7 +2068,7 @@ async function openConversation(id) {
             );
 
 
-        if (!response.ok) {
+        if(!response.ok){
 
             throw new Error(
                 "خطا در دریافت گفتگو"
@@ -1392,8 +2093,7 @@ async function openConversation(id) {
 
                 addMessage(
                     message.content,
-                    message.role ===
-                    "user"
+                    message.role === "user"
                         ? "user"
                         : "bot"
                 );
@@ -1412,8 +2112,7 @@ async function openConversation(id) {
 
         input.focus();
 
-
-    } catch (error) {
+    }catch(error){
 
         console.error(error);
 
@@ -1422,32 +2121,36 @@ async function openConversation(id) {
 }
 
 
-async function deleteConversation(id) {
+/* =========================
+   DELETE CONVERSATION
+========================= */
 
-    if (
+async function deleteConversation(id){
+
+    if(
         !confirm(
             "این گفت‌وگو حذف شود؟"
         )
-    ) {
+    ){
 
         return;
 
     }
 
 
-    try {
+    try{
 
         const response =
             await fetch(
                 "/conversations/" +
                 id,
                 {
-                    method: "DELETE"
+                    method:"DELETE"
                 }
             );
 
 
-        if (!response.ok) {
+        if(!response.ok){
 
             throw new Error(
                 "خطا در حذف گفتگو"
@@ -1456,10 +2159,10 @@ async function deleteConversation(id) {
         }
 
 
-        if (
+        if(
             currentConversationId ===
             id
-        ) {
+        ){
 
             currentConversationId =
                 null;
@@ -1471,8 +2174,7 @@ async function deleteConversation(id) {
 
         await loadConversations();
 
-
-    } catch (error) {
+    }catch(error){
 
         console.error(error);
 
@@ -1481,28 +2183,40 @@ async function deleteConversation(id) {
 }
 
 
+/* =========================
+   DELETE ALL
+========================= */
+
 clearAll.onclick =
     async () => {
 
-        if (
+        if(
             !confirm(
                 "همه گفت‌وگوها حذف شوند؟"
             )
-        ) {
+        ){
 
             return;
 
         }
 
 
-        try {
+        try{
 
-            await fetch(
-                "/conversations",
-                {
-                    method: "DELETE"
-                }
-            );
+            const response =
+                await fetch(
+                    "/conversations",
+                    {
+                        method:"DELETE"
+                    }
+                );
+
+
+            if(!response.ok){
+                throw new Error(
+                    "خطا در حذف گفتگوها"
+                );
+            }
 
 
             currentConversationId =
@@ -1514,8 +2228,7 @@ clearAll.onclick =
 
             await loadConversations();
 
-
-        } catch (error) {
+        }catch(error){
 
             console.error(error);
 
@@ -1523,6 +2236,10 @@ clearAll.onclick =
 
     };
 
+
+/* =========================
+   BUTTONS
+========================= */
 
 newChatButton.onclick =
     createNewConversation;
@@ -1550,14 +2267,42 @@ mobileMenu.onclick =
     };
 
 
+/* =========================
+   FUTURE TOOLS
+========================= */
+
+fileButton.onclick =
+    () => {
+
+        alert(
+            "قابلیت تحلیل فایل در مرحله بعد فعال می‌شود."
+        );
+
+    };
+
+
+webButton.onclick =
+    () => {
+
+        alert(
+            "قابلیت جست‌وجوی وب در مرحله بعد فعال می‌شود."
+        );
+
+    };
+
+
+/* =========================
+   INPUT
+========================= */
+
 input.addEventListener(
     "keydown",
     event => {
 
-        if (
+        if(
             event.key === "Enter" &&
             !event.shiftKey
-        ) {
+        ){
 
             event.preventDefault();
 
@@ -1576,10 +2321,11 @@ input.addEventListener(
         input.style.height =
             "auto";
 
+
         input.style.height =
             Math.min(
                 input.scrollHeight,
-                140
+                145
             ) + "px";
 
     }
@@ -1590,6 +2336,10 @@ send.onclick =
     sendMessage;
 
 
+/* =========================
+   START
+========================= */
+
 loadConversations();
 
 input.focus();
@@ -1598,4 +2348,3 @@ input.focus();
 
 </body>
 </html>
-```
