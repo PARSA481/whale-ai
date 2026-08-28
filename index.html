@@ -4,46 +4,42 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#07111f">
+<meta name="theme-color" content="#050912">
+
 <title>Whale AI</title>
 
 <style>
 *{
     box-sizing:border-box;
-    margin:0;
-    padding:0;
 }
 
 :root{
-    --bg:#050914;
-    --bg2:#08111f;
-    --panel:rgba(9,18,31,.82);
-    --panel2:rgba(14,27,45,.88);
-    --border:rgba(255,255,255,.085);
-    --border2:rgba(255,255,255,.13);
+    --bg:#050912;
+    --panel:#08111f;
+    --panel2:#0d1929;
+    --panel3:#111f32;
+    --border:rgba(255,255,255,.08);
+    --border2:rgba(255,255,255,.12);
     --text:#f5f8ff;
-    --muted:#8ea0b7;
-    --muted2:#61748c;
-    --blue:#2d8cff;
-    --blue2:#1266d7;
-    --cyan:#42c8ff;
-    --green:#38dc8a;
-    --danger:#ff6378;
-    --user:#176fd4;
-    --bot:#0d1a2c;
-    --shadow:0 25px 80px rgba(0,0,0,.35);
+    --muted:#8da1b7;
+    --blue:#278cff;
+    --blue2:#1266d2;
+    --danger:#ff5368;
+    --user:#176fd3;
+    --bot:#101d2d;
 }
 
-html,body{
+html,
+body{
     width:100%;
     height:100%;
+    margin:0;
 }
 
 body{
     overflow:hidden;
     color:var(--text);
     font-family:
-        Inter,
         "Segoe UI",
         Tahoma,
         Arial,
@@ -51,20 +47,20 @@ body{
 
     background:
         radial-gradient(
-            circle at 50% -15%,
-            rgba(28,105,185,.30),
-            transparent 38%
+            circle at 50% -20%,
+            rgba(25,91,161,.42),
+            transparent 42%
         ),
         radial-gradient(
-            circle at 100% 100%,
-            rgba(20,90,180,.13),
+            circle at 90% 100%,
+            rgba(20,80,150,.15),
             transparent 35%
         ),
         linear-gradient(
             135deg,
-            #03060d,
-            #07111e 52%,
-            #040812
+            #030711,
+            #071321 55%,
+            #040a12
         );
 }
 
@@ -81,37 +77,28 @@ button{
 
 .app{
     width:100%;
-    height:100vh;
+    height:100%;
     display:flex;
 }
 
-/* =====================================================
+/* =========================
    SIDEBAR
-===================================================== */
+========================= */
 
 .sidebar{
-    width:305px;
-    height:100vh;
-    flex:0 0 305px;
+    width:290px;
+    height:100%;
+    flex-shrink:0;
 
     display:flex;
     flex-direction:column;
 
-    background:
-        linear-gradient(
-            180deg,
-            rgba(8,18,31,.94),
-            rgba(5,12,22,.96)
-        );
-
+    background:rgba(6,15,27,.94);
     border-left:1px solid var(--border);
-    backdrop-filter:blur(25px);
 
-    z-index:100;
+    backdrop-filter:blur(22px);
 
-    transition:
-        transform .3s ease,
-        width .3s ease;
+    z-index:50;
 }
 
 .brand{
@@ -119,57 +106,52 @@ button{
     display:flex;
     align-items:center;
     gap:13px;
+
     border-bottom:1px solid var(--border);
 }
 
-.logo{
-    width:48px;
-    height:48px;
+.brand-logo{
+    width:50px;
+    height:50px;
+
+    border-radius:17px;
 
     display:flex;
     align-items:center;
     justify-content:center;
 
-    border-radius:15px;
+    font-size:28px;
 
     background:
         linear-gradient(
             145deg,
-            #39a5ff,
-            #1452a5
+            #2c96ff,
+            #0c438f
         );
 
     box-shadow:
-        0 10px 35px rgba(35,137,255,.25),
-        inset 0 1px 1px rgba(255,255,255,.25);
-
-    font-size:25px;
+        0 12px 35px rgba(35,137,255,.25),
+        inset 0 1px rgba(255,255,255,.25);
 }
 
-.brand-name{
-    font-size:19px;
+.brand-title{
+    font-size:20px;
     font-weight:800;
-    letter-spacing:-.3px;
 }
 
-.brand-desc{
-    margin-top:3px;
+.brand-subtitle{
     color:var(--muted);
     font-size:11px;
+    margin-top:4px;
 }
 
 .new-chat{
-    margin:18px;
-    padding:13px 15px;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:8px;
+    margin:17px;
+    padding:13px;
 
     border-radius:13px;
 
-    color:#fff;
+    color:white;
 
     background:
         linear-gradient(
@@ -178,10 +160,10 @@ button{
             var(--blue2)
         );
 
+    font-weight:700;
+
     box-shadow:
         0 10px 30px rgba(35,137,255,.18);
-
-    font-weight:700;
 
     transition:.2s;
 }
@@ -191,63 +173,45 @@ button{
     filter:brightness(1.08);
 }
 
-.sidebar-section-title{
-    padding:0 19px 10px;
+.history-heading{
+    padding:0 18px 10px;
 
-    color:var(--muted2);
-
-    font-size:11px;
-    font-weight:700;
+    color:var(--muted);
+    font-size:12px;
 }
 
 #historyList{
     flex:1;
     overflow-y:auto;
-    padding:0 10px 15px;
-}
 
-#historyList::-webkit-scrollbar,
-#chat::-webkit-scrollbar{
-    width:6px;
-}
-
-#historyList::-webkit-scrollbar-thumb,
-#chat::-webkit-scrollbar-thumb{
-    background:#1a3048;
-    border-radius:20px;
+    padding:0 11px 15px;
 }
 
 .conversation{
-    min-height:58px;
-
     display:flex;
     align-items:center;
-    gap:8px;
 
-    margin:3px 0;
-    padding:9px 10px;
+    gap:7px;
 
-    border:1px solid transparent;
+    padding:10px;
+
+    margin-bottom:5px;
+
     border-radius:12px;
 
     transition:.18s;
 }
 
 .conversation:hover{
-    background:rgba(255,255,255,.045);
-    border-color:var(--border);
+    background:rgba(255,255,255,.055);
 }
 
 .conversation.active{
     background:
-        linear-gradient(
-            90deg,
-            rgba(35,137,255,.15),
-            rgba(35,137,255,.045)
-        );
+        rgba(35,137,255,.13);
 
-    border-color:
-        rgba(35,137,255,.18);
+    border:1px solid
+        rgba(35,137,255,.08);
 }
 
 .conversation-info{
@@ -262,40 +226,30 @@ button{
     text-overflow:ellipsis;
 
     font-size:13px;
-    color:#e7eef8;
 }
 
 .conversation-count{
-    margin-top:5px;
-    color:var(--muted2);
+    margin-top:4px;
+    color:var(--muted);
     font-size:10px;
 }
 
 .delete-conversation{
-    width:29px;
-    height:29px;
+    padding:6px;
 
-    border-radius:8px;
-
+    color:#71869d;
     background:transparent;
-    color:#62758c;
 
-    opacity:.65;
-
-    transition:.2s;
-}
-
-.conversation:hover .delete-conversation{
-    opacity:1;
+    border-radius:7px;
 }
 
 .delete-conversation:hover{
-    color:#ff6d80;
-    background:rgba(255,70,90,.09);
+    color:#ff7180;
+    background:rgba(255,70,90,.12);
 }
 
 .sidebar-bottom{
-    padding:13px;
+    padding:12px;
     border-top:1px solid var(--border);
 }
 
@@ -305,52 +259,49 @@ button{
 
     border-radius:10px;
 
+    color:#8398ae;
     background:transparent;
-    color:#73869d;
-
-    font-size:12px;
-
-    transition:.2s;
 }
 
 .clear-all:hover{
-    color:#ff7182;
-    background:rgba(255,255,255,.035);
+    color:#ff7180;
+    background:rgba(255,255,255,.05);
 }
 
-/* =====================================================
+/* =========================
    MAIN
-===================================================== */
+========================= */
 
 .main{
-    min-width:0;
     flex:1;
-    height:100vh;
+    min-width:0;
+
+    height:100%;
 
     display:flex;
     flex-direction:column;
-
-    position:relative;
 }
 
+/* =========================
+   TOPBAR
+========================= */
+
 .topbar{
-    height:72px;
-    flex:0 0 72px;
+    height:76px;
+    flex-shrink:0;
 
     display:flex;
     align-items:center;
     justify-content:space-between;
 
-    padding:0 24px;
+    padding:0 25px;
 
     border-bottom:1px solid var(--border);
 
     background:
-        rgba(4,10,18,.68);
+        rgba(5,12,21,.72);
 
-    backdrop-filter:blur(22px);
-
-    z-index:30;
+    backdrop-filter:blur(20px);
 }
 
 .model-info{
@@ -359,17 +310,16 @@ button{
     gap:10px;
 }
 
-.status{
+.status-dot{
     width:9px;
     height:9px;
 
     border-radius:50%;
 
-    background:var(--green);
+    background:#31d67b;
 
     box-shadow:
-        0 0 0 4px rgba(56,220,138,.08),
-        0 0 15px rgba(56,220,138,.65);
+        0 0 13px rgba(49,214,123,.75);
 }
 
 .model-name{
@@ -379,88 +329,60 @@ button{
 
 .model-status{
     margin-top:3px;
+
     color:var(--muted);
-    font-size:10px;
+    font-size:11px;
 }
 
 .top-actions{
     display:flex;
-    gap:7px;
+    gap:8px;
 }
 
-.top-button{
-    height:38px;
-    padding:0 12px;
-
-    display:flex;
-    align-items:center;
-    gap:7px;
-
-    border:1px solid var(--border);
+.top-actions button,
+.mobile-menu{
+    padding:9px 12px;
 
     border-radius:10px;
 
-    background:rgba(255,255,255,.045);
-    color:#d5e0ec;
+    color:#d7e4f3;
 
-    font-size:12px;
+    border:1px solid var(--border);
 
-    transition:.2s;
-}
-
-.top-button:hover{
-    background:rgba(255,255,255,.075);
-    border-color:var(--border2);
+    background:rgba(255,255,255,.055);
 }
 
 .mobile-menu{
     display:none;
-
-    width:38px;
-    height:38px;
-
-    margin-left:8px;
-
-    border-radius:10px;
-
-    background:rgba(255,255,255,.055);
-    color:white;
-
-    font-size:18px;
 }
 
-/* =====================================================
+/* =========================
    CHAT
-===================================================== */
+========================= */
 
 #chat{
     flex:1;
-    min-height:0;
 
     overflow-y:auto;
 
     padding:
-        25px
-        max(20px,calc((100% - 980px)/2))
-        30px;
+        35px
+        max(25px,calc((100% - 900px)/2));
 
     scroll-behavior:smooth;
 }
 
 .welcome{
-    max-width:900px;
-    margin:0 auto;
-
-    padding-top:8vh;
-
     text-align:center;
 
-    animation:fadeIn .55s ease;
+    padding:55px 20px 25px;
+
+    animation:fadeIn .5s ease;
 }
 
 .welcome-logo{
-    width:92px;
-    height:92px;
+    width:90px;
+    height:90px;
 
     margin:auto;
 
@@ -468,236 +390,140 @@ button{
     align-items:center;
     justify-content:center;
 
-    border-radius:28px;
+    border-radius:29px;
+
+    font-size:46px;
 
     background:
-        radial-gradient(
-            circle at 30% 20%,
-            rgba(255,255,255,.25),
-            transparent 30%
-        ),
         linear-gradient(
             145deg,
-            #39a8ff,
-            #0b3b79
+            #2994ff,
+            #0a3978
         );
 
     box-shadow:
-        0 25px 65px rgba(20,120,255,.22),
-        inset 0 1px 1px rgba(255,255,255,.25);
-
-    font-size:45px;
+        0 18px 55px rgba(35,137,255,.25),
+        inset 0 1px rgba(255,255,255,.2);
 }
 
-.welcome h1{
-    margin-top:25px;
-
-    font-size:
-        clamp(28px,4vw,42px);
-
-    letter-spacing:-1.5px;
-
-    background:
-        linear-gradient(
-            90deg,
-            #fff,
-            #9ecaff
-        );
-
-    -webkit-background-clip:text;
-    background-clip:text;
-    color:transparent;
+.welcome h2{
+    margin:20px 0 8px;
+    font-size:29px;
 }
 
 .welcome p{
-    margin-top:10px;
+    margin:0;
 
     color:var(--muted);
 
     font-size:13px;
 }
 
-.quick-actions{
-    margin:32px auto 0;
-
-    max-width:720px;
-
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-
-    gap:10px;
-}
-
-.quick-card{
-    padding:16px 13px;
-
-    border:1px solid var(--border);
-
-    border-radius:15px;
-
-    background:
-        linear-gradient(
-            145deg,
-            rgba(255,255,255,.045),
-            rgba(255,255,255,.018)
-        );
-
-    color:#dbe7f4;
-
-    text-align:right;
-
-    transition:.2s;
-}
-
-.quick-card:hover{
-    transform:translateY(-2px);
-
-    border-color:
-        rgba(66,164,255,.28);
-
-    background:
-        rgba(35,137,255,.075);
-}
-
-.quick-icon{
-    font-size:20px;
-}
-
-.quick-title{
-    margin-top:9px;
-    font-size:12px;
-    font-weight:700;
-}
-
-.quick-desc{
-    margin-top:4px;
-    color:var(--muted2);
-    font-size:10px;
-}
-
 .message-row{
     display:flex;
-    align-items:flex-start;
 
-    margin:20px 0;
+    margin:17px 0;
 
-    animation:messageIn .25s ease;
+    animation:
+        messageIn .22s ease;
 }
 
-.user-row{
+.message-row.user-row{
     justify-content:flex-start;
 }
 
-.bot-row{
+.message-row.bot-row{
     justify-content:flex-end;
 }
 
 .avatar{
     width:34px;
     height:34px;
+
     flex:0 0 34px;
 
     margin:0 8px;
+
+    border-radius:11px;
 
     display:flex;
     align-items:center;
     justify-content:center;
 
-    border-radius:11px;
-
     font-size:16px;
 }
 
 .user-avatar{
-    background:
-        linear-gradient(
-            145deg,
-            #216ec4,
-            #10477f
-        );
+    background:#145ca9;
 }
 
 .bot-avatar{
-    background:
-        linear-gradient(
-            145deg,
-            #19334f,
-            #0c1828
-        );
-
-    border:1px solid var(--border);
+    background:#16283d;
 }
 
 .message-box{
-    max-width:min(78%,760px);
+    max-width:min(75%,720px);
 }
 
 .message{
-    padding:14px 17px;
+    padding:13px 16px;
 
     border-radius:17px;
 
-    font-size:14px;
-    line-height:1.9;
+    line-height:1.85;
 
     white-space:pre-wrap;
+
     word-break:break-word;
+
+    font-size:14px;
 }
 
 .user-message{
-    color:#fff;
-
     background:
         linear-gradient(
             135deg,
-            #1d7ce5,
-            #145cad
+            #1c78df,
+            #145eb5
         );
 
     border-bottom-left-radius:5px;
-
-    box-shadow:
-        0 8px 25px rgba(0,80,180,.12);
 }
 
 .bot-message{
     background:
-        linear-gradient(
-            145deg,
-            rgba(18,34,53,.96),
-            rgba(10,22,37,.96)
-        );
+        rgba(16,30,48,.94);
 
-    border:1px solid var(--border);
+    border:1px solid
+        rgba(255,255,255,.06);
 
     border-bottom-right-radius:5px;
-
-    box-shadow:
-        0 10px 30px rgba(0,0,0,.12);
 }
 
 .message-actions{
     display:flex;
-    direction:ltr;
+
+    justify-content:flex-start;
 
     gap:5px;
 
     margin-top:5px;
+
+    direction:ltr;
 }
 
 .copy-btn{
+    opacity:.5;
+
     padding:4px 7px;
 
-    border-radius:7px;
+    border-radius:6px;
+
+    color:#9bb0c6;
 
     background:transparent;
-    color:#7890a9;
 
-    opacity:.6;
-
-    font-size:10px;
-
-    transition:.2s;
+    font-size:11px;
 }
 
 .copy-btn:hover{
@@ -705,23 +531,26 @@ button{
     background:rgba(255,255,255,.05);
 }
 
+/* =========================
+   TYPING
+========================= */
+
 #typing{
     display:none;
 
     align-items:center;
     justify-content:flex-end;
 
-    margin:7px 0 15px;
+    margin:8px 0 15px;
 
     color:var(--muted);
 
-    font-size:11px;
+    font-size:12px;
 }
 
 .typing-dots{
     display:flex;
     gap:4px;
-
     margin-right:8px;
 }
 
@@ -731,7 +560,7 @@ button{
 
     border-radius:50%;
 
-    background:#7894af;
+    background:#7e9ab6;
 
     animation:bounce 1s infinite;
 }
@@ -744,89 +573,60 @@ button{
     animation-delay:.3s;
 }
 
-/* =====================================================
+/* =========================
    INPUT
-===================================================== */
+========================= */
 
 .input-wrapper{
-    padding:
-        12px
-        20px
-        19px;
+    padding:15px 20px 20px;
 
     background:
         linear-gradient(
             transparent,
-            rgba(4,9,16,.96) 35%
+            rgba(4,10,17,.96) 35%
         );
-
-    z-index:20;
 }
 
 .input-box{
-    max-width:980px;
+    max-width:900px;
+
     margin:auto;
 
     display:flex;
     align-items:flex-end;
-    gap:8px;
+
+    gap:9px;
 
     padding:9px;
 
-    border:1px solid rgba(255,255,255,.10);
-
-    border-radius:18px;
-
     background:
-        rgba(11,24,40,.94);
+        rgba(13,28,45,.96);
+
+    border:1px solid
+        rgba(255,255,255,.09);
+
+    border-radius:17px;
 
     box-shadow:
-        0 20px 55px rgba(0,0,0,.28);
+        0 15px 45px rgba(0,0,0,.25);
 
     transition:.2s;
 }
 
 .input-box:focus-within{
     border-color:
-        rgba(45,140,255,.48);
+        rgba(35,137,255,.55);
 
     box-shadow:
-        0 0 0 3px rgba(45,140,255,.07),
-        0 20px 55px rgba(0,0,0,.28);
-}
-
-.input-tools{
-    display:flex;
-    gap:5px;
-    padding-bottom:3px;
-}
-
-.tool-button{
-    width:38px;
-    height:38px;
-
-    border-radius:11px;
-
-    background:rgba(255,255,255,.045);
-    border:1px solid transparent;
-
-    color:#91a6bc;
-
-    transition:.2s;
-}
-
-.tool-button:hover{
-    color:#dcecff;
-    background:rgba(255,255,255,.075);
-    border-color:var(--border);
+        0 0 0 3px
+        rgba(35,137,255,.08);
 }
 
 #input{
     flex:1;
-
     min-width:0;
 
-    max-height:150px;
+    max-height:140px;
 
     resize:none;
 
@@ -837,212 +637,108 @@ button{
 
     color:white;
 
-    padding:8px 9px;
+    padding:9px 10px;
 
-    line-height:1.65;
     font-size:14px;
+
+    line-height:1.6;
 }
 
 #input::placeholder{
-    color:#62778e;
+    color:#6e849b;
 }
 
 #send{
     width:44px;
     height:44px;
+
     flex:0 0 44px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
 
     border-radius:13px;
 
-    color:#fff;
+    color:white;
 
     background:
         linear-gradient(
             145deg,
-            #2e98ff,
-            #1263c8
+            #248dff,
+            #1265ca
         );
-
-    box-shadow:
-        0 8px 25px rgba(35,137,255,.2);
 
     font-size:18px;
 
-    transition:.2s;
+    transition:
+        transform .15s,
+        background .2s,
+        opacity .2s;
 }
 
 #send:hover{
-    transform:translateY(-1px) scale(1.025);
+    transform:scale(1.04);
+}
+
+#send.stop-mode{
+    background:
+        linear-gradient(
+            145deg,
+            #ff6173,
+            #d82e45
+        );
+}
+
+#send.stop-mode:hover{
+    background:
+        linear-gradient(
+            145deg,
+            #ff7180,
+            #e5364d
+        );
 }
 
 #send:disabled{
-    opacity:.4;
+    opacity:.55;
     cursor:not-allowed;
-    transform:none;
 }
 
 .hint{
-    max-width:980px;
-    margin:7px auto 0;
-
     text-align:center;
 
-    color:#4f6278;
+    margin-top:8px;
 
-    font-size:9px;
+    color:#53687c;
+
+    font-size:10px;
 }
 
-/* =====================================================
-   SEARCH / FILE READY UI
-===================================================== */
+/* =========================
+   SCROLLBAR
+========================= */
 
-.feature-pill{
-    position:relative;
+::-webkit-scrollbar{
+    width:7px;
 }
 
-.feature-pill.active{
-    color:#62b6ff;
-
-    background:
-        rgba(35,137,255,.09);
-
-    border-color:
-        rgba(35,137,255,.25);
+::-webkit-scrollbar-track{
+    background:transparent;
 }
 
-.feature-pill::after{
-    content:"به‌زودی";
-
-    position:absolute;
-
-    top:-7px;
-    left:-5px;
-
-    padding:2px 5px;
-
-    border-radius:5px;
-
-    background:#132a43;
-
-    color:#7290ad;
-
-    font-size:7px;
-
-    opacity:0;
-
-    transition:.2s;
+::-webkit-scrollbar-thumb{
+    background:#1c3045;
+    border-radius:10px;
 }
 
-.feature-pill:hover::after{
-    opacity:1;
-}
-
-/* =====================================================
-   MOBILE
-===================================================== */
-
-@media(max-width:850px){
-
-    .sidebar{
-        position:fixed;
-
-        top:0;
-        right:0;
-
-        transform:translateX(105%);
-
-        box-shadow:
-            -25px 0 70px rgba(0,0,0,.45);
-    }
-
-    .sidebar.open{
-        transform:translateX(0);
-    }
-
-    .mobile-menu{
-        display:block;
-    }
-
-    .topbar{
-        padding:0 12px;
-    }
-
-    .top-actions{
-        display:none;
-    }
-
-    #chat{
-        padding:
-            18px
-            12px
-            25px;
-    }
-
-    .message-box{
-        max-width:84%;
-    }
-
-    .welcome{
-        padding-top:45px;
-    }
-
-    .welcome-logo{
-        width:76px;
-        height:76px;
-        border-radius:23px;
-        font-size:37px;
-    }
-
-    .welcome h1{
-        font-size:27px;
-    }
-
-    .quick-actions{
-        grid-template-columns:1fr;
-        max-width:360px;
-    }
-
-    .input-wrapper{
-        padding:8px 9px 12px;
-    }
-
-    .input-tools{
-        display:none;
-    }
-}
-
-@media(max-width:480px){
-
-    .sidebar{
-        width:290px;
-        flex-basis:290px;
-    }
-
-    .message{
-        font-size:13px;
-        padding:12px 14px;
-    }
-
-    .avatar{
-        width:30px;
-        height:30px;
-        flex-basis:30px;
-        margin:0 5px;
-    }
-
-    .welcome p{
-        font-size:12px;
-    }
-}
-
-/* =====================================================
+/* =========================
    ANIMATION
-===================================================== */
+========================= */
 
 @keyframes fadeIn{
     from{
         opacity:0;
-        transform:translateY(12px);
+        transform:translateY(10px);
     }
 
     to{
@@ -1054,7 +750,7 @@ button{
 @keyframes messageIn{
     from{
         opacity:0;
-        transform:translateY(6px);
+        transform:translateY(5px);
     }
 
     to{
@@ -1072,6 +768,57 @@ button{
         transform:translateY(-4px);
     }
 }
+
+/* =========================
+   MOBILE
+========================= */
+
+@media(max-width:750px){
+
+    .sidebar{
+        position:fixed;
+
+        right:-300px;
+        top:0;
+
+        transition:right .25s ease;
+
+        box-shadow:
+            -20px 0 50px rgba(0,0,0,.35);
+    }
+
+    .sidebar.open{
+        right:0;
+    }
+
+    .mobile-menu{
+        display:block;
+    }
+
+    .topbar{
+        padding:0 14px;
+    }
+
+    #chat{
+        padding:20px 12px;
+    }
+
+    .message-box{
+        max-width:82%;
+    }
+
+    .welcome{
+        padding-top:40px;
+    }
+
+    .welcome h2{
+        font-size:23px;
+    }
+
+    .input-wrapper{
+        padding:10px;
+    }
+}
 </style>
 </head>
 
@@ -1079,37 +826,53 @@ button{
 
 <div class="app">
 
-<!-- =====================================================
+<!-- =========================
      SIDEBAR
-===================================================== -->
+========================= -->
 
 <aside class="sidebar" id="sidebar">
 
     <div class="brand">
 
-        <div class="logo">🐋</div>
+        <div class="brand-logo">
+            🐋
+        </div>
 
         <div>
-            <div class="brand-name">Whale AI</div>
-            <div class="brand-desc">دستیار هوشمند نسل جدید</div>
+            <div class="brand-title">
+                Whale AI
+            </div>
+
+            <div class="brand-subtitle">
+                دستیار هوشمند شما
+            </div>
         </div>
 
     </div>
 
-    <button class="new-chat" id="newChatButton">
-        <span>＋</span>
-        <span>گفت‌وگوی جدید</span>
+
+    <button
+        class="new-chat"
+        id="newChatButton"
+    >
+        ＋ گفت‌وگوی جدید
     </button>
 
-    <div class="sidebar-section-title">
-        گفتگوهای اخیر
+
+    <div class="history-heading">
+        گفت‌وگوهای اخیر
     </div>
+
 
     <div id="historyList"></div>
 
+
     <div class="sidebar-bottom">
 
-        <button class="clear-all" id="clearAll">
+        <button
+            class="clear-all"
+            id="clearAll"
+        >
             🗑 حذف همه گفتگوها
         </button>
 
@@ -1118,9 +881,9 @@ button{
 </aside>
 
 
-<!-- =====================================================
+<!-- =========================
      MAIN
-===================================================== -->
+========================= -->
 
 <main class="main">
 
@@ -1135,38 +898,36 @@ button{
             ☰
         </button>
 
-        <div class="status"></div>
+        <div class="status-dot"></div>
 
         <div>
+
             <div class="model-name">
                 Whale AI
             </div>
 
-            <div class="model-status">
+            <div
+                class="model-status"
+                id="modelStatus"
+            >
                 آماده پاسخ‌گویی
             </div>
+
         </div>
 
     </div>
 
+
     <div class="top-actions">
 
-        <button
-            class="top-button"
-            id="historyButton"
-        >
-            🗂
-            <span>تاریخچه</span>
+        <button id="historyButton">
+            🗂 تاریخچه
         </button>
 
     </div>
 
 </header>
 
-
-<!-- =====================================================
-     CHAT
-===================================================== -->
 
 <section id="chat">
 
@@ -1179,89 +940,27 @@ button{
             🐋
         </div>
 
-        <h1>
-            با Whale AI شروع کن
-        </h1>
+        <h2>
+            به Whale AI خوش آمدی
+        </h2>
 
         <p>
-            بپرس، تحلیل کن، یاد بگیر و ایده‌پردازی کن.
+            هر چیزی می‌خواهی بپرس؛ من آماده‌ام.
         </p>
-
-
-        <div class="quick-actions">
-
-            <button
-                class="quick-card"
-                data-prompt="یک موضوع را برای من به زبان ساده توضیح بده."
-            >
-
-                <div class="quick-icon">
-                    💡
-                </div>
-
-                <div class="quick-title">
-                    توضیح یک موضوع
-                </div>
-
-                <div class="quick-desc">
-                    مفاهیم سخت را ساده یاد بگیر
-                </div>
-
-            </button>
-
-
-            <button
-                class="quick-card"
-                data-prompt="برای مطالعه امروز یک برنامه منظم پیشنهاد بده."
-            >
-
-                <div class="quick-icon">
-                    📚
-                </div>
-
-                <div class="quick-title">
-                    کمک در مطالعه
-                </div>
-
-                <div class="quick-desc">
-                    برنامه‌ریزی و یادگیری
-                </div>
-
-            </button>
-
-
-            <button
-                class="quick-card"
-                data-prompt="یک ایده خلاقانه برای یک پروژه نرم‌افزاری پیشنهاد بده."
-            >
-
-                <div class="quick-icon">
-                    ⚡
-                </div>
-
-                <div class="quick-title">
-                    ایده‌پردازی
-                </div>
-
-                <div class="quick-desc">
-                    ساخت و توسعه ایده‌ها
-                </div>
-
-            </button>
-
-        </div>
 
     </div>
 
 
     <div id="typing">
 
-        در حال دریافت پاسخ
+        در حال نوشتن
 
         <div class="typing-dots">
+
             <span></span>
             <span></span>
             <span></span>
+
         </div>
 
     </div>
@@ -1269,51 +968,28 @@ button{
 </section>
 
 
-<!-- =====================================================
-     INPUT
-===================================================== -->
-
 <div class="input-wrapper">
 
     <div class="input-box">
 
-        <div class="input-tools">
-
-            <!-- آماده برای File Analysis -->
-            <button
-                class="tool-button feature-pill"
-                id="fileButton"
-                title="تحلیل فایل"
-            >
-                📎
-            </button>
-
-            <!-- آماده برای Web Search -->
-            <button
-                class="tool-button feature-pill"
-                id="webButton"
-                title="جست‌وجوی وب"
-            >
-                🌐
-            </button>
-
-        </div>
-
         <textarea
             id="input"
             rows="1"
-            placeholder="پیامت را برای Whale AI بنویس..."
+            placeholder="پیامت را بنویس..."
             autocomplete="off"
         ></textarea>
 
+
         <button
             id="send"
-            title="ارسال"
+            type="button"
+            aria-label="ارسال"
         >
             ➤
         </button>
 
     </div>
+
 
     <div class="hint">
         Enter برای ارسال • Shift + Enter برای خط جدید
@@ -1329,7 +1005,15 @@ button{
 <script>
 
 let currentConversationId = null;
+
 let isSending = false;
+
+let abortController = null;
+
+
+/* =========================
+   ELEMENTS
+========================= */
 
 const input =
     document.getElementById("input");
@@ -1364,41 +1048,116 @@ const mobileMenu =
 const sidebar =
     document.getElementById("sidebar");
 
-const fileButton =
-    document.getElementById("fileButton");
-
-const webButton =
-    document.getElementById("webButton");
+const modelStatus =
+    document.getElementById("modelStatus");
 
 
-/* =====================================================
+/* =========================
    WELCOME
-===================================================== */
+========================= */
 
 function showWelcome(){
 
-    welcome.style.display = "block";
+    welcome.style.display =
+        "block";
 
 }
 
 
 function hideWelcome(){
 
-    welcome.style.display = "none";
+    welcome.style.display =
+        "none";
 
 }
 
 
-/* =====================================================
-   ADD MESSAGE
-===================================================== */
+/* =========================
+   SEND BUTTON STATE
+========================= */
 
-function addMessage(text,type){
+function setSendingState(){
+
+    send.classList.add(
+        "stop-mode"
+    );
+
+    send.textContent =
+        "■";
+
+    send.setAttribute(
+        "aria-label",
+        "توقف"
+    );
+
+    input.disabled = false;
+
+    modelStatus.textContent =
+        "در حال پاسخ‌گویی...";
+
+}
+
+
+function setIdleState(){
+
+    send.classList.remove(
+        "stop-mode"
+    );
+
+    send.textContent =
+        "➤";
+
+    send.setAttribute(
+        "aria-label",
+        "ارسال"
+    );
+
+    input.disabled = false;
+
+    send.disabled = false;
+
+    modelStatus.textContent =
+        "آماده پاسخ‌گویی";
+
+}
+
+
+/* =========================
+   STOP AI
+========================= */
+
+function stopGeneration(){
+
+    if(
+        abortController
+    ){
+
+        abortController.abort();
+
+        abortController = null;
+
+    }
+
+}
+
+
+/* =========================
+   ADD MESSAGE
+========================= */
+
+function addMessage(
+    text,
+    type
+){
 
     hideWelcome();
 
+
     const row =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
+
 
     row.className =
         "message-row " +
@@ -1410,7 +1169,10 @@ function addMessage(text,type){
 
 
     const avatar =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
+
 
     avatar.className =
         "avatar " +
@@ -1420,6 +1182,7 @@ function addMessage(text,type){
                 : "bot-avatar"
         );
 
+
     avatar.textContent =
         type === "user"
             ? "👤"
@@ -1427,14 +1190,20 @@ function addMessage(text,type){
 
 
     const box =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
+
 
     box.className =
         "message-box";
 
 
     const message =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
+
 
     message.className =
         "message " +
@@ -1444,34 +1213,44 @@ function addMessage(text,type){
                 : "bot-message"
         );
 
+
     message.textContent =
         text;
 
 
-    box.appendChild(message);
+    box.appendChild(
+        message
+    );
 
 
     if(type === "bot"){
 
         const actions =
-            document.createElement("div");
+            document.createElement(
+                "div"
+            );
+
 
         actions.className =
             "message-actions";
 
 
         const copy =
-            document.createElement("button");
+            document.createElement(
+                "button"
+            );
+
 
         copy.className =
             "copy-btn";
+
 
         copy.textContent =
             "📋 کپی";
 
 
         copy.onclick =
-            async () => {
+            async function(){
 
                 try{
 
@@ -1483,38 +1262,56 @@ function addMessage(text,type){
                         "✓ کپی شد";
 
                     setTimeout(
-                        () => {
+                        function(){
+
                             copy.textContent =
                                 "📋 کپی";
+
                         },
                         1500
                     );
 
                 }catch(error){
 
-                    console.error(error);
+                    console.error(
+                        error
+                    );
 
                 }
 
             };
 
 
-        actions.appendChild(copy);
+        actions.appendChild(
+            copy
+        );
 
-        box.appendChild(actions);
+        box.appendChild(
+            actions
+        );
 
     }
 
 
     if(type === "user"){
 
-        row.appendChild(box);
-        row.appendChild(avatar);
+        row.appendChild(
+            box
+        );
+
+        row.appendChild(
+            avatar
+        );
 
     }else{
 
-        row.appendChild(avatar);
-        row.appendChild(box);
+        row.appendChild(
+            avatar
+        );
+
+        row.appendChild(
+            box
+        );
 
     }
 
@@ -1530,19 +1327,23 @@ function addMessage(text,type){
 
 
     return message;
+
 }
 
 
-/* =====================================================
+/* =========================
    CLEAR CHAT
-===================================================== */
+========================= */
 
 function clearChat(){
 
     chat
-        .querySelectorAll(".message-row")
+        .querySelectorAll(
+            ".message-row"
+        )
         .forEach(
-            element => element.remove()
+            element =>
+                element.remove()
         );
 
     showWelcome();
@@ -1550,11 +1351,18 @@ function clearChat(){
 }
 
 
-/* =====================================================
+/* =========================
    NEW CONVERSATION
-===================================================== */
+========================= */
 
 async function createNewConversation(){
+
+    if(isSending){
+
+        stopGeneration();
+
+    }
+
 
     try{
 
@@ -1586,29 +1394,46 @@ async function createNewConversation(){
 
         clearChat();
 
-        sidebar.classList.remove("open");
+
+        sidebar.classList.remove(
+            "open"
+        );
+
 
         input.focus();
 
+
         await loadConversations();
+
 
     }catch(error){
 
-        console.error(error);
+        console.error(
+            error
+        );
 
     }
 
 }
 
 
-/* =====================================================
+/* =========================
    SEND MESSAGE
-===================================================== */
+========================= */
 
 async function sendMessage(){
 
+    /*
+     * اگر در حال پاسخ هستیم،
+     * کلیک روی همان دکمه = توقف
+     */
+
     if(isSending){
+
+        stopGeneration();
+
         return;
+
     }
 
 
@@ -1617,13 +1442,19 @@ async function sendMessage(){
 
 
     if(!text){
+
         return;
+
     }
 
 
     isSending = true;
 
-    send.disabled = true;
+    abortController =
+        new AbortController();
+
+
+    setSendingState();
 
 
     addMessage(
@@ -1642,6 +1473,11 @@ async function sendMessage(){
         "flex";
 
 
+    let botMessage = null;
+
+    let streamFinished = false;
+
+
     try{
 
         const response =
@@ -1652,7 +1488,10 @@ async function sendMessage(){
 
                     headers:{
                         "Content-Type":
-                            "application/json"
+                            "application/json",
+
+                        "Accept":
+                            "application/x-ndjson"
                     },
 
                     body:JSON.stringify({
@@ -1662,24 +1501,49 @@ async function sendMessage(){
                         conversation_id:
                             currentConversationId
 
-                    })
+                    }),
+
+                    signal:
+                        abortController.signal
                 }
             );
 
 
         if(!response.ok){
 
-            const errorData =
-                await response
-                    .json()
-                    .catch(
-                        () => ({})
-                    );
+            let errorMessage =
+                "خطا در ارتباط با سرور.";
+
+
+            try{
+
+                const errorData =
+                    await response.json();
+
+
+                if(
+                    errorData.error
+                ){
+
+                    errorMessage =
+                        errorData.error;
+
+                }
+
+            }catch(_){}
 
 
             throw new Error(
-                errorData.error ||
-                "خطا در ارتباط با سرور"
+                errorMessage
+            );
+
+        }
+
+
+        if(!response.body){
+
+            throw new Error(
+                "سرور پاسخی ارسال نکرد."
             );
 
         }
@@ -1689,24 +1553,16 @@ async function sendMessage(){
             "none";
 
 
-        const botMessage =
+        botMessage =
             addMessage(
                 "",
                 "bot"
             );
 
 
-        if(!response.body){
-
-            throw new Error(
-                "پاسخ سرور قابل دریافت نیست."
-            );
-
-        }
-
-
         const reader =
             response.body.getReader();
+
 
         const decoder =
             new TextDecoder(
@@ -1724,7 +1580,12 @@ async function sendMessage(){
 
 
             if(result.done){
+
+                streamFinished =
+                    true;
+
                 break;
+
             }
 
 
@@ -1742,45 +1603,79 @@ async function sendMessage(){
 
 
             buffer =
-                lines.pop();
+                lines.pop() || "";
 
 
-            for(const line of lines){
+            for(
+                const line of lines
+            ){
 
                 const cleanLine =
                     line.trim();
 
 
                 if(!cleanLine){
+
                     continue;
+
                 }
+
+
+                let data;
 
 
                 try{
 
-                    const data =
+                    data =
                         JSON.parse(
                             cleanLine
                         );
 
+                }catch(error){
 
-                    if(
-                        data.type ===
-                        "text"
-                    ){
+                    console.warn(
+                        "Invalid stream data:",
+                        cleanLine
+                    );
 
-                        botMessage.textContent +=
-                            data.content;
+                    continue;
 
-                        chat.scrollTop =
-                            chat.scrollHeight;
+                }
+
+
+                if(
+                    data.type ===
+                    "text"
+                ){
+
+                    if(!botMessage){
+
+                        botMessage =
+                            addMessage(
+                                "",
+                                "bot"
+                            );
 
                     }
 
 
+                    botMessage.textContent +=
+                        data.content || "";
+
+
+                    chat.scrollTop =
+                        chat.scrollHeight;
+
+                }
+
+
+                else if(
+                    data.type ===
+                    "done"
+                ){
+
                     if(
-                        data.type ===
-                        "done"
+                        data.conversation_id
                     ){
 
                         currentConversationId =
@@ -1788,27 +1683,88 @@ async function sendMessage(){
 
                     }
 
+                }
 
-                    if(
-                        data.type ===
-                        "error"
-                    ){
 
-                        botMessage.textContent =
-                            data.content;
+                else if(
+                    data.type ===
+                    "error"
+                ){
+
+                    if(!botMessage){
+
+                        botMessage =
+                            addMessage(
+                                "",
+                                "bot"
+                            );
 
                     }
 
-                }catch(error){
 
-                    console.log(
-                        "داده نامعتبر:",
-                        cleanLine
-                    );
+                    botMessage.textContent =
+                        data.content ||
+                        "خطایی رخ داد.";
 
                 }
 
             }
+
+        }
+
+
+        /*
+         * آخرین داده باقی‌مانده
+         */
+
+        if(buffer.trim()){
+
+            try{
+
+                const data =
+                    JSON.parse(
+                        buffer.trim()
+                    );
+
+
+                if(
+                    data.type ===
+                    "text"
+                    &&
+                    botMessage
+                ){
+
+                    botMessage.textContent +=
+                        data.content || "";
+
+                }
+
+
+                if(
+                    data.type ===
+                    "done"
+                    &&
+                    data.conversation_id
+                ){
+
+                    currentConversationId =
+                        data.conversation_id;
+
+                }
+
+            }catch(_){}
+
+        }
+
+
+        if(
+            botMessage
+            &&
+            !botMessage.textContent.trim()
+        ){
+
+            botMessage.textContent =
+                "پاسخی دریافت نشد.";
 
         }
 
@@ -1818,38 +1774,117 @@ async function sendMessage(){
 
     }catch(error){
 
+        /*
+         * AbortError یعنی کاربر
+         * خودش پاسخ را متوقف کرده.
+         */
+
+        if(
+            error.name ===
+            "AbortError"
+        ){
+
+            typing.style.display =
+                "none";
+
+
+            if(botMessage){
+
+                if(
+                    botMessage.textContent.trim()
+                ){
+
+                    botMessage.textContent +=
+                        "\n\n⏹ پاسخ متوقف شد.";
+
+                }else{
+
+                    botMessage.textContent =
+                        "⏹ پاسخ متوقف شد.";
+
+                }
+
+            }else{
+
+                botMessage =
+                    addMessage(
+                        "⏹ پاسخ متوقف شد.",
+                        "bot"
+                    );
+
+            }
+
+        }
+
+        else{
+
+            console.error(
+                "CHAT ERROR:",
+                error
+            );
+
+
+            typing.style.display =
+                "none";
+
+
+            const message =
+                error.message ||
+                "ارتباط با سرور برقرار نشد.";
+
+
+            if(botMessage){
+
+                botMessage.textContent =
+                    message;
+
+            }else{
+
+                addMessage(
+                    message,
+                    "bot"
+                );
+
+            }
+
+        }
+
+    }finally{
+
+        /*
+         * بسیار مهم:
+         * بعد از هر حالت، ارسال دوباره
+         * آزاد می‌شود.
+         */
+
         typing.style.display =
             "none";
 
 
-        addMessage(
-            error.message ||
-            "ارتباط با سرور برقرار نشد.",
-            "bot"
-        );
+        isSending = false;
 
 
-        console.error(error);
+        abortController =
+            null;
+
+
+        setIdleState();
+
+
+        input.focus();
+
+
+        chat.scrollTop =
+            chat.scrollHeight;
 
     }
-
-
-    typing.style.display =
-        "none";
-
-
-    isSending = false;
-
-    send.disabled = false;
-
-    input.focus();
 
 }
 
 
-/* =====================================================
+/* =========================
    LOAD CONVERSATIONS
-===================================================== */
+========================= */
 
 async function loadConversations(){
 
@@ -1878,15 +1913,17 @@ async function loadConversations(){
             "";
 
 
-        if(data.length === 0){
+        if(
+            !data.length
+        ){
 
             historyList.innerHTML =
                 `
                 <div
                     style="
-                    padding:18px;
-                    color:#647990;
-                    font-size:11px;
+                    padding:15px;
+                    color:#71869d;
+                    font-size:12px;
                     text-align:center;
                     "
                 >
@@ -1903,7 +1940,9 @@ async function loadConversations(){
             conversation => {
 
                 const row =
-                    document.createElement("div");
+                    document.createElement(
+                        "div"
+                    );
 
 
                 row.className =
@@ -1923,17 +1962,24 @@ async function loadConversations(){
 
 
                 const info =
-                    document.createElement("div");
+                    document.createElement(
+                        "div"
+                    );
+
 
                 info.className =
                     "conversation-info";
 
 
                 const title =
-                    document.createElement("div");
+                    document.createElement(
+                        "div"
+                    );
+
 
                 title.className =
                     "conversation-title";
+
 
                 title.textContent =
                     conversation.title ||
@@ -1941,25 +1987,31 @@ async function loadConversations(){
 
 
                 const count =
-                    document.createElement("div");
+                    document.createElement(
+                        "div"
+                    );
+
 
                 count.className =
                     "conversation-count";
 
+
                 count.textContent =
-                    (
-                        conversation.message_count ||
-                        0
-                    ) +
+                    conversation.message_count +
                     " پیام";
 
 
-                info.appendChild(title);
-                info.appendChild(count);
+                info.appendChild(
+                    title
+                );
+
+                info.appendChild(
+                    count
+                );
 
 
                 info.onclick =
-                    () => {
+                    function(){
 
                         openConversation(
                             conversation.id
@@ -1969,19 +2021,24 @@ async function loadConversations(){
 
 
                 const deleteButton =
-                    document.createElement("button");
+                    document.createElement(
+                        "button"
+                    );
+
 
                 deleteButton.className =
                     "delete-conversation";
+
 
                 deleteButton.textContent =
                     "🗑";
 
 
                 deleteButton.onclick =
-                    event => {
+                    function(event){
 
                         event.stopPropagation();
+
 
                         deleteConversation(
                             conversation.id
@@ -1990,11 +2047,18 @@ async function loadConversations(){
                     };
 
 
-                row.appendChild(info);
-                row.appendChild(deleteButton);
+                row.appendChild(
+                    info
+                );
+
+                row.appendChild(
+                    deleteButton
+                );
 
 
-                historyList.appendChild(row);
+                historyList.appendChild(
+                    row
+                );
 
             }
         );
@@ -2002,18 +2066,29 @@ async function loadConversations(){
 
     }catch(error){
 
-        console.error(error);
+        console.error(
+            error
+        );
 
     }
 
 }
 
 
-/* =====================================================
+/* =========================
    OPEN CONVERSATION
-===================================================== */
+========================= */
 
-async function openConversation(id){
+async function openConversation(
+    id
+){
+
+    if(isSending){
+
+        stopGeneration();
+
+    }
+
 
     try{
 
@@ -2050,7 +2125,8 @@ async function openConversation(id){
 
                 addMessage(
                     message.content,
-                    message.role === "user"
+                    message.role ===
+                    "user"
                         ? "user"
                         : "bot"
                 );
@@ -2059,34 +2135,44 @@ async function openConversation(id){
         );
 
 
-        sidebar.classList.remove("open");
+        sidebar.classList.remove(
+            "open"
+        );
+
 
         await loadConversations();
+
 
         input.focus();
 
 
     }catch(error){
 
-        console.error(error);
+        console.error(
+            error
+        );
 
     }
 
 }
 
 
-/* =====================================================
+/* =========================
    DELETE
-===================================================== */
+========================= */
 
-async function deleteConversation(id){
+async function deleteConversation(
+    id
+){
 
     if(
         !confirm(
             "این گفت‌وگو حذف شود؟"
         )
     ){
+
         return;
+
     }
 
 
@@ -2112,7 +2198,8 @@ async function deleteConversation(id){
 
 
         if(
-            currentConversationId === id
+            currentConversationId ===
+            id
         ){
 
             currentConversationId =
@@ -2128,26 +2215,37 @@ async function deleteConversation(id){
 
     }catch(error){
 
-        console.error(error);
+        console.error(
+            error
+        );
 
     }
 
 }
 
 
-/* =====================================================
+/* =========================
    DELETE ALL
-===================================================== */
+========================= */
 
 clearAll.onclick =
-    async () => {
+    async function(){
+
+        if(isSending){
+
+            stopGeneration();
+
+        }
+
 
         if(
             !confirm(
                 "همه گفت‌وگوها حذف شوند؟"
             )
         ){
+
             return;
+
         }
 
 
@@ -2177,30 +2275,35 @@ clearAll.onclick =
 
             clearChat();
 
+
             await loadConversations();
 
 
         }catch(error){
 
-            console.error(error);
+            console.error(
+                error
+            );
 
         }
 
     };
 
 
-/* =====================================================
-   NAVIGATION
-===================================================== */
+/* =========================
+   EVENTS
+========================= */
 
 newChatButton.onclick =
     createNewConversation;
 
 
 historyButton.onclick =
-    () => {
+    function(){
 
-        sidebar.classList.add("open");
+        sidebar.classList.add(
+            "open"
+        );
 
         loadConversations();
 
@@ -2208,96 +2311,34 @@ historyButton.onclick =
 
 
 mobileMenu.onclick =
-    () => {
+    function(){
 
-        sidebar.classList.toggle("open");
-
-    };
-
-
-/* =====================================================
-   QUICK PROMPTS
-===================================================== */
-
-document
-    .querySelectorAll(".quick-card")
-    .forEach(
-        card => {
-
-            card.onclick =
-                () => {
-
-                    const prompt =
-                        card.dataset.prompt;
-
-                    input.value =
-                        prompt;
-
-                    input.focus();
-
-                    input.style.height =
-                        "auto";
-
-                    input.style.height =
-                        Math.min(
-                            input.scrollHeight,
-                            150
-                        ) + "px";
-
-                };
-
-        }
-    );
-
-
-/* =====================================================
-   FUTURE FEATURES
-===================================================== */
-
-fileButton.onclick =
-    () => {
-
-        alert(
-            "قابلیت تحلیل فایل در مرحله بعد به Whale AI اضافه می‌شود."
+        sidebar.classList.toggle(
+            "open"
         );
 
     };
 
 
-webButton.onclick =
-    () => {
+/*
+ * یک دکمه برای دو کار:
+ *
+ * حالت عادی → ارسال
+ *
+ * هنگام پاسخ → توقف
+ */
 
-        webButton.classList.toggle(
-            "active"
-        );
+send.onclick =
+    sendMessage;
 
-        if(
-            webButton.classList.contains("active")
-        ){
-
-            webButton.title =
-                "جست‌وجوی وب فعال است";
-
-        }else{
-
-            webButton.title =
-                "جست‌وجوی وب";
-
-        }
-
-    };
-
-
-/* =====================================================
-   TEXTAREA
-===================================================== */
 
 input.addEventListener(
     "keydown",
-    event => {
+    function(event){
 
         if(
-            event.key === "Enter" &&
+            event.key === "Enter"
+            &&
             !event.shiftKey
         ){
 
@@ -2313,28 +2354,25 @@ input.addEventListener(
 
 input.addEventListener(
     "input",
-    () => {
+    function(){
 
         input.style.height =
             "auto";
 
+
         input.style.height =
             Math.min(
                 input.scrollHeight,
-                150
+                140
             ) + "px";
 
     }
 );
 
 
-send.onclick =
-    sendMessage;
-
-
-/* =====================================================
+/* =========================
    START
-===================================================== */
+========================= */
 
 loadConversations();
 
