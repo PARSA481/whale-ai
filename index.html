@@ -10,64 +10,68 @@
 <style>
 *{
     box-sizing:border-box;
+    margin:0;
+    padding:0;
 }
 
 :root{
     --bg:#050914;
-    --bg2:#07111f;
-    --panel:rgba(11,20,34,.78);
-    --panel-solid:#0b1626;
-    --panel-soft:rgba(255,255,255,.045);
+    --bg2:#08111f;
+    --panel:rgba(9,18,31,.82);
+    --panel2:rgba(14,27,45,.88);
     --border:rgba(255,255,255,.085);
-    --border-blue:rgba(69,157,255,.32);
-    --text:#f4f8ff;
-    --muted:#8fa4bc;
-    --muted2:#62778f;
-    --blue:#3295ff;
-    --blue2:#1264c9;
-    --cyan:#43c7ff;
-    --danger:#ff6678;
-    --success:#42db8b;
+    --border2:rgba(255,255,255,.13);
+    --text:#f5f8ff;
+    --muted:#8ea0b7;
+    --muted2:#61748c;
+    --blue:#2d8cff;
+    --blue2:#1266d7;
+    --cyan:#42c8ff;
+    --green:#38dc8a;
+    --danger:#ff6378;
+    --user:#176fd4;
+    --bot:#0d1a2c;
     --shadow:0 25px 80px rgba(0,0,0,.35);
 }
 
 html,body{
     width:100%;
     height:100%;
-    margin:0;
 }
 
 body{
     overflow:hidden;
     color:var(--text);
     font-family:
+        Inter,
         "Segoe UI",
         Tahoma,
         Arial,
         sans-serif;
+
     background:
         radial-gradient(
-            circle at 75% -15%,
-            rgba(38,123,214,.24),
-            transparent 34%
+            circle at 50% -15%,
+            rgba(28,105,185,.30),
+            transparent 38%
         ),
         radial-gradient(
-            circle at 15% 110%,
-            rgba(20,87,170,.14),
+            circle at 100% 100%,
+            rgba(20,90,180,.13),
             transparent 35%
         ),
         linear-gradient(
             135deg,
-            #030711,
-            #07111f 55%,
-            #040913
+            #03060d,
+            #07111e 52%,
+            #040812
         );
 }
 
 button,
 textarea,
 input{
-    font-family:inherit;
+    font:inherit;
 }
 
 button{
@@ -75,121 +79,111 @@ button{
     cursor:pointer;
 }
 
-button:focus-visible,
-textarea:focus-visible,
-input:focus-visible{
-    outline:2px solid rgba(67,165,255,.55);
-    outline-offset:2px;
-}
-
-/* =========================
-   APP
-========================= */
-
 .app{
     width:100%;
     height:100vh;
     display:flex;
-    overflow:hidden;
 }
 
-/* =========================
+/* =====================================================
    SIDEBAR
-========================= */
+===================================================== */
 
 .sidebar{
-    width:300px;
+    width:305px;
     height:100vh;
-    flex:0 0 300px;
+    flex:0 0 305px;
+
     display:flex;
     flex-direction:column;
+
     background:
         linear-gradient(
             180deg,
-            rgba(10,21,36,.94),
-            rgba(5,13,24,.96)
+            rgba(8,18,31,.94),
+            rgba(5,12,22,.96)
         );
+
     border-left:1px solid var(--border);
-    backdrop-filter:blur(22px);
-    -webkit-backdrop-filter:blur(22px);
-    z-index:50;
+    backdrop-filter:blur(25px);
+
+    z-index:100;
+
+    transition:
+        transform .3s ease,
+        width .3s ease;
 }
 
 .brand{
-    min-height:82px;
-    padding:17px 18px;
+    padding:20px;
     display:flex;
     align-items:center;
-    gap:12px;
+    gap:13px;
     border-bottom:1px solid var(--border);
 }
 
-.brand-logo{
+.logo{
     width:48px;
     height:48px;
-    flex:0 0 48px;
+
     display:flex;
     align-items:center;
     justify-content:center;
+
     border-radius:15px;
+
     background:
         linear-gradient(
             145deg,
-            #36a4ff,
-            #1262c6
+            #39a5ff,
+            #1452a5
         );
+
     box-shadow:
-        0 10px 28px rgba(35,137,255,.28),
-        inset 0 1px rgba(255,255,255,.24);
-    overflow:hidden;
+        0 10px 35px rgba(35,137,255,.25),
+        inset 0 1px 1px rgba(255,255,255,.25);
+
+    font-size:25px;
 }
 
-.brand-logo svg{
-    width:31px;
-    height:31px;
-}
-
-.brand-text{
-    min-width:0;
-}
-
-.brand-title{
-    font-size:18px;
+.brand-name{
+    font-size:19px;
     font-weight:800;
-    letter-spacing:.2px;
+    letter-spacing:-.3px;
 }
 
-.brand-subtitle{
+.brand-desc{
     margin-top:3px;
     color:var(--muted);
-    font-size:10px;
+    font-size:11px;
 }
 
 .new-chat{
-    margin:17px;
-    height:46px;
-    border-radius:14px;
+    margin:18px;
+    padding:13px 15px;
+
     display:flex;
     align-items:center;
     justify-content:center;
-    gap:9px;
-    color:white;
-    font-size:13px;
-    font-weight:700;
+    gap:8px;
+
+    border-radius:13px;
+
+    color:#fff;
+
     background:
         linear-gradient(
             135deg,
-            #349aff,
-            #1768ce
+            var(--blue),
+            var(--blue2)
         );
-    box-shadow:
-        0 10px 28px rgba(31,125,236,.2);
-    transition:.2s ease;
-}
 
-.new-chat svg{
-    width:18px;
-    height:18px;
+    box-shadow:
+        0 10px 30px rgba(35,137,255,.18);
+
+    font-weight:700;
+
+    transition:.2s;
 }
 
 .new-chat:hover{
@@ -197,22 +191,13 @@ input:focus-visible{
     filter:brightness(1.08);
 }
 
-.history-header{
-    padding:0 18px 10px;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-}
+.sidebar-section-title{
+    padding:0 19px 10px;
 
-.history-heading{
-    color:var(--muted);
+    color:var(--muted2);
+
     font-size:11px;
     font-weight:700;
-}
-
-.history-label{
-    color:var(--muted2);
-    font-size:10px;
 }
 
 #historyList{
@@ -221,31 +206,48 @@ input:focus-visible{
     padding:0 10px 15px;
 }
 
+#historyList::-webkit-scrollbar,
+#chat::-webkit-scrollbar{
+    width:6px;
+}
+
+#historyList::-webkit-scrollbar-thumb,
+#chat::-webkit-scrollbar-thumb{
+    background:#1a3048;
+    border-radius:20px;
+}
+
 .conversation{
-    min-height:54px;
+    min-height:58px;
+
     display:flex;
     align-items:center;
-    gap:9px;
-    margin-bottom:5px;
+    gap:8px;
+
+    margin:3px 0;
     padding:9px 10px;
+
     border:1px solid transparent;
-    border-radius:13px;
-    transition:.18s ease;
+    border-radius:12px;
+
+    transition:.18s;
 }
 
 .conversation:hover{
     background:rgba(255,255,255,.045);
-    border-color:rgba(255,255,255,.05);
+    border-color:var(--border);
 }
 
 .conversation.active{
     background:
         linear-gradient(
-            135deg,
-            rgba(43,143,255,.15),
-            rgba(31,101,177,.07)
+            90deg,
+            rgba(35,137,255,.15),
+            rgba(35,137,255,.045)
         );
-    border-color:rgba(58,150,255,.16);
+
+    border-color:
+        rgba(35,137,255,.18);
 }
 
 .conversation-info{
@@ -258,312 +260,335 @@ input:focus-visible{
     overflow:hidden;
     white-space:nowrap;
     text-overflow:ellipsis;
-    color:#e9f2fc;
-    font-size:12px;
+
+    font-size:13px;
+    color:#e7eef8;
 }
 
 .conversation-count{
-    margin-top:4px;
+    margin-top:5px;
     color:var(--muted2);
-    font-size:9px;
+    font-size:10px;
 }
 
 .delete-conversation{
     width:29px;
     height:29px;
-    flex:0 0 29px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    border-radius:9px;
+
+    border-radius:8px;
+
     background:transparent;
-    color:#60758c;
-    transition:.18s;
+    color:#62758c;
+
+    opacity:.65;
+
+    transition:.2s;
 }
 
-.delete-conversation svg{
-    width:15px;
-    height:15px;
+.conversation:hover .delete-conversation{
+    opacity:1;
 }
 
 .delete-conversation:hover{
-    color:var(--danger);
-    background:rgba(255,80,100,.1);
+    color:#ff6d80;
+    background:rgba(255,70,90,.09);
 }
 
 .sidebar-bottom{
-    padding:12px;
+    padding:13px;
     border-top:1px solid var(--border);
 }
 
 .clear-all{
     width:100%;
-    height:39px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:8px;
-    border-radius:11px;
-    background:transparent;
-    color:#71869c;
-    font-size:11px;
-    transition:.18s;
-}
+    padding:10px;
 
-.clear-all svg{
-    width:15px;
-    height:15px;
+    border-radius:10px;
+
+    background:transparent;
+    color:#73869d;
+
+    font-size:12px;
+
+    transition:.2s;
 }
 
 .clear-all:hover{
-    color:var(--danger);
-    background:rgba(255,255,255,.04);
+    color:#ff7182;
+    background:rgba(255,255,255,.035);
 }
 
-/* =========================
+/* =====================================================
    MAIN
-========================= */
+===================================================== */
 
 .main{
-    flex:1;
     min-width:0;
+    flex:1;
     height:100vh;
+
     display:flex;
     flex-direction:column;
+
     position:relative;
 }
-
-/* =========================
-   TOPBAR
-========================= */
 
 .topbar{
     height:72px;
     flex:0 0 72px;
-    padding:0 23px;
+
     display:flex;
     align-items:center;
     justify-content:space-between;
+
+    padding:0 24px;
+
     border-bottom:1px solid var(--border);
-    background:rgba(5,12,21,.58);
-    backdrop-filter:blur(20px);
-    -webkit-backdrop-filter:blur(20px);
-    z-index:10;
-}
 
-.top-left{
-    display:flex;
-    align-items:center;
-    gap:11px;
-}
+    background:
+        rgba(4,10,18,.68);
 
-.mobile-menu{
-    display:none;
-    width:38px;
-    height:38px;
-    align-items:center;
-    justify-content:center;
-    border-radius:11px;
-    background:rgba(255,255,255,.055);
-    color:#e9f4ff;
-}
+    backdrop-filter:blur(22px);
 
-.mobile-menu svg{
-    width:19px;
-    height:19px;
+    z-index:30;
 }
 
 .model-info{
     display:flex;
     align-items:center;
-    gap:9px;
+    gap:10px;
 }
 
-.status-dot{
-    width:8px;
-    height:8px;
+.status{
+    width:9px;
+    height:9px;
+
     border-radius:50%;
-    background:var(--success);
-    box-shadow:0 0 14px rgba(66,219,139,.75);
+
+    background:var(--green);
+
+    box-shadow:
+        0 0 0 4px rgba(56,220,138,.08),
+        0 0 15px rgba(56,220,138,.65);
 }
 
 .model-name{
-    font-size:13px;
+    font-size:14px;
     font-weight:800;
 }
 
 .model-status{
     margin-top:3px;
-    color:var(--muted2);
-    font-size:9px;
+    color:var(--muted);
+    font-size:10px;
 }
 
 .top-actions{
     display:flex;
-    align-items:center;
     gap:7px;
 }
 
-.top-action{
-    height:36px;
-    padding:0 11px;
+.top-button{
+    height:38px;
+    padding:0 12px;
+
     display:flex;
     align-items:center;
     gap:7px;
+
     border:1px solid var(--border);
+
     border-radius:10px;
+
     background:rgba(255,255,255,.045);
-    color:#cbd9e8;
-    font-size:11px;
-    transition:.18s;
+    color:#d5e0ec;
+
+    font-size:12px;
+
+    transition:.2s;
 }
 
-.top-action:hover{
+.top-button:hover{
     background:rgba(255,255,255,.075);
-    border-color:rgba(255,255,255,.12);
+    border-color:var(--border2);
 }
 
-.top-action svg{
-    width:15px;
-    height:15px;
+.mobile-menu{
+    display:none;
+
+    width:38px;
+    height:38px;
+
+    margin-left:8px;
+
+    border-radius:10px;
+
+    background:rgba(255,255,255,.055);
+    color:white;
+
+    font-size:18px;
 }
 
-/* =========================
+/* =====================================================
    CHAT
-========================= */
+===================================================== */
 
 #chat{
     flex:1;
     min-height:0;
+
     overflow-y:auto;
+
     padding:
-        32px
-        max(18px, calc((100% - 920px) / 2))
-        40px;
+        25px
+        max(20px,calc((100% - 980px)/2))
+        30px;
+
     scroll-behavior:smooth;
 }
 
 .welcome{
-    max-width:850px;
+    max-width:900px;
     margin:0 auto;
-    padding:44px 20px 25px;
+
+    padding-top:8vh;
+
     text-align:center;
-    animation:fadeIn .45s ease;
+
+    animation:fadeIn .55s ease;
 }
 
 .welcome-logo{
-    width:88px;
-    height:88px;
-    margin:0 auto 20px;
+    width:92px;
+    height:92px;
+
+    margin:auto;
+
     display:flex;
     align-items:center;
     justify-content:center;
+
     border-radius:28px;
+
     background:
+        radial-gradient(
+            circle at 30% 20%,
+            rgba(255,255,255,.25),
+            transparent 30%
+        ),
         linear-gradient(
             145deg,
-            #38a7ff,
-            #1059b3
+            #39a8ff,
+            #0b3b79
         );
-    box-shadow:
-        0 18px 55px rgba(26,124,235,.27),
-        inset 0 1px rgba(255,255,255,.22);
-}
 
-.welcome-logo svg{
-    width:54px;
-    height:54px;
+    box-shadow:
+        0 25px 65px rgba(20,120,255,.22),
+        inset 0 1px 1px rgba(255,255,255,.25);
+
+    font-size:45px;
 }
 
 .welcome h1{
-    margin:0;
-    font-size:30px;
-    font-weight:850;
-    letter-spacing:-.5px;
-}
+    margin-top:25px;
 
-.welcome h1 span{
+    font-size:
+        clamp(28px,4vw,42px);
+
+    letter-spacing:-1.5px;
+
     background:
         linear-gradient(
             90deg,
             #fff,
-            #79c8ff
+            #9ecaff
         );
+
     -webkit-background-clip:text;
     background-clip:text;
     color:transparent;
 }
 
 .welcome p{
-    margin:11px 0 0;
+    margin-top:10px;
+
     color:var(--muted);
+
     font-size:13px;
 }
 
 .quick-actions{
+    margin:32px auto 0;
+
     max-width:720px;
-    margin:29px auto 0;
+
     display:grid;
     grid-template-columns:repeat(3,1fr);
+
     gap:10px;
 }
 
 .quick-card{
-    min-height:92px;
-    padding:15px;
-    text-align:right;
+    padding:16px 13px;
+
     border:1px solid var(--border);
-    border-radius:16px;
-    background:rgba(255,255,255,.035);
-    color:var(--text);
-    transition:.2s ease;
+
+    border-radius:15px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,.045),
+            rgba(255,255,255,.018)
+        );
+
+    color:#dbe7f4;
+
+    text-align:right;
+
+    transition:.2s;
 }
 
 .quick-card:hover{
     transform:translateY(-2px);
-    border-color:var(--border-blue);
-    background:rgba(40,130,220,.075);
+
+    border-color:
+        rgba(66,164,255,.28);
+
+    background:
+        rgba(35,137,255,.075);
 }
 
 .quick-icon{
-    width:31px;
-    height:31px;
-    margin-bottom:10px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    border-radius:10px;
-    background:rgba(52,150,255,.12);
-    color:#62b7ff;
-}
-
-.quick-icon svg{
-    width:17px;
-    height:17px;
+    font-size:20px;
 }
 
 .quick-title{
-    font-size:11px;
+    margin-top:9px;
+    font-size:12px;
     font-weight:700;
 }
 
 .quick-desc{
     margin-top:4px;
     color:var(--muted2);
-    font-size:9px;
+    font-size:10px;
 }
 
 .message-row{
     display:flex;
-    margin:18px 0;
-    animation:messageIn .22s ease;
+    align-items:flex-start;
+
+    margin:20px 0;
+
+    animation:messageIn .25s ease;
 }
 
-.message-row.user-row{
+.user-row{
     justify-content:flex-start;
 }
 
-.message-row.bot-row{
+.bot-row{
     justify-content:flex-end;
 }
 
@@ -571,120 +596,143 @@ input:focus-visible{
     width:34px;
     height:34px;
     flex:0 0 34px;
+
     margin:0 8px;
+
     display:flex;
     align-items:center;
     justify-content:center;
-    border-radius:11px;
-}
 
-.avatar svg{
-    width:19px;
-    height:19px;
+    border-radius:11px;
+
+    font-size:16px;
 }
 
 .user-avatar{
-    background:linear-gradient(145deg,#1c76d9,#1259aa);
+    background:
+        linear-gradient(
+            145deg,
+            #216ec4,
+            #10477f
+        );
 }
 
 .bot-avatar{
-    background:linear-gradient(145deg,#172b42,#0e1c2e);
-    border:1px solid rgba(255,255,255,.07);
+    background:
+        linear-gradient(
+            145deg,
+            #19334f,
+            #0c1828
+        );
+
+    border:1px solid var(--border);
 }
 
 .message-box{
-    max-width:min(78%,740px);
+    max-width:min(78%,760px);
 }
 
 .message{
-    padding:13px 16px;
+    padding:14px 17px;
+
     border-radius:17px;
-    line-height:1.85;
+
+    font-size:14px;
+    line-height:1.9;
+
     white-space:pre-wrap;
     word-break:break-word;
-    font-size:13.5px;
 }
 
 .user-message{
     color:#fff;
+
     background:
         linear-gradient(
             135deg,
-            #217ddd,
-            #145cae
+            #1d7ce5,
+            #145cad
         );
+
     border-bottom-left-radius:5px;
-    box-shadow:0 8px 25px rgba(15,92,174,.13);
+
+    box-shadow:
+        0 8px 25px rgba(0,80,180,.12);
 }
 
 .bot-message{
     background:
         linear-gradient(
             145deg,
-            rgba(17,33,52,.96),
-            rgba(12,25,42,.94)
+            rgba(18,34,53,.96),
+            rgba(10,22,37,.96)
         );
-    border:1px solid rgba(255,255,255,.065);
+
+    border:1px solid var(--border);
+
     border-bottom-right-radius:5px;
+
+    box-shadow:
+        0 10px 30px rgba(0,0,0,.12);
 }
 
 .message-actions{
     display:flex;
-    justify-content:flex-start;
-    gap:4px;
-    margin-top:5px;
     direction:ltr;
+
+    gap:5px;
+
+    margin-top:5px;
 }
 
-.message-action{
-    display:flex;
-    align-items:center;
-    gap:4px;
+.copy-btn{
     padding:4px 7px;
+
     border-radius:7px;
+
     background:transparent;
-    color:#71879e;
+    color:#7890a9;
+
+    opacity:.6;
+
     font-size:10px;
-    opacity:.65;
-    transition:.18s;
+
+    transition:.2s;
 }
 
-.message-action:hover{
+.copy-btn:hover{
     opacity:1;
-    background:rgba(255,255,255,.045);
-    color:#c6d6e7;
-}
-
-.message-action svg{
-    width:12px;
-    height:12px;
+    background:rgba(255,255,255,.05);
 }
 
 #typing{
     display:none;
+
     align-items:center;
     justify-content:flex-end;
-    margin:8px 0 14px;
-    color:var(--muted2);
-    font-size:10px;
-}
 
-.typing-box{
-    display:flex;
-    align-items:center;
-    gap:7px;
+    margin:7px 0 15px;
+
+    color:var(--muted);
+
+    font-size:11px;
 }
 
 .typing-dots{
     display:flex;
     gap:4px;
+
+    margin-right:8px;
 }
 
 .typing-dots span{
     width:5px;
     height:5px;
+
     border-radius:50%;
-    background:#7591ad;
+
+    background:#7894af;
+
     animation:bounce 1s infinite;
 }
 
@@ -696,185 +744,307 @@ input:focus-visible{
     animation-delay:.3s;
 }
 
-/* =========================
+/* =====================================================
    INPUT
-========================= */
+===================================================== */
 
 .input-wrapper{
     padding:
-        10px
-        max(14px, calc((100% - 940px) / 2))
-        18px;
+        12px
+        20px
+        19px;
+
     background:
         linear-gradient(
             transparent,
-            rgba(4,10,17,.94) 30%
+            rgba(4,9,16,.96) 35%
         );
+
+    z-index:20;
 }
 
 .input-box{
-    max-width:920px;
-    min-height:62px;
+    max-width:980px;
     margin:auto;
+
     display:flex;
     align-items:flex-end;
-    gap:7px;
-    padding:8px;
-    border:1px solid rgba(255,255,255,.09);
+    gap:8px;
+
+    padding:9px;
+
+    border:1px solid rgba(255,255,255,.10);
+
     border-radius:18px;
+
     background:
-        linear-gradient(
-            145deg,
-            rgba(15,31,49,.97),
-            rgba(10,23,38,.97)
-        );
-    box-shadow:var(--shadow);
+        rgba(11,24,40,.94);
+
+    box-shadow:
+        0 20px 55px rgba(0,0,0,.28);
+
     transition:.2s;
 }
 
 .input-box:focus-within{
-    border-color:rgba(53,151,255,.45);
+    border-color:
+        rgba(45,140,255,.48);
+
     box-shadow:
-        0 0 0 3px rgba(42,139,238,.07),
-        var(--shadow);
+        0 0 0 3px rgba(45,140,255,.07),
+        0 20px 55px rgba(0,0,0,.28);
 }
 
 .input-tools{
     display:flex;
-    align-items:center;
-    gap:4px;
+    gap:5px;
+    padding-bottom:3px;
 }
 
 .tool-button{
-    width:39px;
-    height:39px;
-    flex:0 0 39px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
+    width:38px;
+    height:38px;
+
     border-radius:11px;
-    background:transparent;
-    color:#7890a8;
-    transition:.18s;
+
+    background:rgba(255,255,255,.045);
+    border:1px solid transparent;
+
+    color:#91a6bc;
+
+    transition:.2s;
 }
 
 .tool-button:hover{
-    color:#b9d8f5;
-    background:rgba(255,255,255,.055);
-}
-
-.tool-button.active{
-    color:#68bcff;
-    background:rgba(39,143,239,.12);
-}
-
-.tool-button svg{
-    width:18px;
-    height:18px;
+    color:#dcecff;
+    background:rgba(255,255,255,.075);
+    border-color:var(--border);
 }
 
 #input{
     flex:1;
+
     min-width:0;
-    max-height:145px;
+
+    max-height:150px;
+
     resize:none;
+
+    outline:none;
     border:0;
-    outline:0;
+
     background:transparent;
-    color:#f7fbff;
-    padding:9px 7px;
-    font-size:13px;
+
+    color:white;
+
+    padding:8px 9px;
+
     line-height:1.65;
+    font-size:14px;
 }
 
 #input::placeholder{
-    color:#62788f;
+    color:#62778e;
 }
 
 #send{
-    width:43px;
-    height:43px;
-    flex:0 0 43px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
+    width:44px;
+    height:44px;
+    flex:0 0 44px;
+
     border-radius:13px;
+
+    color:#fff;
+
     background:
         linear-gradient(
             145deg,
-            #319cff,
-            #1465c7
+            #2e98ff,
+            #1263c8
         );
-    color:white;
-    box-shadow:0 7px 22px rgba(30,126,235,.2);
+
+    box-shadow:
+        0 8px 25px rgba(35,137,255,.2);
+
+    font-size:18px;
+
     transition:.2s;
 }
 
-#send svg{
-    width:19px;
-    height:19px;
-}
-
 #send:hover{
-    transform:scale(1.045);
+    transform:translateY(-1px) scale(1.025);
 }
 
 #send:disabled{
-    opacity:.42;
-    transform:none;
+    opacity:.4;
     cursor:not-allowed;
-}
-
-.search-status{
-    display:none;
-    max-width:920px;
-    margin:6px auto 0;
-    padding:0 5px;
-    color:#69baff;
-    font-size:9px;
+    transform:none;
 }
 
 .hint{
+    max-width:980px;
+    margin:7px auto 0;
+
     text-align:center;
-    color:#4d637a;
+
+    color:#4f6278;
+
     font-size:9px;
-    margin-top:7px;
 }
 
-/* =========================
-   MOBILE OVERLAY
-========================= */
+/* =====================================================
+   SEARCH / FILE READY UI
+===================================================== */
 
-.sidebar-overlay{
-    display:none;
+.feature-pill{
+    position:relative;
 }
 
-/* =========================
-   SCROLLBAR
-========================= */
+.feature-pill.active{
+    color:#62b6ff;
 
-::-webkit-scrollbar{
-    width:6px;
+    background:
+        rgba(35,137,255,.09);
+
+    border-color:
+        rgba(35,137,255,.25);
 }
 
-::-webkit-scrollbar-track{
-    background:transparent;
+.feature-pill::after{
+    content:"به‌زودی";
+
+    position:absolute;
+
+    top:-7px;
+    left:-5px;
+
+    padding:2px 5px;
+
+    border-radius:5px;
+
+    background:#132a43;
+
+    color:#7290ad;
+
+    font-size:7px;
+
+    opacity:0;
+
+    transition:.2s;
 }
 
-::-webkit-scrollbar-thumb{
-    background:#1a3047;
-    border-radius:20px;
+.feature-pill:hover::after{
+    opacity:1;
 }
 
-/* =========================
-   ANIMATIONS
-========================= */
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media(max-width:850px){
+
+    .sidebar{
+        position:fixed;
+
+        top:0;
+        right:0;
+
+        transform:translateX(105%);
+
+        box-shadow:
+            -25px 0 70px rgba(0,0,0,.45);
+    }
+
+    .sidebar.open{
+        transform:translateX(0);
+    }
+
+    .mobile-menu{
+        display:block;
+    }
+
+    .topbar{
+        padding:0 12px;
+    }
+
+    .top-actions{
+        display:none;
+    }
+
+    #chat{
+        padding:
+            18px
+            12px
+            25px;
+    }
+
+    .message-box{
+        max-width:84%;
+    }
+
+    .welcome{
+        padding-top:45px;
+    }
+
+    .welcome-logo{
+        width:76px;
+        height:76px;
+        border-radius:23px;
+        font-size:37px;
+    }
+
+    .welcome h1{
+        font-size:27px;
+    }
+
+    .quick-actions{
+        grid-template-columns:1fr;
+        max-width:360px;
+    }
+
+    .input-wrapper{
+        padding:8px 9px 12px;
+    }
+
+    .input-tools{
+        display:none;
+    }
+}
+
+@media(max-width:480px){
+
+    .sidebar{
+        width:290px;
+        flex-basis:290px;
+    }
+
+    .message{
+        font-size:13px;
+        padding:12px 14px;
+    }
+
+    .avatar{
+        width:30px;
+        height:30px;
+        flex-basis:30px;
+        margin:0 5px;
+    }
+
+    .welcome p{
+        font-size:12px;
+    }
+}
+
+/* =====================================================
+   ANIMATION
+===================================================== */
 
 @keyframes fadeIn{
     from{
         opacity:0;
         transform:translateY(12px);
     }
+
     to{
         opacity:1;
         transform:translateY(0);
@@ -884,8 +1054,9 @@ input:focus-visible{
 @keyframes messageIn{
     from{
         opacity:0;
-        transform:translateY(5px);
+        transform:translateY(6px);
     }
+
     to{
         opacity:1;
         transform:translateY(0);
@@ -896,171 +1067,9 @@ input:focus-visible{
     0%,60%,100%{
         transform:translateY(0);
     }
+
     30%{
         transform:translateY(-4px);
-    }
-}
-
-/* =========================
-   MOBILE
-========================= */
-
-@media(max-width:750px){
-
-    .sidebar{
-        position:fixed;
-        right:-310px;
-        top:0;
-        width:300px;
-        flex-basis:300px;
-        box-shadow:-25px 0 70px rgba(0,0,0,.42);
-        transition:right .25s ease;
-    }
-
-    .sidebar.open{
-        right:0;
-    }
-
-    .sidebar-overlay{
-        position:fixed;
-        inset:0;
-        z-index:40;
-        background:rgba(0,0,0,.45);
-        backdrop-filter:blur(2px);
-    }
-
-    .sidebar-overlay.show{
-        display:block;
-    }
-
-    .mobile-menu{
-        display:flex;
-    }
-
-    .topbar{
-        height:64px;
-        flex-basis:64px;
-        padding:0 12px;
-    }
-
-    .top-action.history-label-button{
-        padding:0 9px;
-    }
-
-    .top-action span{
-        display:none;
-    }
-
-    #chat{
-        padding:20px 11px 28px;
-    }
-
-    .welcome{
-        padding:30px 10px 20px;
-    }
-
-    .welcome-logo{
-        width:72px;
-        height:72px;
-        border-radius:23px;
-    }
-
-    .welcome-logo svg{
-        width:43px;
-        height:43px;
-    }
-
-    .welcome h1{
-        font-size:24px;
-    }
-
-    .quick-actions{
-        grid-template-columns:1fr;
-        max-width:420px;
-        margin-top:23px;
-    }
-
-    .quick-card{
-        min-height:auto;
-        padding:12px;
-        display:flex;
-        align-items:center;
-        gap:11px;
-        text-align:right;
-    }
-
-    .quick-icon{
-        margin:0;
-        flex:0 0 31px;
-    }
-
-    .message-box{
-        max-width:84%;
-    }
-
-    .message{
-        font-size:13px;
-    }
-
-    .input-wrapper{
-        padding:8px 8px 12px;
-    }
-
-    .input-box{
-        min-height:57px;
-        border-radius:16px;
-    }
-
-    .tool-button{
-        width:35px;
-        height:35px;
-        flex-basis:35px;
-    }
-
-    #send{
-        width:40px;
-        height:40px;
-        flex-basis:40px;
-    }
-
-    .hint{
-        font-size:8px;
-    }
-}
-
-@media(max-width:420px){
-
-    .brand{
-        padding:15px;
-    }
-
-    .topbar{
-        padding:0 9px;
-    }
-
-    .model-name{
-        font-size:12px;
-    }
-
-    .message-box{
-        max-width:88%;
-    }
-
-    .avatar{
-        width:30px;
-        height:30px;
-        flex-basis:30px;
-        margin:0 5px;
-    }
-
-    .input-tools{
-        gap:1px;
-    }
-
-    .tool-button{
-        width:32px;
-        height:32px;
-        flex-basis:32px;
     }
 }
 </style>
@@ -1070,415 +1079,257 @@ input:focus-visible{
 
 <div class="app">
 
-    <!-- SIDEBAR -->
-    <aside class="sidebar" id="sidebar">
+<!-- =====================================================
+     SIDEBAR
+===================================================== -->
 
-        <div class="brand">
+<aside class="sidebar" id="sidebar">
 
-            <div class="brand-logo">
-                <svg viewBox="0 0 64 64" fill="none">
-                    <path
-                        d="M10 37c8 12 24 17 37 10 8-4 12-11 12-20-4 5-9 8-15 8-8 0-13-5-17-11-3-5-7-7-12-6 3 3 4 7 2 11-2 4-4 6-7 8Z"
-                        fill="white"
-                        opacity=".96"
-                    />
-                    <path
-                        d="M39 14c2-5 6-8 11-9-1 4-1 8 1 11"
-                        stroke="white"
-                        stroke-width="4"
-                        stroke-linecap="round"
-                        opacity=".95"
-                    />
-                    <circle
-                        cx="45"
-                        cy="28"
-                        r="2.4"
-                        fill="#1265c9"
-                    />
-                </svg>
-            </div>
+    <div class="brand">
 
-            <div class="brand-text">
-                <div class="brand-title">Whale AI</div>
-                <div class="brand-subtitle">
-                    دستیار هوشمند شما
-                </div>
-            </div>
+        <div class="logo">🐋</div>
 
+        <div>
+            <div class="brand-name">Whale AI</div>
+            <div class="brand-desc">دستیار هوشمند نسل جدید</div>
         </div>
 
-        <button class="new-chat" id="newChatButton">
+    </div>
 
-            <svg viewBox="0 0 24 24" fill="none">
-                <path
-                    d="M12 5v14M5 12h14"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                />
-            </svg>
+    <button class="new-chat" id="newChatButton">
+        <span>＋</span>
+        <span>گفت‌وگوی جدید</span>
+    </button>
 
-            گفت‌وگوی جدید
+    <div class="sidebar-section-title">
+        گفتگوهای اخیر
+    </div>
 
+    <div id="historyList"></div>
+
+    <div class="sidebar-bottom">
+
+        <button class="clear-all" id="clearAll">
+            🗑 حذف همه گفتگوها
         </button>
 
-        <div class="history-header">
-            <div class="history-heading">
-                گفت‌وگوهای اخیر
+    </div>
+
+</aside>
+
+
+<!-- =====================================================
+     MAIN
+===================================================== -->
+
+<main class="main">
+
+<header class="topbar">
+
+    <div class="model-info">
+
+        <button
+            class="mobile-menu"
+            id="mobileMenu"
+        >
+            ☰
+        </button>
+
+        <div class="status"></div>
+
+        <div>
+            <div class="model-name">
+                Whale AI
             </div>
 
-            <div class="history-label">
-                Whale AI
+            <div class="model-status">
+                آماده پاسخ‌گویی
             </div>
         </div>
 
-        <div id="historyList"></div>
+    </div>
 
-        <div class="sidebar-bottom">
+    <div class="top-actions">
 
-            <button class="clear-all" id="clearAll">
+        <button
+            class="top-button"
+            id="historyButton"
+        >
+            🗂
+            <span>تاریخچه</span>
+        </button>
 
-                <svg viewBox="0 0 24 24" fill="none">
-                    <path
-                        d="M4 7h16M9 7V4h6v3m-9 0 1 13h10l1-13"
-                        stroke="currentColor"
-                        stroke-width="1.7"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                    />
-                </svg>
+    </div>
 
-                حذف همه گفتگوها
+</header>
+
+
+<!-- =====================================================
+     CHAT
+===================================================== -->
+
+<section id="chat">
+
+    <div
+        class="welcome"
+        id="welcome"
+    >
+
+        <div class="welcome-logo">
+            🐋
+        </div>
+
+        <h1>
+            با Whale AI شروع کن
+        </h1>
+
+        <p>
+            بپرس، تحلیل کن، یاد بگیر و ایده‌پردازی کن.
+        </p>
+
+
+        <div class="quick-actions">
+
+            <button
+                class="quick-card"
+                data-prompt="یک موضوع را برای من به زبان ساده توضیح بده."
+            >
+
+                <div class="quick-icon">
+                    💡
+                </div>
+
+                <div class="quick-title">
+                    توضیح یک موضوع
+                </div>
+
+                <div class="quick-desc">
+                    مفاهیم سخت را ساده یاد بگیر
+                </div>
+
+            </button>
+
+
+            <button
+                class="quick-card"
+                data-prompt="برای مطالعه امروز یک برنامه منظم پیشنهاد بده."
+            >
+
+                <div class="quick-icon">
+                    📚
+                </div>
+
+                <div class="quick-title">
+                    کمک در مطالعه
+                </div>
+
+                <div class="quick-desc">
+                    برنامه‌ریزی و یادگیری
+                </div>
+
+            </button>
+
+
+            <button
+                class="quick-card"
+                data-prompt="یک ایده خلاقانه برای یک پروژه نرم‌افزاری پیشنهاد بده."
+            >
+
+                <div class="quick-icon">
+                    ⚡
+                </div>
+
+                <div class="quick-title">
+                    ایده‌پردازی
+                </div>
+
+                <div class="quick-desc">
+                    ساخت و توسعه ایده‌ها
+                </div>
 
             </button>
 
         </div>
 
-    </aside>
+    </div>
 
-    <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-    <!-- MAIN -->
-    <main class="main">
+    <div id="typing">
 
-        <!-- TOPBAR -->
-        <header class="topbar">
+        در حال دریافت پاسخ
 
-            <div class="top-left">
+        <div class="typing-dots">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
 
-                <button
-                    class="mobile-menu"
-                    id="mobileMenu"
-                    aria-label="منو"
-                >
-                    <svg viewBox="0 0 24 24" fill="none">
-                        <path
-                            d="M4 6h16M4 12h16M4 18h16"
-                            stroke="currentColor"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                        />
-                    </svg>
-                </button>
+    </div>
 
-                <div class="model-info">
+</section>
 
-                    <div class="status-dot"></div>
 
-                    <div>
-                        <div class="model-name">
-                            Whale AI
-                        </div>
+<!-- =====================================================
+     INPUT
+===================================================== -->
 
-                        <div class="model-status">
-                            آماده پاسخ‌گویی
-                        </div>
-                    </div>
+<div class="input-wrapper">
 
-                </div>
+    <div class="input-box">
 
-            </div>
+        <div class="input-tools">
 
-            <div class="top-actions">
-
-                <button
-                    class="top-action history-label-button"
-                    id="historyButton"
-                >
-
-                    <svg viewBox="0 0 24 24" fill="none">
-                        <path
-                            d="M4 5h16v14H4zM8 9h8M8 13h5"
-                            stroke="currentColor"
-                            stroke-width="1.7"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                        />
-                    </svg>
-
-                    <span>تاریخچه</span>
-
-                </button>
-
-            </div>
-
-        </header>
-
-        <!-- CHAT -->
-        <section id="chat">
-
-            <div class="welcome" id="welcome">
-
-                <div class="welcome-logo">
-
-                    <svg viewBox="0 0 64 64" fill="none">
-                        <path
-                            d="M10 37c8 12 24 17 37 10 8-4 12-11 12-20-4 5-9 8-15 8-8 0-13-5-17-11-3-5-7-7-12-6 3 3 4 7 2 11-2 4-4 6-7 8Z"
-                            fill="white"
-                        />
-                        <path
-                            d="M39 14c2-5 6-8 11-9-1 4-1 8 1 11"
-                            stroke="white"
-                            stroke-width="4"
-                            stroke-linecap="round"
-                        />
-                        <circle
-                            cx="45"
-                            cy="28"
-                            r="2.4"
-                            fill="#1265c9"
-                        />
-                    </svg>
-
-                </div>
-
-                <h1>
-                    به <span>Whale AI</span> خوش آمدی
-                </h1>
-
-                <p>
-                    هوش مصنوعی برای فکر کردن، ساختن و کشف کردن.
-                </p>
-
-                <div class="quick-actions">
-
-                    <button
-                        class="quick-card"
-                        data-prompt="یک موضوع جالب و علمی برای یادگیری امروز پیشنهاد بده."
-                    >
-
-                        <div class="quick-icon">
-                            <svg viewBox="0 0 24 24" fill="none">
-                                <path
-                                    d="M9 18h6M10 22h4M8 14c-4-4-1-10 4-10s8 6 4 10c-1 1-2 2-2 4h-4c0-2-1-3-2-4Z"
-                                    stroke="currentColor"
-                                    stroke-width="1.7"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                />
-                            </svg>
-                        </div>
-
-                        <div>
-                            <div class="quick-title">
-                                یادگیری
-                            </div>
-
-                            <div class="quick-desc">
-                                یک موضوع را عمیق یاد بگیر
-                            </div>
-                        </div>
-
-                    </button>
-
-                    <button
-                        class="quick-card"
-                        data-prompt="یک ایده خلاقانه و کاربردی برای یک پروژه نرم‌افزاری پیشنهاد بده."
-                    >
-
-                        <div class="quick-icon">
-                            <svg viewBox="0 0 24 24" fill="none">
-                                <path
-                                    d="M12 3v4m0 10v4M3 12h4m10 0h4M5.6 5.6l2.8 2.8m7.2 7.2 2.8 2.8m0-12.8-2.8 2.8m-7.2 7.2-2.8 2.8"
-                                    stroke="currentColor"
-                                    stroke-width="1.7"
-                                    stroke-linecap="round"
-                                />
-                            </svg>
-                        </div>
-
-                        <div>
-                            <div class="quick-title">
-                                ایده‌پردازی
-                            </div>
-
-                            <div class="quick-desc">
-                                ایده‌های تازه بساز
-                            </div>
-                        </div>
-
-                    </button>
-
-                    <button
-                        class="quick-card"
-                        data-prompt="این موضوع را به زبان انگلیسی توضیح بده و سپس یک خلاصه فارسی ارائه کن."
-                    >
-
-                        <div class="quick-icon">
-                            <svg viewBox="0 0 24 24" fill="none">
-                                <path
-                                    d="M4 5h16v14H4zM8 9h8M8 13h5"
-                                    stroke="currentColor"
-                                    stroke-width="1.7"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                />
-                            </svg>
-                        </div>
-
-                        <div>
-                            <div class="quick-title">
-                                زبان و ترجمه
-                            </div>
-
-                            <div class="quick-desc">
-                                فارسی و انگلیسی
-                            </div>
-                        </div>
-
-                    </button>
-
-                </div>
-
-            </div>
-
-            <div id="typing">
-
-                <div class="typing-box">
-
-                    در حال نوشتن
-
-                    <div class="typing-dots">
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                    </div>
-
-                </div>
-
-            </div>
-
-        </section>
-
-        <!-- INPUT -->
-        <div class="input-wrapper">
-
-            <div class="input-box">
-
-                <div class="input-tools">
-
-                    <button
-                        class="tool-button"
-                        id="fileButton"
-                        title="افزودن فایل"
-                        aria-label="افزودن فایل"
-                    >
-                        <svg viewBox="0 0 24 24" fill="none">
-                            <path
-                                d="M20 11.5 11.5 20a6 6 0 0 1-8.5-8.5l9-9a4 4 0 0 1 5.7 5.7l-8.8 8.8a2 2 0 1 1-2.8-2.8l8-8"
-                                stroke="currentColor"
-                                stroke-width="1.7"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                            />
-                        </svg>
-                    </button>
-
-                    <button
-                        class="tool-button"
-                        id="webSearchButton"
-                        title="جست‌وجوی وب"
-                        aria-label="جست‌وجوی وب"
-                    >
-                        <svg viewBox="0 0 24 24" fill="none">
-                            <circle
-                                cx="11"
-                                cy="11"
-                                r="6.5"
-                                stroke="currentColor"
-                                stroke-width="1.7"
-                            />
-                            <path
-                                d="m16 16 4 4"
-                                stroke="currentColor"
-                                stroke-width="1.7"
-                                stroke-linecap="round"
-                            />
-                            <path
-                                d="M8 11h6M11 8v6"
-                                stroke="currentColor"
-                                stroke-width="1.3"
-                                stroke-linecap="round"
-                                opacity=".7"
-                            />
-                        </svg>
-                    </button>
-
-                </div>
-
-                <textarea
-                    id="input"
-                    rows="1"
-                    placeholder="هر چیزی می‌خواهی بپرس..."
-                    autocomplete="off"
-                ></textarea>
-
-                <button
-                    id="send"
-                    title="ارسال"
-                    aria-label="ارسال"
-                >
-                    <svg viewBox="0 0 24 24" fill="none">
-                        <path
-                            d="M21 3 10.5 13.5"
-                            stroke="currentColor"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                        />
-                        <path
-                            d="m21 3-7 18-3.5-7.5L3 10 21 3Z"
-                            stroke="currentColor"
-                            stroke-width="1.7"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                        />
-                    </svg>
-                </button>
-
-            </div>
-
-            <div
-                class="search-status"
-                id="searchStatus"
+            <!-- آماده برای File Analysis -->
+            <button
+                class="tool-button feature-pill"
+                id="fileButton"
+                title="تحلیل فایل"
             >
-                جست‌وجوی وب فعال است
-            </div>
+                📎
+            </button>
 
-            <div class="hint">
-                Enter برای ارسال • Shift + Enter برای خط جدید
-            </div>
+            <!-- آماده برای Web Search -->
+            <button
+                class="tool-button feature-pill"
+                id="webButton"
+                title="جست‌وجوی وب"
+            >
+                🌐
+            </button>
 
         </div>
 
-    </main>
+        <textarea
+            id="input"
+            rows="1"
+            placeholder="پیامت را برای Whale AI بنویس..."
+            autocomplete="off"
+        ></textarea>
+
+        <button
+            id="send"
+            title="ارسال"
+        >
+            ➤
+        </button>
+
+    </div>
+
+    <div class="hint">
+        Enter برای ارسال • Shift + Enter برای خط جدید
+    </div>
 
 </div>
+
+</main>
+
+</div>
+
 
 <script>
 
 let currentConversationId = null;
 let isSending = false;
-let webSearchEnabled = false;
 
 const input =
     document.getElementById("input");
@@ -1513,84 +1364,36 @@ const mobileMenu =
 const sidebar =
     document.getElementById("sidebar");
 
-const sidebarOverlay =
-    document.getElementById("sidebarOverlay");
-
-const webSearchButton =
-    document.getElementById("webSearchButton");
-
 const fileButton =
     document.getElementById("fileButton");
 
-const searchStatus =
-    document.getElementById("searchStatus");
+const webButton =
+    document.getElementById("webButton");
 
 
-/* =========================
+/* =====================================================
    WELCOME
-========================= */
+===================================================== */
 
 function showWelcome(){
+
     welcome.style.display = "block";
+
 }
+
 
 function hideWelcome(){
+
     welcome.style.display = "none";
+
 }
 
 
-/* =========================
-   MESSAGE
-========================= */
+/* =====================================================
+   ADD MESSAGE
+===================================================== */
 
-function createIcon(type){
-
-    if(type === "user"){
-
-        return `
-            <svg viewBox="0 0 24 24" fill="none">
-                <circle
-                    cx="12"
-                    cy="8"
-                    r="3"
-                    stroke="currentColor"
-                    stroke-width="1.7"
-                />
-                <path
-                    d="M5 20c.8-4 3.1-6 7-6s6.2 2 7 6"
-                    stroke="currentColor"
-                    stroke-width="1.7"
-                    stroke-linecap="round"
-                />
-            </svg>
-        `;
-
-    }
-
-    return `
-        <svg viewBox="0 0 64 64" fill="none">
-            <path
-                d="M10 37c8 12 24 17 37 10 8-4 12-11 12-20-4 5-9 8-15 8-8 0-13-5-17-11-3-5-7-7-12-6 3 3 4 7 2 11-2 4-4 6-7 8Z"
-                fill="currentColor"
-            />
-            <path
-                d="M39 14c2-5 6-8 11-9-1 4-1 8 1 11"
-                stroke="currentColor"
-                stroke-width="4"
-                stroke-linecap="round"
-            />
-            <circle
-                cx="45"
-                cy="28"
-                r="2.4"
-                fill="#07111f"
-            />
-        </svg>
-    `;
-}
-
-
-function addMessage(text, type){
+function addMessage(text,type){
 
     hideWelcome();
 
@@ -1617,8 +1420,10 @@ function addMessage(text, type){
                 : "bot-avatar"
         );
 
-    avatar.innerHTML =
-        createIcon(type);
+    avatar.textContent =
+        type === "user"
+            ? "👤"
+            : "🐋";
 
 
     const box =
@@ -1659,27 +1464,10 @@ function addMessage(text, type){
             document.createElement("button");
 
         copy.className =
-            "message-action";
+            "copy-btn";
 
-        copy.innerHTML = `
-            <svg viewBox="0 0 24 24" fill="none">
-                <rect
-                    x="8"
-                    y="8"
-                    width="11"
-                    height="11"
-                    rx="2"
-                    stroke="currentColor"
-                    stroke-width="1.6"
-                />
-                <path
-                    d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"
-                    stroke="currentColor"
-                    stroke-width="1.6"
-                />
-            </svg>
-            کپی
-        `;
+        copy.textContent =
+            "📋 کپی";
 
 
         copy.onclick =
@@ -1691,42 +1479,13 @@ function addMessage(text, type){
                         message.textContent
                     );
 
-                    copy.innerHTML = `
-                        <svg viewBox="0 0 24 24" fill="none">
-                            <path
-                                d="m5 12 4 4L19 6"
-                                stroke="currentColor"
-                                stroke-width="2"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                            />
-                        </svg>
-                        کپی شد
-                    `;
+                    copy.textContent =
+                        "✓ کپی شد";
 
                     setTimeout(
                         () => {
-
-                            copy.innerHTML = `
-                                <svg viewBox="0 0 24 24" fill="none">
-                                    <rect
-                                        x="8"
-                                        y="8"
-                                        width="11"
-                                        height="11"
-                                        rx="2"
-                                        stroke="currentColor"
-                                        stroke-width="1.6"
-                                    />
-                                    <path
-                                        d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"
-                                        stroke="currentColor"
-                                        stroke-width="1.6"
-                                    />
-                                </svg>
-                                کپی
-                            `;
-
+                            copy.textContent =
+                                "📋 کپی";
                         },
                         1500
                     );
@@ -1765,6 +1524,7 @@ function addMessage(text, type){
         typing
     );
 
+
     chat.scrollTop =
         chat.scrollHeight;
 
@@ -1773,25 +1533,26 @@ function addMessage(text, type){
 }
 
 
-/* =========================
-   CLEAR
-========================= */
+/* =====================================================
+   CLEAR CHAT
+===================================================== */
 
 function clearChat(){
 
-    chat.querySelectorAll(
-        ".message-row"
-    ).forEach(
-        element => element.remove()
-    );
+    chat
+        .querySelectorAll(".message-row")
+        .forEach(
+            element => element.remove()
+        );
 
     showWelcome();
+
 }
 
 
-/* =========================
+/* =====================================================
    NEW CONVERSATION
-========================= */
+===================================================== */
 
 async function createNewConversation(){
 
@@ -1805,6 +1566,7 @@ async function createNewConversation(){
                 }
             );
 
+
         if(!response.ok){
 
             throw new Error(
@@ -1813,15 +1575,18 @@ async function createNewConversation(){
 
         }
 
+
         const data =
             await response.json();
+
 
         currentConversationId =
             data.id;
 
+
         clearChat();
 
-        closeSidebar();
+        sidebar.classList.remove("open");
 
         input.focus();
 
@@ -1832,12 +1597,13 @@ async function createNewConversation(){
         console.error(error);
 
     }
+
 }
 
 
-/* =========================
-   SEND
-========================= */
+/* =====================================================
+   SEND MESSAGE
+===================================================== */
 
 async function sendMessage(){
 
@@ -1845,29 +1611,36 @@ async function sendMessage(){
         return;
     }
 
+
     const text =
         input.value.trim();
+
 
     if(!text){
         return;
     }
 
+
     isSending = true;
 
     send.disabled = true;
+
 
     addMessage(
         text,
         "user"
     );
 
+
     input.value = "";
 
     input.style.height =
         "auto";
 
+
     typing.style.display =
         "flex";
+
 
     try{
 
@@ -1903,6 +1676,7 @@ async function sendMessage(){
                         () => ({})
                     );
 
+
             throw new Error(
                 errorData.error ||
                 "خطا در ارتباط با سرور"
@@ -1925,7 +1699,7 @@ async function sendMessage(){
         if(!response.body){
 
             throw new Error(
-                "پاسخی از سرور دریافت نشد."
+                "پاسخ سرور قابل دریافت نیست."
             );
 
         }
@@ -1935,7 +1709,10 @@ async function sendMessage(){
             response.body.getReader();
 
         const decoder =
-            new TextDecoder("utf-8");
+            new TextDecoder(
+                "utf-8"
+            );
+
 
         let buffer = "";
 
@@ -1944,6 +1721,7 @@ async function sendMessage(){
 
             const result =
                 await reader.read();
+
 
             if(result.done){
                 break;
@@ -1962,16 +1740,16 @@ async function sendMessage(){
             const lines =
                 buffer.split("\n");
 
+
             buffer =
                 lines.pop();
 
 
-            for(
-                const line of lines
-            ){
+            for(const line of lines){
 
                 const cleanLine =
                     line.trim();
+
 
                 if(!cleanLine){
                     continue;
@@ -2043,11 +1821,13 @@ async function sendMessage(){
         typing.style.display =
             "none";
 
+
         addMessage(
             error.message ||
             "ارتباط با سرور برقرار نشد.",
             "bot"
         );
+
 
         console.error(error);
 
@@ -2056,6 +1836,7 @@ async function sendMessage(){
 
     typing.style.display =
         "none";
+
 
     isSending = false;
 
@@ -2066,9 +1847,9 @@ async function sendMessage(){
 }
 
 
-/* =========================
+/* =====================================================
    LOAD CONVERSATIONS
-========================= */
+===================================================== */
 
 async function loadConversations(){
 
@@ -2099,16 +1880,19 @@ async function loadConversations(){
 
         if(data.length === 0){
 
-            historyList.innerHTML = `
-                <div style="
-                    padding:20px 12px;
+            historyList.innerHTML =
+                `
+                <div
+                    style="
+                    padding:18px;
                     color:#647990;
-                    font-size:10px;
+                    font-size:11px;
                     text-align:center;
-                ">
+                    "
+                >
                     هنوز گفت‌وگویی وجود ندارد.
                 </div>
-            `;
+                `;
 
             return;
 
@@ -2119,9 +1903,7 @@ async function loadConversations(){
             conversation => {
 
                 const row =
-                    document.createElement(
-                        "div"
-                    );
+                    document.createElement("div");
 
 
                 row.className =
@@ -2141,18 +1923,14 @@ async function loadConversations(){
 
 
                 const info =
-                    document.createElement(
-                        "div"
-                    );
+                    document.createElement("div");
 
                 info.className =
                     "conversation-info";
 
 
                 const title =
-                    document.createElement(
-                        "div"
-                    );
+                    document.createElement("div");
 
                 title.className =
                     "conversation-title";
@@ -2163,15 +1941,16 @@ async function loadConversations(){
 
 
                 const count =
-                    document.createElement(
-                        "div"
-                    );
+                    document.createElement("div");
 
                 count.className =
                     "conversation-count";
 
                 count.textContent =
-                    conversation.message_count +
+                    (
+                        conversation.message_count ||
+                        0
+                    ) +
                     " پیام";
 
 
@@ -2190,27 +1969,13 @@ async function loadConversations(){
 
 
                 const deleteButton =
-                    document.createElement(
-                        "button"
-                    );
+                    document.createElement("button");
 
                 deleteButton.className =
                     "delete-conversation";
 
-                deleteButton.title =
-                    "حذف گفتگو";
-
-                deleteButton.innerHTML = `
-                    <svg viewBox="0 0 24 24" fill="none">
-                        <path
-                            d="M4 7h16M9 7V4h6v3m-9 0 1 13h10l1-13"
-                            stroke="currentColor"
-                            stroke-width="1.7"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                        />
-                    </svg>
-                `;
+                deleteButton.textContent =
+                    "🗑";
 
 
                 deleteButton.onclick =
@@ -2228,6 +1993,7 @@ async function loadConversations(){
                 row.appendChild(info);
                 row.appendChild(deleteButton);
 
+
                 historyList.appendChild(row);
 
             }
@@ -2243,9 +2009,9 @@ async function loadConversations(){
 }
 
 
-/* =========================
+/* =====================================================
    OPEN CONVERSATION
-========================= */
+===================================================== */
 
 async function openConversation(id){
 
@@ -2293,7 +2059,7 @@ async function openConversation(id){
         );
 
 
-        closeSidebar();
+        sidebar.classList.remove("open");
 
         await loadConversations();
 
@@ -2309,9 +2075,9 @@ async function openConversation(id){
 }
 
 
-/* =========================
-   DELETE CONVERSATION
-========================= */
+/* =====================================================
+   DELETE
+===================================================== */
 
 async function deleteConversation(id){
 
@@ -2320,9 +2086,7 @@ async function deleteConversation(id){
             "این گفت‌وگو حذف شود؟"
         )
     ){
-
         return;
-
     }
 
 
@@ -2371,9 +2135,9 @@ async function deleteConversation(id){
 }
 
 
-/* =========================
+/* =====================================================
    DELETE ALL
-========================= */
+===================================================== */
 
 clearAll.onclick =
     async () => {
@@ -2383,9 +2147,7 @@ clearAll.onclick =
                 "همه گفت‌وگوها حذف شوند؟"
             )
         ){
-
             return;
-
         }
 
 
@@ -2412,6 +2174,7 @@ clearAll.onclick =
             currentConversationId =
                 null;
 
+
             clearChat();
 
             await loadConversations();
@@ -2426,131 +2189,108 @@ clearAll.onclick =
     };
 
 
-/* =========================
-   WEB SEARCH UI
-========================= */
+/* =====================================================
+   NAVIGATION
+===================================================== */
 
-webSearchButton.onclick =
-    () => {
-
-        webSearchEnabled =
-            !webSearchEnabled;
-
-        webSearchButton.classList.toggle(
-            "active",
-            webSearchEnabled
-        );
-
-        searchStatus.style.display =
-            webSearchEnabled
-                ? "block"
-                : "none";
-
-    };
-
-
-/* =========================
-   FILE UI
-========================= */
-
-fileButton.onclick =
-    () => {
-
-        alert(
-            "قابلیت تحلیل فایل در مرحله بعد به Backend متصل می‌شود."
-        );
-
-    };
-
-
-/* =========================
-   SIDEBAR
-========================= */
-
-function openSidebar(){
-
-    sidebar.classList.add("open");
-
-    sidebarOverlay.classList.add("show");
-
-    loadConversations();
-
-}
-
-function closeSidebar(){
-
-    sidebar.classList.remove("open");
-
-    sidebarOverlay.classList.remove("show");
-
-}
+newChatButton.onclick =
+    createNewConversation;
 
 
 historyButton.onclick =
-    openSidebar;
+    () => {
+
+        sidebar.classList.add("open");
+
+        loadConversations();
+
+    };
 
 
 mobileMenu.onclick =
     () => {
 
+        sidebar.classList.toggle("open");
+
+    };
+
+
+/* =====================================================
+   QUICK PROMPTS
+===================================================== */
+
+document
+    .querySelectorAll(".quick-card")
+    .forEach(
+        card => {
+
+            card.onclick =
+                () => {
+
+                    const prompt =
+                        card.dataset.prompt;
+
+                    input.value =
+                        prompt;
+
+                    input.focus();
+
+                    input.style.height =
+                        "auto";
+
+                    input.style.height =
+                        Math.min(
+                            input.scrollHeight,
+                            150
+                        ) + "px";
+
+                };
+
+        }
+    );
+
+
+/* =====================================================
+   FUTURE FEATURES
+===================================================== */
+
+fileButton.onclick =
+    () => {
+
+        alert(
+            "قابلیت تحلیل فایل در مرحله بعد به Whale AI اضافه می‌شود."
+        );
+
+    };
+
+
+webButton.onclick =
+    () => {
+
+        webButton.classList.toggle(
+            "active"
+        );
+
         if(
-            sidebar.classList.contains("open")
+            webButton.classList.contains("active")
         ){
 
-            closeSidebar();
+            webButton.title =
+                "جست‌وجوی وب فعال است";
 
         }else{
 
-            openSidebar();
+            webButton.title =
+                "جست‌وجوی وب";
 
         }
 
     };
 
 
-sidebarOverlay.onclick =
-    closeSidebar;
-
-
-/* =========================
-   QUICK PROMPTS
-========================= */
-
-document.querySelectorAll(
-    ".quick-card"
-).forEach(
-    card => {
-
-        card.addEventListener(
-            "click",
-            () => {
-
-                const prompt =
-                    card.dataset.prompt;
-
-                if(!prompt){
-                    return;
-                }
-
-                input.value =
-                    prompt;
-
-                input.dispatchEvent(
-                    new Event("input")
-                );
-
-                input.focus();
-
-            }
-        );
-
-    }
-);
-
-
-/* =========================
-   KEYBOARD
-========================= */
+/* =====================================================
+   TEXTAREA
+===================================================== */
 
 input.addEventListener(
     "keydown",
@@ -2571,10 +2311,6 @@ input.addEventListener(
 );
 
 
-/* =========================
-   AUTO RESIZE
-========================= */
-
 input.addEventListener(
     "input",
     () => {
@@ -2585,24 +2321,20 @@ input.addEventListener(
         input.style.height =
             Math.min(
                 input.scrollHeight,
-                145
+                150
             ) + "px";
 
     }
 );
 
 
-/* =========================
-   SEND
-========================= */
-
 send.onclick =
     sendMessage;
 
 
-/* =========================
+/* =====================================================
    START
-========================= */
+===================================================== */
 
 loadConversations();
 
