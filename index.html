@@ -16,174 +16,265 @@
 
 * {
     box-sizing: border-box;
-    margin: 0;
-    padding: 0;
 }
 
 :root {
-    --bg: #0b0f14;
-    --sidebar: #10151c;
-    --panel: #151b23;
-    --panel2: #1b222c;
-    --border: rgba(255,255,255,.08);
-    --text: #f3f5f7;
-    --muted: #8d98a6;
-    --accent: #58a6ff;
-    --accent2: #2f81f7;
-    --user: #1d4f91;
-    --assistant: #151b23;
+    --bg: #080b12;
+    --sidebar: #0d111a;
+    --panel: #101621;
+    --panel2: #151c28;
+    --border: #202a3a;
+    --text: #f2f5f8;
+    --muted: #8c97a8;
+    --accent: #5b8cff;
+    --accent2: #3974ff;
+    --user: #1d2940;
+    --assistant: #121923;
+}
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
 }
 
 body {
+
+    background: var(--bg);
+
+    color: var(--text);
+
     font-family:
-        -apple-system,
-        BlinkMacSystemFont,
         "Segoe UI",
         Tahoma,
         Arial,
         sans-serif;
 
-    background: var(--bg);
-    color: var(--text);
-
-    height: 100vh;
     overflow: hidden;
-}
-
-button,
-textarea {
-    font-family: inherit;
 }
 
 
 /* =====================================================
    APP
-   ===================================================== */
+===================================================== */
 
 .app {
+
     display: flex;
-    height: 100vh;
+
     width: 100%;
+    height: 100vh;
+
 }
 
 
 /* =====================================================
    SIDEBAR
-   ===================================================== */
+===================================================== */
 
 .sidebar {
-    width: 290px;
+
+    width: 285px;
+
+    min-width: 285px;
+
     background: var(--sidebar);
-    border-left: 1px solid var(--border);
+
+    border-left:
+        1px solid var(--border);
 
     display: flex;
+
     flex-direction: column;
 
-    transition: .25s;
+    padding: 18px 14px;
+
 }
 
-.sidebar-header {
-    padding: 18px;
-}
+
+/* =====================================================
+   LOGO
+===================================================== */
 
 .logo {
+
     display: flex;
+
     align-items: center;
+
     gap: 12px;
 
-    font-size: 21px;
-    font-weight: 800;
+    padding:
+        8px 10px 18px;
+
 }
 
-.whale {
-    width: 42px;
-    height: 42px;
+
+.whale-logo {
+
+    width: 45px;
+    height: 45px;
 
     border-radius: 14px;
 
     display: flex;
+
     align-items: center;
+
     justify-content: center;
 
     background:
         linear-gradient(
-            135deg,
-            #2484ff,
-            #1457b8
+            145deg,
+            #284fba,
+            #16377f
         );
 
-    font-size: 24px;
-
     box-shadow:
-        0 8px 30px rgba(37,132,255,.25);
+        0 8px 25px
+        rgba(49, 102, 255, .22);
+
+    font-size: 25px;
+
 }
 
+
+.logo-title {
+
+    font-size: 19px;
+
+    font-weight: 700;
+
+}
+
+
+.logo-subtitle {
+
+    font-size: 11px;
+
+    color: var(--muted);
+
+    margin-top: 2px;
+
+}
+
+
+/* =====================================================
+   NEW CHAT
+===================================================== */
+
 .new-chat {
+
     width: 100%;
 
-    border: 1px solid var(--border);
+    border: 1px solid
+        #293650;
 
-    background: var(--panel);
+    background:
+        #121a28;
 
     color: var(--text);
 
     border-radius: 12px;
 
-    padding: 12px;
+    padding: 12px 14px;
 
     cursor: pointer;
-
-    margin-top: 18px;
 
     font-size: 14px;
 
     transition: .2s;
+
+    margin-bottom: 16px;
+
 }
+
 
 .new-chat:hover {
-    background: var(--panel2);
+
+    background:
+        #182238;
+
+    border-color:
+        #38528a;
+
 }
 
+
+/* =====================================================
+   SIDEBAR TITLE
+===================================================== */
+
+.sidebar-title {
+
+    font-size: 12px;
+
+    color: var(--muted);
+
+    padding:
+        0 8px 8px;
+
+}
+
+
+/* =====================================================
+   CONVERSATIONS
+===================================================== */
+
 .conversations {
+
     flex: 1;
 
     overflow-y: auto;
 
-    padding: 8px 12px;
 }
 
+
 .conversation {
+
     display: flex;
 
     align-items: center;
-    justify-content: space-between;
 
     gap: 8px;
 
-    padding: 11px 12px;
+    padding:
+        11px 10px;
 
     border-radius: 10px;
 
     cursor: pointer;
 
-    color: var(--muted);
-
     margin-bottom: 4px;
 
-    transition: .2s;
+    color: #c9d0dc;
+
+    transition: .15s;
+
 }
+
 
 .conversation:hover {
-    background: var(--panel);
-    color: var(--text);
+
+    background:
+        #141c29;
+
 }
+
 
 .conversation.active {
-    background: var(--panel2);
-    color: var(--text);
+
+    background:
+        #19253a;
+
+    color: white;
+
 }
 
-.conversation-title {
+
+.conversation-text {
+
     overflow: hidden;
 
     white-space: nowrap;
@@ -191,75 +282,119 @@ textarea {
     text-overflow: ellipsis;
 
     flex: 1;
+
+    font-size: 13px;
+
 }
+
 
 .delete-conversation {
+
     opacity: 0;
 
-    border: none;
+    border: 0;
 
     background: transparent;
 
-    color: #ff6b6b;
+    color: #8994a5;
 
     cursor: pointer;
 
-    font-size: 16px;
+    font-size: 14px;
+
 }
 
-.conversation:hover .delete-conversation {
+
+.conversation:hover
+.delete-conversation {
+
     opacity: 1;
+
 }
 
-.sidebar-footer {
-    padding: 14px;
 
-    border-top: 1px solid var(--border);
+.delete-conversation:hover {
+
+    color: #ff6f7d;
+
 }
 
-.memory-btn {
+
+/* =====================================================
+   SIDEBAR BOTTOM
+===================================================== */
+
+.sidebar-bottom {
+
+    border-top:
+        1px solid var(--border);
+
+    padding-top: 12px;
+
+    margin-top: 10px;
+
+}
+
+
+.sidebar-button {
+
     width: 100%;
 
-    padding: 11px;
-
-    border: 1px solid var(--border);
-
-    border-radius: 10px;
+    border: 0;
 
     background: transparent;
 
-    color: var(--muted);
+    color: #aeb7c5;
+
+    padding: 10px;
+
+    border-radius: 9px;
+
+    text-align: right;
 
     cursor: pointer;
+
 }
 
-.memory-btn:hover {
-    background: var(--panel);
-    color: var(--text);
+
+.sidebar-button:hover {
+
+    background:
+        #141b27;
+
+    color: white;
+
 }
 
 
 /* =====================================================
    MAIN
-   ===================================================== */
+===================================================== */
 
 .main {
+
     flex: 1;
+
+    min-width: 0;
 
     display: flex;
 
     flex-direction: column;
 
-    min-width: 0;
+    position: relative;
+
 }
 
 
 /* =====================================================
    TOPBAR
-   ===================================================== */
+===================================================== */
 
 .topbar {
-    height: 65px;
+
+    height: 64px;
+
+    min-height: 64px;
 
     display: flex;
 
@@ -267,20 +402,32 @@ textarea {
 
     justify-content: space-between;
 
-    padding: 0 20px;
+    padding:
+        0 24px;
 
-    border-bottom: 1px solid var(--border);
+    border-bottom:
+        1px solid var(--border);
 
-    background: rgba(11,15,20,.85);
+    background:
+        rgba(8, 11, 18, .88);
 
-    backdrop-filter: blur(12px);
+    backdrop-filter:
+        blur(15px);
+
 }
+
 
 .topbar-title {
-    font-weight: 700;
+
+    font-size: 15px;
+
+    font-weight: 600;
+
 }
 
+
 .status {
+
     display: flex;
 
     align-items: center;
@@ -290,432 +437,574 @@ textarea {
     color: var(--muted);
 
     font-size: 12px;
+
 }
 
+
 .status-dot {
-    width: 8px;
-    height: 8px;
+
+    width: 7px;
+    height: 7px;
+
+    background: #39d98a;
 
     border-radius: 50%;
 
-    background: #3fb950;
-
     box-shadow:
-        0 0 10px #3fb950;
-}
+        0 0 10px
+        rgba(57, 217, 138, .7);
 
-.menu-btn {
-    display: none;
-
-    border: none;
-
-    background: transparent;
-
-    color: white;
-
-    font-size: 22px;
-
-    cursor: pointer;
 }
 
 
 /* =====================================================
    CHAT
-   ===================================================== */
+===================================================== */
 
 .chat {
+
     flex: 1;
 
     overflow-y: auto;
 
-    padding: 35px 20px 160px;
+    padding:
+        30px 20px 170px;
+
 }
+
 
 .chat-inner {
+
+    width: 100%;
+
     max-width: 900px;
 
-    margin: auto;
+    margin:
+        0 auto;
+
 }
+
+
+/* =====================================================
+   WELCOME
+===================================================== */
 
 .welcome {
+
+    min-height:
+        calc(100vh - 250px);
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    flex-direction: column;
+
     text-align: center;
 
-    padding-top: 10vh;
+    padding: 40px 20px;
+
 }
+
 
 .welcome-whale {
-    font-size: 65px;
 
-    margin-bottom: 15px;
+    font-size: 62px;
+
+    margin-bottom: 18px;
+
+    filter:
+        drop-shadow(
+            0 12px 25px
+            rgba(60, 110, 255, .25)
+        );
+
 }
+
 
 .welcome h1 {
+
+    margin: 0;
+
     font-size: 30px;
 
-    margin-bottom: 10px;
 }
 
+
 .welcome p {
+
+    margin-top: 10px;
+
     color: var(--muted);
 
-    font-size: 15px;
+    font-size: 14px;
+
 }
 
 
 /* =====================================================
    MESSAGE
-   ===================================================== */
+===================================================== */
+
+.message-row {
+
+    display: flex;
+
+    margin-bottom: 22px;
+
+}
+
+
+.message-row.user {
+
+    justify-content: flex-start;
+
+}
+
+
+.message-row.assistant {
+
+    justify-content: flex-end;
+
+}
+
 
 .message {
-    display: flex;
 
-    margin-bottom: 24px;
+    max-width: 82%;
 
-    gap: 12px;
-}
+    border-radius: 17px;
 
-.message.user {
-    justify-content: flex-start;
-}
+    padding:
+        13px 16px;
 
-.message.assistant {
-    justify-content: flex-end;
-}
+    line-height: 1.85;
 
-.avatar {
-    width: 36px;
-    height: 36px;
-
-    min-width: 36px;
-
-    border-radius: 11px;
-
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-
-    background: var(--panel2);
-
-    font-size: 18px;
-}
-
-.message.user .avatar {
-    order: 2;
-}
-
-.bubble {
-    max-width: min(760px, 85%);
-
-    padding: 13px 16px;
-
-    border-radius: 16px;
-
-    line-height: 1.9;
-
-    font-size: 15px;
+    font-size: 14px;
 
     white-space: normal;
 
     overflow-wrap: anywhere;
+
 }
 
-.message.user .bubble {
-    background: var(--user);
 
-    border-bottom-right-radius: 5px;
+.user-message {
+
+    background:
+        var(--user);
+
+    border:
+        1px solid #293b5e;
+
 }
 
-.message.assistant .bubble {
-    background: var(--assistant);
 
-    border: 1px solid var(--border);
+.assistant-message {
 
-    border-bottom-left-radius: 5px;
+    background:
+        var(--assistant);
+
+    border:
+        1px solid var(--border);
+
 }
 
-.bubble p {
-    margin-bottom: 10px;
-}
 
-.bubble p:last-child {
-    margin-bottom: 0;
-}
+.message-role {
 
-.bubble h1,
-.bubble h2,
-.bubble h3 {
-    margin: 12px 0 8px;
-}
+    font-size: 10px;
 
-.bubble ul,
-.bubble ol {
-    padding-right: 22px;
+    color: var(--muted);
 
-    margin: 8px 0;
-}
+    margin-bottom: 4px;
 
-.bubble code {
-    background: rgba(255,255,255,.08);
-
-    padding: 2px 5px;
-
-    border-radius: 5px;
-
-    direction: ltr;
-}
-
-.bubble pre {
-    direction: ltr;
-
-    text-align: left;
-
-    background: #090d12;
-
-    border: 1px solid var(--border);
-
-    padding: 14px;
-
-    border-radius: 10px;
-
-    overflow-x: auto;
-
-    margin: 12px 0;
-}
-
-.bubble pre code {
-    background: transparent;
-
-    padding: 0;
 }
 
 
 /* =====================================================
-   WEB SOURCES
-   ===================================================== */
+   MARKDOWN
+===================================================== */
 
-.sources {
-    margin-top: 15px;
+.message h1,
+.message h2,
+.message h3 {
 
-    border-top: 1px solid var(--border);
-
-    padding-top: 12px;
-}
-
-.sources-title {
-    font-size: 13px;
-
-    color: var(--muted);
+    margin-top: 12px;
 
     margin-bottom: 8px;
+
 }
 
-.source {
-    display: block;
 
-    text-decoration: none;
+.message p {
 
-    color: var(--text);
+    margin:
+        5px 0;
 
-    background: rgba(255,255,255,.03);
-
-    border: 1px solid var(--border);
-
-    padding: 9px 11px;
-
-    border-radius: 9px;
-
-    margin-bottom: 6px;
-
-    font-size: 13px;
-
-    transition: .2s;
 }
 
-.source:hover {
-    background: rgba(255,255,255,.07);
+
+.message ul,
+.message ol {
+
+    padding-right: 22px;
+
 }
 
-.source-url {
-    display: block;
 
-    color: var(--muted);
+.message code {
 
-    font-size: 11px;
+    background:
+        #080d15;
+
+    border:
+        1px solid #222d3d;
+
+    border-radius: 5px;
+
+    padding:
+        2px 5px;
+
+    direction: ltr;
+
+}
+
+
+.message pre {
 
     direction: ltr;
 
     text-align: left;
 
-    overflow: hidden;
+    overflow-x: auto;
 
-    text-overflow: ellipsis;
+    background:
+        #080d15;
+
+    border:
+        1px solid #222d3d;
+
+    padding: 13px;
+
+    border-radius: 10px;
+
+}
+
+
+.message pre code {
+
+    background: transparent;
+
+    border: 0;
+
+    padding: 0;
+
+}
+
+
+/* =====================================================
+   ATTACHMENT
+===================================================== */
+
+.file-card {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 9px;
+
+    background:
+        #101a2a;
+
+    border:
+        1px solid #2a3b5a;
+
+    padding:
+        8px 10px;
+
+    border-radius: 9px;
+
+    margin-bottom: 8px;
+
+    font-size: 12px;
+
+}
+
+
+.file-icon {
+
+    font-size: 18px;
+
+}
+
+
+.file-name {
+
+    overflow: hidden;
 
     white-space: nowrap;
 
-    margin-top: 3px;
+    text-overflow: ellipsis;
+
 }
 
 
 /* =====================================================
    TYPING
-   ===================================================== */
+===================================================== */
 
 .typing {
-    display: flex;
 
-    gap: 5px;
+    display: flex;
 
     align-items: center;
 
+    gap: 5px;
+
     padding: 8px;
+
 }
 
+
 .typing span {
+
     width: 7px;
+
     height: 7px;
 
     border-radius: 50%;
 
-    background: var(--muted);
+    background: #75839a;
 
     animation:
         typing 1.2s infinite;
+
 }
+
 
 .typing span:nth-child(2) {
+
     animation-delay: .15s;
+
 }
 
+
 .typing span:nth-child(3) {
+
     animation-delay: .3s;
+
 }
+
 
 @keyframes typing {
 
-    0%, 60%, 100% {
+    0%,
+    60%,
+    100% {
+
         transform: translateY(0);
-        opacity: .4;
+
+        opacity: .35;
+
     }
 
     30% {
-        transform: translateY(-5px);
+
+        transform:
+            translateY(-4px);
+
         opacity: 1;
+
     }
+
 }
 
 
 /* =====================================================
-   INPUT
-   ===================================================== */
+   INPUT AREA
+===================================================== */
 
 .input-area {
-    position: fixed;
+
+    position: absolute;
 
     bottom: 0;
 
-    left: 290px;
     right: 0;
 
-    padding: 15px 20px 20px;
+    left: 0;
+
+    padding:
+        18px 20px 20px;
 
     background:
         linear-gradient(
             transparent,
             var(--bg) 25%
         );
+
 }
 
-.input-inner {
+
+.input-container {
+
     max-width: 900px;
 
-    margin: auto;
+    margin: 0 auto;
+
 }
 
-.input-box {
-    display: flex;
 
-    align-items: flex-end;
+.composer {
 
-    gap: 8px;
+    background:
+        #111824;
 
-    background: var(--panel);
-
-    border: 1px solid var(--border);
+    border:
+        1px solid #273449;
 
     border-radius: 18px;
 
-    padding: 8px;
-
     box-shadow:
-        0 12px 45px rgba(0,0,0,.3);
+        0 12px 35px
+        rgba(0, 0, 0, .25);
+
+    overflow: hidden;
+
+    transition: .2s;
+
 }
 
-#messageInput {
-    flex: 1;
 
-    resize: none;
+.composer:focus-within {
+
+    border-color:
+        #3d5d99;
+
+    box-shadow:
+        0 12px 40px
+        rgba(40, 70, 130, .18);
+
+}
+
+
+textarea {
+
+    width: 100%;
+
+    min-height: 54px;
 
     max-height: 180px;
 
-    min-height: 42px;
+    resize: none;
 
-    background: transparent;
-
-    border: none;
+    border: 0;
 
     outline: none;
 
-    color: var(--text);
+    background: transparent;
 
-    padding: 10px 12px;
+    color: white;
 
-    font-size: 15px;
+    padding:
+        16px 18px 5px;
+
+    font-family: inherit;
+
+    font-size: 14px;
 
     line-height: 1.7;
+
 }
 
-#messageInput::placeholder {
-    color: #697483;
+
+textarea::placeholder {
+
+    color: #697587;
+
 }
 
-.web-toggle {
-    height: 42px;
 
-    padding: 0 13px;
+/* =====================================================
+   COMPOSER BOTTOM
+===================================================== */
 
-    border-radius: 11px;
+.composer-bottom {
 
-    border: 1px solid var(--border);
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    padding:
+        7px 9px 9px;
+
+}
+
+
+.composer-tools {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 5px;
+
+}
+
+
+.tool-button {
+
+    width: 38px;
+    height: 38px;
+
+    border: 0;
+
+    border-radius: 10px;
 
     background: transparent;
 
-    color: var(--muted);
+    color: #9ba6b7;
 
     cursor: pointer;
 
-    white-space: nowrap;
+    font-size: 18px;
 
-    transition: .2s;
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
 }
 
-.web-toggle.active {
+
+.tool-button:hover {
+
+    background:
+        #1a2434;
+
     color: white;
 
-    background: rgba(47,129,247,.2);
-
-    border-color: var(--accent);
 }
 
-.send-btn {
-    width: 42px;
-    height: 42px;
 
-    border: none;
+.send-button {
+
+    width: 40px;
+    height: 40px;
+
+    border: 0;
 
     border-radius: 12px;
 
-    background: var(--accent2);
+    background:
+        var(--accent);
 
     color: white;
 
@@ -723,233 +1012,255 @@ textarea {
 
     font-size: 18px;
 
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
     transition: .2s;
+
 }
 
-.send-btn:hover {
-    transform: translateY(-1px);
 
-    filter: brightness(1.1);
+.send-button:hover {
+
+    background:
+        var(--accent2);
+
+    transform:
+        translateY(-1px);
+
 }
 
-.send-btn:disabled {
-    opacity: .5;
+
+.send-button:disabled {
+
+    opacity: .45;
 
     cursor: not-allowed;
 
     transform: none;
-}
 
-.input-hint {
-    text-align: center;
-
-    color: #66707d;
-
-    font-size: 11px;
-
-    margin-top: 8px;
 }
 
 
 /* =====================================================
-   MEMORY MODAL
-   ===================================================== */
+   FILE PREVIEW
+===================================================== */
 
-.modal {
-    position: fixed;
-
-    inset: 0;
-
-    background: rgba(0,0,0,.65);
+.file-preview {
 
     display: none;
 
-    align-items: center;
-    justify-content: center;
+    padding:
+        8px 12px 0;
 
-    z-index: 100;
 }
 
-.modal.show {
-    display: flex;
+
+.file-preview.show {
+
+    display: block;
+
 }
 
-.modal-box {
-    width: min(520px, 92vw);
 
-    background: var(--panel);
+.file-preview-inner {
 
-    border: 1px solid var(--border);
-
-    border-radius: 18px;
-
-    padding: 20px;
-
-    box-shadow:
-        0 20px 70px rgba(0,0,0,.5);
-}
-
-.modal-header {
-    display: flex;
-
-    justify-content: space-between;
+    display: inline-flex;
 
     align-items: center;
-
-    margin-bottom: 15px;
-}
-
-.close-btn {
-    border: none;
-
-    background: transparent;
-
-    color: var(--muted);
-
-    font-size: 20px;
-
-    cursor: pointer;
-}
-
-.memory-form {
-    display: flex;
 
     gap: 8px;
 
-    margin-bottom: 15px;
-}
+    max-width: 100%;
 
-.memory-form input {
-    flex: 1;
+    padding:
+        7px 9px;
 
-    min-width: 0;
+    border:
+        1px solid #2a3a55;
 
-    background: var(--bg);
-
-    color: var(--text);
-
-    border: 1px solid var(--border);
+    background:
+        #0d1521;
 
     border-radius: 9px;
-
-    padding: 10px;
-}
-
-.memory-form button {
-    background: var(--accent2);
-
-    color: white;
-
-    border: none;
-
-    border-radius: 9px;
-
-    padding: 0 15px;
-
-    cursor: pointer;
-}
-
-.memory-item {
-    display: flex;
-
-    align-items: center;
-
-    justify-content: space-between;
-
-    gap: 10px;
-
-    background: var(--bg);
-
-    border: 1px solid var(--border);
-
-    border-radius: 10px;
-
-    padding: 10px;
-
-    margin-bottom: 7px;
-}
-
-.memory-content {
-    overflow: hidden;
-}
-
-.memory-key {
-    font-weight: 700;
-
-    font-size: 13px;
-}
-
-.memory-value {
-    color: var(--muted);
 
     font-size: 12px;
 
-    margin-top: 3px;
-
-    overflow: hidden;
-
-    text-overflow: ellipsis;
 }
 
-.memory-delete {
-    border: none;
+
+.remove-file {
+
+    border: 0;
 
     background: transparent;
 
-    color: #ff6b6b;
+    color: #8f9aaa;
 
     cursor: pointer;
+
+}
+
+
+.remove-file:hover {
+
+    color: #ff6d7b;
+
+}
+
+
+.hidden {
+
+    display: none !important;
+
 }
 
 
 /* =====================================================
    MOBILE
-   ===================================================== */
+===================================================== */
+
+.mobile-menu {
+
+    display: none;
+
+}
+
 
 @media (max-width: 800px) {
 
     .sidebar {
+
         position: fixed;
 
-        z-index: 50;
-
-        top: 0;
-        bottom: 0;
         right: -300px;
 
-        transition: right .25s;
+        top: 0;
+
+        bottom: 0;
+
+        z-index: 100;
+
+        transition: .25s;
+
+        box-shadow:
+            -10px 0 40px
+            rgba(0,0,0,.35);
+
     }
+
 
     .sidebar.open {
+
         right: 0;
+
     }
 
-    .menu-btn {
-        display: block;
+
+    .mobile-menu {
+
+        display: flex;
+
+        width: 38px;
+        height: 38px;
+
+        border: 0;
+
+        border-radius: 10px;
+
+        background:
+            #141c29;
+
+        color: white;
+
+        align-items: center;
+
+        justify-content: center;
+
+        cursor: pointer;
+
+        font-size: 18px;
+
     }
 
-    .input-area {
-        left: 0;
-    }
 
     .topbar {
-        padding: 0 13px;
+
+        padding:
+            0 14px;
+
     }
+
 
     .chat {
-        padding-left: 10px;
-        padding-right: 10px;
+
+        padding:
+            20px 12px 160px;
+
     }
 
-    .bubble {
+
+    .message {
+
         max-width: 90%;
+
+        font-size: 13px;
+
     }
 
-    .web-toggle {
-        font-size: 12px;
 
-        padding: 0 9px;
+    .input-area {
+
+        padding:
+            10px 10px 12px;
+
     }
+
+
+    .welcome h1 {
+
+        font-size: 25px;
+
+    }
+
+}
+
+
+/* =====================================================
+   SCROLLBAR
+===================================================== */
+
+::-webkit-scrollbar {
+
+    width: 7px;
+
+}
+
+
+::-webkit-scrollbar-track {
+
+    background: transparent;
+
+}
+
+
+::-webkit-scrollbar-thumb {
+
+    background:
+        #263143;
+
+    border-radius: 10px;
+
+}
+
+
+::-webkit-scrollbar-thumb:hover {
+
+    background:
+        #344258;
 
 }
 
@@ -960,52 +1271,72 @@ textarea {
 
 <body>
 
+
 <div class="app">
 
 
-    <!-- SIDEBAR -->
+    <!-- =================================================
+         SIDEBAR
+    ================================================== -->
 
     <aside
         class="sidebar"
         id="sidebar"
     >
 
-        <div class="sidebar-header">
+        <div class="logo">
 
-            <div class="logo">
+            <div class="whale-logo">
+                🐋
+            </div>
 
-                <div class="whale">
-                    🐋
+            <div>
+
+                <div class="logo-title">
+                    Whale AI
                 </div>
 
-                <span>
-                    Whale AI
-                </span>
+                <div class="logo-subtitle">
+                    دستیار هوشمند فارسی
+                </div>
 
             </div>
 
+        </div>
 
-            <button
-                class="new-chat"
-                onclick="newConversation()"
-            >
-                ＋ گفتگوی جدید
-            </button>
 
+        <button
+            class="new-chat"
+            onclick="newConversation()"
+        >
+            ＋ گفتگوی جدید
+        </button>
+
+
+        <div class="sidebar-title">
+            گفتگوهای اخیر
         </div>
 
 
         <div
             class="conversations"
-            id="conversationList"
-        ></div>
+            id="conversations"
+        >
+        </div>
 
 
-        <div class="sidebar-footer">
+        <div class="sidebar-bottom">
 
             <button
-                class="memory-btn"
-                onclick="openMemory()"
+                class="sidebar-button"
+                onclick="clearAllConversations()"
+            >
+                🗑 پاک کردن همه گفتگوها
+            </button>
+
+            <button
+                class="sidebar-button"
+                onclick="showMemory()"
             >
                 🧠 حافظه Whale
             </button>
@@ -1015,28 +1346,35 @@ textarea {
     </aside>
 
 
-    <!-- MAIN -->
+    <!-- =================================================
+         MAIN
+    ================================================== -->
 
     <main class="main">
 
 
-        <!-- TOPBAR -->
-
         <header class="topbar">
 
             <div
-                style="display:flex;align-items:center;gap:12px;"
+                style="
+                    display:flex;
+                    align-items:center;
+                    gap:10px;
+                "
             >
 
                 <button
-                    class="menu-btn"
+                    class="mobile-menu"
                     onclick="toggleSidebar()"
                 >
                     ☰
                 </button>
 
-                <div class="topbar-title">
-                    Whale AI
+                <div
+                    class="topbar-title"
+                    id="topbarTitle"
+                >
+                    گفتگوی جدید
                 </div>
 
             </div>
@@ -1046,16 +1384,16 @@ textarea {
 
                 <span class="status-dot"></span>
 
-                <span id="statusText">
-                    آماده
-                </span>
+                آنلاین
 
             </div>
 
         </header>
 
 
-        <!-- CHAT -->
+        <!-- =================================================
+             CHAT
+        ================================================== -->
 
         <section
             class="chat"
@@ -1077,11 +1415,11 @@ textarea {
                     </div>
 
                     <h1>
-                        به Whale AI خوش آمدی
+                        سلام، من Whale AI هستم
                     </h1>
 
                     <p>
-                        هر چیزی می‌خواهی بپرس.
+                        سؤال خودت را بپرس یا یک فایل برای بررسی ارسال کن.
                     </p>
 
                 </div>
@@ -1091,44 +1429,86 @@ textarea {
         </section>
 
 
-        <!-- INPUT -->
+        <!-- =================================================
+             INPUT
+        ================================================== -->
 
         <div class="input-area">
 
-            <div class="input-inner">
+            <div class="input-container">
 
-                <div class="input-box">
+                <div class="composer">
+
+
+                    <div
+                        class="file-preview"
+                        id="filePreview"
+                    >
+
+                        <div class="file-preview-inner">
+
+                            <span class="file-icon">
+                                📎
+                            </span>
+
+                            <span
+                                class="file-name"
+                                id="fileName"
+                            >
+                            </span>
+
+                            <button
+                                class="remove-file"
+                                onclick="removeFile()"
+                            >
+                                ×
+                            </button>
+
+                        </div>
+
+                    </div>
 
 
                     <textarea
                         id="messageInput"
-                        placeholder="پیامت را بنویس..."
+                        placeholder="پیامت را برای Whale AI بنویس..."
                         rows="1"
                     ></textarea>
 
 
-                    <button
-                        class="web-toggle"
-                        id="webToggle"
-                        onclick="toggleWeb()"
-                    >
-                        🌐 وب
-                    </button>
+                    <div class="composer-bottom">
+
+                        <div class="composer-tools">
+
+                            <button
+                                class="tool-button"
+                                title="آپلود فایل"
+                                onclick="document.getElementById('fileInput').click()"
+                            >
+                                📎
+                            </button>
+
+                            <input
+                                id="fileInput"
+                                type="file"
+                                class="hidden"
+                                accept=".txt,.md,.csv,.json,.pdf,.docx"
+                                onchange="handleFile(event)"
+                            >
+
+                        </div>
 
 
-                    <button
-                        class="send-btn"
-                        id="sendButton"
-                        onclick="sendMessage()"
-                    >
-                        ➤
-                    </button>
+                        <button
+                            class="send-button"
+                            id="sendButton"
+                            onclick="sendMessage()"
+                        >
+                            ➤
+                        </button>
 
-                </div>
+                    </div>
 
-
-                <div class="input-hint">
-                    Enter برای ارسال • Shift + Enter برای خط جدید
                 </div>
 
             </div>
@@ -1140,730 +1520,77 @@ textarea {
 </div>
 
 
-<!-- MEMORY MODAL -->
-
-<div
-    class="modal"
-    id="memoryModal"
->
-
-    <div class="modal-box">
-
-        <div class="modal-header">
-
-            <strong>
-                🧠 حافظه Whale
-            </strong>
-
-            <button
-                class="close-btn"
-                onclick="closeMemory()"
-            >
-                ×
-            </button>
-
-        </div>
-
-
-        <div class="memory-form">
-
-            <input
-                id="memoryKey"
-                placeholder="کلید"
-            >
-
-            <input
-                id="memoryValue"
-                placeholder="مقدار"
-            >
-
-            <button
-                onclick="addMemory()"
-            >
-                ذخیره
-            </button>
-
-        </div>
-
-
-        <div id="memoryList"></div>
-
-    </div>
-
-</div>
-
-
 <script>
 
 /* =====================================================
    STATE
-   ===================================================== */
+===================================================== */
 
 let currentConversationId = null;
 
-let webEnabled = false;
+let selectedFile = null;
 
-let sending = false;
+let selectedFileText = "";
 
 
 /* =====================================================
    ELEMENTS
-   ===================================================== */
+===================================================== */
 
-const chat =
-    document.getElementById("chat");
+const chat = document.getElementById(
+    "chat"
+);
 
-const chatInner =
-    document.getElementById("chatInner");
+const chatInner = document.getElementById(
+    "chatInner"
+);
 
-const input =
-    document.getElementById("messageInput");
+const messageInput = document.getElementById(
+    "messageInput"
+);
 
-const sendButton =
-    document.getElementById("sendButton");
+const sendButton = document.getElementById(
+    "sendButton"
+);
 
-const statusText =
-    document.getElementById("statusText");
-
-const sidebar =
-    document.getElementById("sidebar");
+const conversationsElement =
+    document.getElementById(
+        "conversations"
+    );
 
 
 /* =====================================================
-   MARKDOWN
-   ===================================================== */
+   START
+===================================================== */
 
-function escapeHtml(text) {
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
 
-    return text
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;");
-}
+        loadConversations();
 
-
-function markdown(text) {
-
-    let html =
-        escapeHtml(
-            String(text)
-        );
-
-
-    html = html.replace(
-        /```([\s\S]*?)```/g,
-        function(_, code) {
-
-            return (
-                "<pre><code>" +
-                code.trim() +
-                "</code></pre>"
-            );
-        }
-    );
-
-
-    html = html.replace(
-        /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,
-        '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>'
-    );
-
-
-    html = html.replace(
-        /^### (.*)$/gm,
-        "<h3>$1</h3>"
-    );
-
-
-    html = html.replace(
-        /^## (.*)$/gm,
-        "<h2>$1</h2>"
-    );
-
-
-    html = html.replace(
-        /^# (.*)$/gm,
-        "<h1>$1</h1>"
-    );
-
-
-    html = html.replace(
-        /\*\*(.*?)\*\*/g,
-        "<strong>$1</strong>"
-    );
-
-
-    html = html.replace(
-        /\*(.*?)\*/g,
-        "<em>$1</em>"
-    );
-
-
-    html = html.replace(
-        /^\- (.*)$/gm,
-        "<li>$1</li>"
-    );
-
-
-    html = html.replace(
-        /(<li>.*<\/li>)/gs,
-        "<ul>$1</ul>"
-    );
-
-
-    html = html.replace(
-        /\n/g,
-        "<br>"
-    );
-
-
-    return html;
-}
-
-
-/* =====================================================
-   SCROLL
-   ===================================================== */
-
-function scrollBottom() {
-
-    setTimeout(() => {
-
-        chat.scrollTop =
-            chat.scrollHeight;
-
-    }, 20);
-}
-
-
-/* =====================================================
-   WELCOME
-   ===================================================== */
-
-function hideWelcome() {
-
-    const welcome =
-        document.getElementById(
-            "welcome"
-        );
-
-    if (welcome) {
-
-        welcome.remove();
-
-    }
-}
-
-
-/* =====================================================
-   ADD MESSAGE
-   ===================================================== */
-
-function addMessage(
-    role,
-    content,
-    sources = []
-) {
-
-    hideWelcome();
-
-
-    const wrapper =
-        document.createElement(
-            "div"
-        );
-
-    wrapper.className =
-        "message " + role;
-
-
-    const avatar =
-        document.createElement(
-            "div"
-        );
-
-    avatar.className =
-        "avatar";
-
-    avatar.textContent =
-        role === "user"
-            ? "👤"
-            : "🐋";
-
-
-    const bubble =
-        document.createElement(
-            "div"
-        );
-
-    bubble.className =
-        "bubble";
-
-
-    bubble.innerHTML =
-        markdown(content);
-
-
-    if (
-        role === "assistant" &&
-        sources &&
-        sources.length
-    ) {
-
-        const sourceBox =
-            document.createElement(
-                "div"
-            );
-
-        sourceBox.className =
-            "sources";
-
-
-        const title =
-            document.createElement(
-                "div"
-            );
-
-        title.className =
-            "sources-title";
-
-        title.textContent =
-            "🌐 منابع وب";
-
-
-        sourceBox.appendChild(
-            title
-        );
-
-
-        sources.forEach(
-            source => {
-
-                if (!source.url)
-                    return;
-
-
-                const link =
-                    document.createElement(
-                        "a"
-                    );
-
-                link.className =
-                    "source";
-
-                link.href =
-                    source.url;
-
-                link.target =
-                    "_blank";
-
-                link.rel =
-                    "noopener noreferrer";
-
-
-                link.innerHTML =
-                    escapeHtml(
-                        source.title ||
-                        source.url
-                    ) +
-                    '<span class="source-url">' +
-                    escapeHtml(
-                        source.url
-                    ) +
-                    "</span>";
-
-
-                sourceBox.appendChild(
-                    link
-                );
-
-            }
-        );
-
-
-        bubble.appendChild(
-            sourceBox
-        );
-
-    }
-
-
-    wrapper.appendChild(
-        avatar
-    );
-
-    wrapper.appendChild(
-        bubble
-    );
-
-
-    chatInner.appendChild(
-        wrapper
-    );
-
-
-    scrollBottom();
-
-    return wrapper;
-}
-
-
-/* =====================================================
-   TYPING
-   ===================================================== */
-
-function showTyping() {
-
-    hideWelcome();
-
-
-    const wrapper =
-        document.createElement(
-            "div"
-        );
-
-    wrapper.className =
-        "message assistant";
-
-    wrapper.id =
-        "typingMessage";
-
-
-    const avatar =
-        document.createElement(
-            "div"
-        );
-
-    avatar.className =
-        "avatar";
-
-    avatar.textContent =
-        "🐋";
-
-
-    const bubble =
-        document.createElement(
-            "div"
-        );
-
-    bubble.className =
-        "bubble";
-
-
-    bubble.innerHTML = `
-        <div class="typing">
-            <span></span>
-            <span></span>
-            <span></span>
-        </div>
-    `;
-
-
-    wrapper.appendChild(
-        avatar
-    );
-
-    wrapper.appendChild(
-        bubble
-    );
-
-
-    chatInner.appendChild(
-        wrapper
-    );
-
-
-    scrollBottom();
-}
-
-
-function hideTyping() {
-
-    const typing =
-        document.getElementById(
-            "typingMessage"
-        );
-
-    if (typing) {
-
-        typing.remove();
-
-    }
-}
-
-
-/* =====================================================
-   SEND
-   ===================================================== */
-
-async function sendMessage() {
-
-    if (sending)
-        return;
-
-
-    const message =
-        input.value.trim();
-
-
-    if (!message)
-        return;
-
-
-    sending = true;
-
-    sendButton.disabled =
-        true;
-
-    statusText.textContent =
-        "در حال پاسخ‌گویی...";
-
-
-    input.value = "";
-
-    autoResize();
-
-
-    addMessage(
-        "user",
-        message
-    );
-
-
-    showTyping();
-
-
-    try {
-
-        const response =
-            await fetch(
-                "/chat",
-                {
-                    method:
-                        "POST",
-
-                    headers: {
-                        "Content-Type":
-                            "application/json"
-                    },
-
-                    body:
-                        JSON.stringify({
-                            message:
-                                message,
-
-                            conversation_id:
-                                currentConversationId,
-
-                            web:
-                                webEnabled
-                        })
-                }
-            );
-
-
-        const data =
-            await response.json();
-
-
-        hideTyping();
-
-
-        if (!response.ok) {
-
-            addMessage(
-                "assistant",
-                "❌ " +
-                (
-                    data.error ||
-                    "خطایی رخ داد."
-                )
-            );
-
-            return;
-        }
-
-
-        currentConversationId =
-            data.conversation_id;
-
-
-        addMessage(
-            "assistant",
-            data.content,
-            data.web || []
-        );
-
-
-        await loadConversations();
-
-
-    } catch (error) {
-
-        hideTyping();
-
-        addMessage(
-            "assistant",
-            "❌ ارتباط با سرور برقرار نشد."
-        );
-
-        console.error(error);
-
-    } finally {
-
-        sending = false;
-
-        sendButton.disabled =
-            false;
-
-        statusText.textContent =
-            "آماده";
-
-        input.focus();
-
-    }
-}
-
-
-/* =====================================================
-   ENTER
-   ===================================================== */
-
-input.addEventListener(
-    "keydown",
-    function(event) {
-
-        if (
-            event.key === "Enter" &&
-            !event.shiftKey
-        ) {
-
-            event.preventDefault();
-
-            sendMessage();
-
-        }
+        messageInput.focus();
 
     }
 );
 
 
 /* =====================================================
-   AUTO RESIZE
-   ===================================================== */
+   SIDEBAR
+===================================================== */
 
-input.addEventListener(
-    "input",
-    autoResize
-);
+function toggleSidebar() {
 
+    document
+        .getElementById("sidebar")
+        .classList.toggle("open");
 
-function autoResize() {
-
-    input.style.height =
-        "auto";
-
-    input.style.height =
-        Math.min(
-            input.scrollHeight,
-            180
-        ) + "px";
-}
-
-
-/* =====================================================
-   WEB
-   ===================================================== */
-
-function toggleWeb() {
-
-    webEnabled =
-        !webEnabled;
-
-
-    const button =
-        document.getElementById(
-            "webToggle"
-        );
-
-
-    button.classList.toggle(
-        "active",
-        webEnabled
-    );
-
-
-    button.textContent =
-        webEnabled
-            ? "🌐 وب روشن"
-            : "🌐 وب";
-
-}
-
-
-/* =====================================================
-   NEW CONVERSATION
-   ===================================================== */
-
-async function newConversation() {
-
-    try {
-
-        const response =
-            await fetch(
-                "/conversations",
-                {
-                    method:
-                        "POST"
-                }
-            );
-
-
-        const data =
-            await response.json();
-
-
-        currentConversationId =
-            data.id;
-
-
-        chatInner.innerHTML = `
-            <div class="welcome" id="welcome">
-
-                <div class="welcome-whale">
-                    🐋
-                </div>
-
-                <h1>
-                    گفتگوی جدید
-                </h1>
-
-                <p>
-                    آماده‌ام. چه کمکی از من می‌خواهی؟
-                </p>
-
-            </div>
-        `;
-
-
-        await loadConversations();
-
-        closeSidebar();
-
-        input.focus();
-
-
-    } catch (error) {
-
-        console.error(error);
-
-    }
 }
 
 
 /* =====================================================
    LOAD CONVERSATIONS
-   ===================================================== */
+===================================================== */
 
 async function loadConversations() {
 
@@ -1875,20 +1602,14 @@ async function loadConversations() {
             );
 
 
-        const conversations =
+        const data =
             await response.json();
 
 
-        const list =
-            document.getElementById(
-                "conversationList"
-            );
+        conversationsElement.innerHTML = "";
 
 
-        list.innerHTML = "";
-
-
-        conversations.forEach(
+        data.forEach(
             conversation => {
 
                 const item =
@@ -1896,25 +1617,34 @@ async function loadConversations() {
                         "div"
                     );
 
+
                 item.className =
-                    "conversation" +
-                    (
-                        currentConversationId ===
-                        conversation.id
+                    "conversation"
+                    + (
+                        conversation.id ===
+                        currentConversationId
                             ? " active"
                             : ""
                     );
 
 
-                const title =
+                item.onclick =
+                    () => loadConversation(
+                        conversation.id
+                    );
+
+
+                const text =
                     document.createElement(
                         "div"
                     );
 
-                title.className =
-                    "conversation-title";
 
-                title.textContent =
+                text.className =
+                    "conversation-text";
+
+
+                text.textContent =
                     conversation.title ||
                     "گفتگوی جدید";
 
@@ -1924,15 +1654,17 @@ async function loadConversations() {
                         "button"
                     );
 
+
                 deleteButton.className =
                     "delete-conversation";
+
 
                 deleteButton.textContent =
                     "×";
 
 
                 deleteButton.onclick =
-                    function(event) {
+                    event => {
 
                         event.stopPropagation();
 
@@ -1943,26 +1675,13 @@ async function loadConversations() {
                     };
 
 
-                item.appendChild(
-                    title
-                );
+                item.appendChild(text);
 
                 item.appendChild(
                     deleteButton
                 );
 
-
-                item.onclick =
-                    function() {
-
-                        loadConversation(
-                            conversation.id
-                        );
-
-                    };
-
-
-                list.appendChild(
+                conversationsElement.appendChild(
                     item
                 );
 
@@ -1975,16 +1694,71 @@ async function loadConversations() {
         console.error(error);
 
     }
+
 }
 
 
 /* =====================================================
-   LOAD ONE
-   ===================================================== */
+   NEW CONVERSATION
+===================================================== */
 
-async function loadConversation(
-    id
-) {
+async function newConversation() {
+
+    try {
+
+        const response =
+            await fetch(
+                "/conversations",
+                {
+                    method: "POST"
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        currentConversationId =
+            data.id;
+
+
+        clearChat();
+
+
+        document.getElementById(
+            "topbarTitle"
+        ).textContent =
+            "گفتگوی جدید";
+
+
+        removeFile();
+
+        await loadConversations();
+
+
+        closeMobileSidebar();
+
+
+        messageInput.focus();
+
+
+    } catch (error) {
+
+        alert(
+            "ساخت گفتگو انجام نشد."
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   LOAD CONVERSATION
+===================================================== */
+
+async function loadConversation(id) {
 
     try {
 
@@ -1998,12 +1772,10 @@ async function loadConversation(
             await response.json();
 
 
-        currentConversationId =
-            id;
+        currentConversationId = id;
 
 
-        chatInner.innerHTML =
-            "";
+        clearChat();
 
 
         messages.forEach(
@@ -2018,11 +1790,37 @@ async function loadConversation(
         );
 
 
+        const conversations =
+            await fetch(
+                "/conversations"
+            );
+
+
+        const list =
+            await conversations.json();
+
+
+        const conversation =
+            list.find(
+                item => item.id === id
+            );
+
+
+        document.getElementById(
+            "topbarTitle"
+        ).textContent =
+            conversation
+                ? conversation.title
+                : "گفتگو";
+
+
         await loadConversations();
 
-        closeSidebar();
 
-        scrollBottom();
+        closeMobileSidebar();
+
+
+        scrollToBottom();
 
 
     } catch (error) {
@@ -2030,16 +1828,15 @@ async function loadConversation(
         console.error(error);
 
     }
+
 }
 
 
 /* =====================================================
    DELETE CONVERSATION
-   ===================================================== */
+===================================================== */
 
-async function deleteConversation(
-    id
-) {
+async function deleteConversation(id) {
 
     if (
         !confirm(
@@ -2057,38 +1854,23 @@ async function deleteConversation(
         await fetch(
             `/conversations/${id}`,
             {
-                method:
-                    "DELETE"
+                method: "DELETE"
             }
         );
 
 
         if (
-            currentConversationId ===
-            id
+            currentConversationId === id
         ) {
 
-            currentConversationId =
-                null;
+            currentConversationId = null;
 
+            clearChat();
 
-            chatInner.innerHTML = `
-                <div class="welcome" id="welcome">
-
-                    <div class="welcome-whale">
-                        🐋
-                    </div>
-
-                    <h1>
-                        Whale AI
-                    </h1>
-
-                    <p>
-                        یک گفتگوی جدید شروع کن.
-                    </p>
-
-                </div>
-            `;
+            document.getElementById(
+                "topbarTitle"
+            ).textContent =
+                "گفتگوی جدید";
 
         }
 
@@ -2098,46 +1880,774 @@ async function deleteConversation(
 
     } catch (error) {
 
-        console.error(error);
+        alert(
+            "حذف گفتگو انجام نشد."
+        );
 
     }
+
+}
+
+
+/* =====================================================
+   CLEAR ALL
+===================================================== */
+
+async function clearAllConversations() {
+
+    if (
+        !confirm(
+            "همه گفتگوها حذف شوند؟"
+        )
+    ) {
+
+        return;
+
+    }
+
+
+    try {
+
+        await fetch(
+            "/conversations",
+            {
+                method: "DELETE"
+            }
+        );
+
+
+        currentConversationId = null;
+
+        clearChat();
+
+
+        document.getElementById(
+            "topbarTitle"
+        ).textContent =
+            "گفتگوی جدید";
+
+
+        await loadConversations();
+
+
+    } catch (error) {
+
+        alert(
+            "پاک کردن گفتگوها انجام نشد."
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   CLEAR CHAT
+===================================================== */
+
+function clearChat() {
+
+    chatInner.innerHTML = `
+
+        <div
+            class="welcome"
+            id="welcome"
+        >
+
+            <div class="welcome-whale">
+                🐋
+            </div>
+
+            <h1>
+                سلام، من Whale AI هستم
+            </h1>
+
+            <p>
+                سؤال خودت را بپرس یا یک فایل برای بررسی ارسال کن.
+            </p>
+
+        </div>
+
+    `;
+
+}
+
+
+/* =====================================================
+   ADD MESSAGE
+===================================================== */
+
+function addMessage(
+    role,
+    content,
+    fileName = ""
+) {
+
+    const welcome =
+        document.getElementById(
+            "welcome"
+        );
+
+
+    if (welcome) {
+
+        welcome.remove();
+
+    }
+
+
+    const row =
+        document.createElement(
+            "div"
+        );
+
+
+    row.className =
+        "message-row "
+        + (
+            role === "user"
+                ? "user"
+                : "assistant"
+        );
+
+
+    const message =
+        document.createElement(
+            "div"
+        );
+
+
+    message.className =
+        "message "
+        + (
+            role === "user"
+                ? "user-message"
+                : "assistant-message"
+        );
+
+
+    const roleText =
+        document.createElement(
+            "div"
+        );
+
+
+    roleText.className =
+        "message-role";
+
+
+    roleText.textContent =
+        role === "user"
+            ? "شما"
+            : "Whale AI";
+
+
+    message.appendChild(
+        roleText
+    );
+
+
+    if (fileName) {
+
+        const fileCard =
+            document.createElement(
+                "div"
+            );
+
+
+        fileCard.className =
+            "file-card";
+
+
+        fileCard.innerHTML = `
+
+            <span class="file-icon">
+                📎
+            </span>
+
+            <span class="file-name">
+                ${escapeHtml(fileName)}
+            </span>
+
+        `;
+
+
+        message.appendChild(
+            fileCard
+        );
+
+    }
+
+
+    const contentElement =
+        document.createElement(
+            "div"
+        );
+
+
+    contentElement.innerHTML =
+        formatMarkdown(content);
+
+
+    message.appendChild(
+        contentElement
+    );
+
+
+    row.appendChild(
+        message
+    );
+
+
+    chatInner.appendChild(
+        row
+    );
+
+
+    scrollToBottom();
+
+}
+
+
+/* =====================================================
+   MARKDOWN
+===================================================== */
+
+function escapeHtml(text) {
+
+    return text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+}
+
+
+function formatMarkdown(text) {
+
+    let html =
+        escapeHtml(
+            String(text)
+        );
+
+
+    html =
+        html.replace(
+            /```([\s\S]*?)```/g,
+            "<pre><code>$1</code></pre>"
+        );
+
+
+    html =
+        html.replace(
+            /^### (.*)$/gm,
+            "<h3>$1</h3>"
+        );
+
+
+    html =
+        html.replace(
+            /^## (.*)$/gm,
+            "<h2>$1</h2>"
+        );
+
+
+    html =
+        html.replace(
+            /^# (.*)$/gm,
+            "<h1>$1</h1>"
+        );
+
+
+    html =
+        html.replace(
+            /\*\*(.*?)\*\*/g,
+            "<strong>$1</strong>"
+        );
+
+
+    html =
+        html.replace(
+            /`([^`]+)`/g,
+            "<code>$1</code>"
+        );
+
+
+    html =
+        html.replace(
+            /^\- (.*)$/gm,
+            "• $1"
+        );
+
+
+    html =
+        html.replace(
+            /\n/g,
+            "<br>"
+        );
+
+
+    return html;
+
+}
+
+
+/* =====================================================
+   TYPING
+===================================================== */
+
+function showTyping() {
+
+    const row =
+        document.createElement(
+            "div"
+        );
+
+
+    row.className =
+        "message-row assistant";
+
+
+    row.id =
+        "typingMessage";
+
+
+    row.innerHTML = `
+
+        <div class="message assistant-message">
+
+            <div class="message-role">
+                Whale AI
+            </div>
+
+            <div class="typing">
+
+                <span></span>
+                <span></span>
+                <span></span>
+
+            </div>
+
+        </div>
+
+    `;
+
+
+    chatInner.appendChild(
+        row
+    );
+
+
+    scrollToBottom();
+
+}
+
+
+function removeTyping() {
+
+    const element =
+        document.getElementById(
+            "typingMessage"
+        );
+
+
+    if (element) {
+
+        element.remove();
+
+    }
+
+}
+
+
+/* =====================================================
+   SEND MESSAGE
+===================================================== */
+
+async function sendMessage() {
+
+    const text =
+        messageInput.value.trim();
+
+
+    if (
+        !text &&
+        !selectedFileText
+    ) {
+
+        return;
+
+    }
+
+
+    sendButton.disabled = true;
+
+
+    const fileName =
+        selectedFile
+            ? selectedFile.name
+            : "";
+
+
+    addMessage(
+        "user",
+        text,
+        fileName
+    );
+
+
+    messageInput.value = "";
+
+    autoResize();
+
+
+    showTyping();
+
+
+    try {
+
+        const response =
+            await fetch(
+                "/chat",
+                {
+
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body:
+                        JSON.stringify({
+
+                            message:
+                                text,
+
+                            conversation_id:
+                                currentConversationId,
+
+                            file_name:
+                                fileName,
+
+                            file_text:
+                                selectedFileText
+
+                        })
+
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        removeTyping();
+
+
+        if (!response.ok) {
+
+            addMessage(
+                "assistant",
+                data.error ||
+                "خطایی رخ داد."
+            );
+
+            return;
+
+        }
+
+
+        currentConversationId =
+            data.conversation_id;
+
+
+        addMessage(
+            "assistant",
+            data.content
+        );
+
+
+        removeFile();
+
+
+        await loadConversations();
+
+
+    } catch (error) {
+
+        removeTyping();
+
+
+        addMessage(
+            "assistant",
+            "ارتباط با سرور برقرار نشد."
+        );
+
+        console.error(error);
+
+    } finally {
+
+        sendButton.disabled =
+            false;
+
+        messageInput.focus();
+
+    }
+
+}
+
+
+/* =====================================================
+   FILE UPLOAD
+===================================================== */
+
+async function handleFile(event) {
+
+    const file =
+        event.target.files[0];
+
+
+    if (!file) {
+
+        return;
+
+    }
+
+
+    const maxSize =
+        20 * 1024 * 1024;
+
+
+    if (file.size > maxSize) {
+
+        alert(
+            "حجم فایل نباید بیشتر از 20MB باشد."
+        );
+
+        event.target.value = "";
+
+        return;
+
+    }
+
+
+    selectedFile = file;
+
+    selectedFileText = "";
+
+
+    document.getElementById(
+        "fileName"
+    ).textContent =
+        file.name;
+
+
+    document.getElementById(
+        "filePreview"
+    ).classList.add(
+        "show"
+    );
+
+
+    const formData =
+        new FormData();
+
+
+    formData.append(
+        "file",
+        file
+    );
+
+
+    try {
+
+        const response =
+            await fetch(
+                "/upload",
+                {
+                    method: "POST",
+                    body: formData
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.error ||
+                "آپلود ناموفق بود."
+            );
+
+        }
+
+
+        selectedFileText =
+            data.text || "";
+
+
+        if (
+            !selectedFileText &&
+            data.extension === "pdf"
+        ) {
+
+            alert(
+                "متن قابل استخراجی از PDF پیدا نشد."
+            );
+
+        }
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert(
+            error.message ||
+            "آپلود فایل انجام نشد."
+        );
+
+
+        removeFile();
+
+    }
+
+}
+
+
+/* =====================================================
+   REMOVE FILE
+===================================================== */
+
+function removeFile() {
+
+    selectedFile = null;
+
+    selectedFileText = "";
+
+
+    const input =
+        document.getElementById(
+            "fileInput"
+        );
+
+
+    input.value = "";
+
+
+    document.getElementById(
+        "filePreview"
+    ).classList.remove(
+        "show"
+    );
+
+
+    document.getElementById(
+        "fileName"
+    ).textContent = "";
+
+}
+
+
+/* =====================================================
+   TEXTAREA
+===================================================== */
+
+messageInput.addEventListener(
+    "input",
+    autoResize
+);
+
+
+function autoResize() {
+
+    messageInput.style.height =
+        "auto";
+
+
+    messageInput.style.height =
+        Math.min(
+            messageInput.scrollHeight,
+            180
+        ) + "px";
+
+}
+
+
+/* =====================================================
+   ENTER
+===================================================== */
+
+messageInput.addEventListener(
+    "keydown",
+    event => {
+
+        if (
+            event.key === "Enter" &&
+            !event.shiftKey
+        ) {
+
+            event.preventDefault();
+
+            sendMessage();
+
+        }
+
+    }
+);
+
+
+/* =====================================================
+   SCROLL
+===================================================== */
+
+function scrollToBottom() {
+
+    setTimeout(
+        () => {
+
+            chat.scrollTo({
+
+                top:
+                    chat.scrollHeight,
+
+                behavior:
+                    "smooth"
+
+            });
+
+        },
+        50
+    );
+
+}
+
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+function closeMobileSidebar() {
+
+    document
+        .getElementById("sidebar")
+        .classList.remove("open");
+
 }
 
 
 /* =====================================================
    MEMORY
-   ===================================================== */
+===================================================== */
 
-async function openMemory() {
-
-    document
-        .getElementById(
-            "memoryModal"
-        )
-        .classList.add(
-            "show"
-        );
-
-
-    await loadMemory();
-
-}
-
-
-function closeMemory() {
-
-    document
-        .getElementById(
-            "memoryModal"
-        )
-        .classList.remove(
-            "show"
-        );
-
-}
-
-
-async function loadMemory() {
+async function showMemory() {
 
     try {
 
@@ -2151,205 +2661,43 @@ async function loadMemory() {
             await response.json();
 
 
-        const list =
-            document.getElementById(
-                "memoryList"
+        if (
+            !data.memories ||
+            data.memories.length === 0
+        ) {
+
+            alert(
+                "حافظه Whale خالی است."
             );
 
+            return;
 
-        list.innerHTML =
-            "";
-
-
-        data.memories.forEach(
-            memory => {
-
-                const item =
-                    document.createElement(
-                        "div"
-                    );
-
-                item.className =
-                    "memory-item";
+        }
 
 
-                item.innerHTML = `
-                    <div class="memory-content">
-                        <div class="memory-key">
-                            ${escapeHtml(memory.key)}
-                        </div>
-
-                        <div class="memory-value">
-                            ${escapeHtml(memory.value)}
-                        </div>
-                    </div>
-                `;
+        const text =
+            data.memories
+                .map(
+                    memory =>
+                        `${memory.key}: ${memory.value}`
+                )
+                .join("\n");
 
 
-                const button =
-                    document.createElement(
-                        "button"
-                    );
-
-                button.className =
-                    "memory-delete";
-
-                button.textContent =
-                    "حذف";
-
-
-                button.onclick =
-                    function() {
-
-                        deleteMemory(
-                            memory.key
-                        );
-
-                    };
-
-
-                item.appendChild(
-                    button
-                );
-
-
-                list.appendChild(
-                    item
-                );
-
-            }
+        alert(
+            "حافظه Whale:\n\n" + text
         );
 
 
     } catch (error) {
 
-        console.error(error);
+        alert(
+            "دریافت حافظه انجام نشد."
+        );
 
     }
-}
-
-
-async function addMemory() {
-
-    const key =
-        document
-            .getElementById(
-                "memoryKey"
-            )
-            .value
-            .trim();
-
-
-    const value =
-        document
-            .getElementById(
-                "memoryValue"
-            )
-            .value
-            .trim();
-
-
-    if (!key || !value)
-        return;
-
-
-    await fetch(
-        "/memory",
-        {
-            method:
-                "POST",
-
-            headers: {
-                "Content-Type":
-                    "application/json"
-            },
-
-            body:
-                JSON.stringify({
-                    key:
-                        key,
-
-                    value:
-                        value
-                })
-        }
-    );
-
-
-    document
-        .getElementById(
-            "memoryKey"
-        )
-        .value = "";
-
-
-    document
-        .getElementById(
-            "memoryValue"
-        )
-        .value = "";
-
-
-    await loadMemory();
 
 }
-
-
-async function deleteMemory(
-    key
-) {
-
-    await fetch(
-        "/memory/" +
-        encodeURIComponent(key),
-        {
-            method:
-                "DELETE"
-        }
-    );
-
-
-    await loadMemory();
-
-}
-
-
-/* =====================================================
-   SIDEBAR
-   ===================================================== */
-
-function toggleSidebar() {
-
-    sidebar.classList.toggle(
-        "open"
-    );
-
-}
-
-
-function closeSidebar() {
-
-    sidebar.classList.remove(
-        "open"
-    );
-
-}
-
-
-/* =====================================================
-   INIT
-   ===================================================== */
-
-async function init() {
-
-    await loadConversations();
-
-    input.focus();
-
-}
-
-
-init();
 
 </script>
 
