@@ -15,15 +15,23 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_FILE = os.path.join(BASE_DIR, "whale.db")
 
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
+TAVILY_URL = "https://api.tavily.com/search"
 
 
 # =========================================================
-# API KEY
+# API KEYS
 # =========================================================
 
-def get_api_key():
+def get_openrouter_key():
     return os.environ.get(
         "OPENROUTER_API_KEY",
+        ""
+    ).strip()
+
+
+def get_tavily_key():
+    return os.environ.get(
+        "TAVILY_API_KEY",
         ""
     ).strip()
 
@@ -200,6 +208,118 @@ def build_memory_context():
 
 
 # =========================================================
+# WEB SEARCH
+# =========================================================
+
+def search_web(query):
+
+    api_key = get_tavily_key()
+
+    if not api_key:
+        return {
+            "enabled": False,
+            "results": [],
+            "error": "TAVILY_API_KEY تنظیم نشده است."
+        }
+
+    try:
+
+        response = requests.post(
+            TAVILY_URL,
+            headers={
+                "Content-Type": "application/json"
+            },
+            json={
+                "api_key": api_key,
+                "query": query,
+                "search_depth": "advanced",
+                "topic": "general",
+                "max_results": 5,
+                "include_answer": False,
+                "include_raw_content": False
+            },
+            timeout=30
+        )
+
+        if response.status_code != 200:
+
+            print(
+                "TAVILY STATUS:",
+                response.status_code
+            )
+
+            print(
+                "TAVILY RESPONSE:",
+                response.text[:2000]
+            )
+
+            return {
+                "enabled": True,
+                "results": [],
+                "error": "خطا در جست‌وجوی وب."
+            }
+
+        data = response.json()
+
+        results = []
+
+        for item in data.get("results", []):
+
+            results.append({
+                "title": item.get(
+                    "title",
+                    ""
+                ),
+
+                "url": item.get(
+                    "url",
+                    ""
+                ),
+
+                "content": item.get(
+                    "content",
+                    ""
+                ),
+
+                "score": item.get(
+                    "score"
+                )
+            })
+
+        return {
+            "enabled": True,
+            "results": results,
+            "error": None
+        }
+
+    except requests.RequestException as error:
+
+        print(
+            "TAVILY REQUEST ERROR:",
+            repr(error)
+        )
+
+        return {
+            "enabled": True,
+            "results": [],
+            "error": "ارتباط با سرویس جست‌وجوی وب برقرار نشد."
+        }
+
+    except Exception as error:
+
+        print(
+            "TAVILY ERROR:",
+            repr(error)
+        )
+
+        return {
+            "enabled": True,
+            "results": [],
+            "error": "خطای داخلی جست‌وجوی وب."
+        }
+
+
+# =========================================================
 # HOME
 # =========================================================
 
@@ -228,7 +348,8 @@ def home():
 @app.route("/health")
 def health():
 
-    api_key = get_api_key()
+    openrouter_key = get_openrouter_key()
+    tavily_key = get_tavily_key()
 
     try:
 
@@ -252,16 +373,26 @@ def health():
         database = False
 
     return jsonify({
+
         "status": "ok",
-        "openrouter_key": bool(api_key),
-        "key_length": len(api_key),
-        "database": database,
-        "memory": True
+
+        "openrouter_key":
+            bool(openrouter_key),
+
+        "tavily_key":
+            bool(tavily_key),
+
+        "database":
+            database,
+
+        "memory":
+            True
+
     }), 200
 
 
 # =========================================================
-# GET CONVERSATIONS
+# CONVERSATIONS
 # =========================================================
 
 @app.route(
@@ -294,10 +425,17 @@ def get_conversations():
 
         return jsonify([
             {
-                "id": row["id"],
-                "title": row["title"],
-                "created_at": row["created_at"],
-                "message_count": row["message_count"]
+                "id":
+                    row["id"],
+
+                "title":
+                    row["title"],
+
+                "created_at":
+                    row["created_at"],
+
+                "message_count":
+                    row["message_count"]
             }
             for row in rows
         ])
@@ -343,8 +481,11 @@ def create_conversation():
         conn.close()
 
         return jsonify({
-            "id": conversation_id,
-            "title": "گفتگوی جدید"
+            "id":
+                conversation_id,
+
+            "title":
+                "گفتگوی جدید"
         }), 200
 
     except Exception as error:
@@ -392,10 +533,17 @@ def get_messages(conversation_id):
 
         return jsonify([
             {
-                "id": row["id"],
-                "role": row["role"],
-                "content": row["content"],
-                "created_at": row["created_at"]
+                "id":
+                    row["id"],
+
+                "role":
+                    row["role"],
+
+                "content":
+                    row["content"],
+
+                "created_at":
+                    row["created_at"]
             }
             for row in rows
         ])
@@ -409,7 +557,7 @@ def get_messages(conversation_id):
 
         return jsonify({
             "error":
-                "خطا در دریافت پیام‌های گفتگو."
+                "خطا در دریافت پیام‌ها."
         }), 500
 
 
@@ -426,8 +574,9 @@ def memory_get():
     try:
 
         return jsonify({
-            "memories": get_memories()
-        }), 200
+            "memories":
+                get_memories()
+        })
 
     except Exception as error:
 
@@ -443,7 +592,7 @@ def memory_get():
 
 
 # =========================================================
-# MEMORY ADD / UPDATE
+# MEMORY ADD
 # =========================================================
 
 @app.route(
@@ -459,17 +608,11 @@ def memory_add():
         ) or {}
 
         key = str(
-            data.get(
-                "key",
-                ""
-            )
+            data.get("key", "")
         ).strip()
 
         value = str(
-            data.get(
-                "value",
-                ""
-            )
+            data.get("value", "")
         ).strip()
 
         if not key or not value:
@@ -485,10 +628,15 @@ def memory_add():
         )
 
         return jsonify({
-            "success": True,
-            "key": key,
-            "value": value
-        }), 200
+            "success":
+                True,
+
+            "key":
+                key,
+
+            "value":
+                value
+        })
 
     except Exception as error:
 
@@ -504,7 +652,7 @@ def memory_add():
 
 
 # =========================================================
-# MEMORY DELETE ONE
+# MEMORY DELETE
 # =========================================================
 
 @app.route(
@@ -518,8 +666,9 @@ def memory_delete(key):
         delete_memory(key)
 
         return jsonify({
-            "success": True
-        }), 200
+            "success":
+                True
+        })
 
     except Exception as error:
 
@@ -549,8 +698,9 @@ def memory_delete_all():
         clear_memories()
 
         return jsonify({
-            "success": True
-        }), 200
+            "success":
+                True
+        })
 
     except Exception as error:
 
@@ -577,23 +727,13 @@ def chat():
 
     try:
 
-        # -------------------------------------------------
-        # API KEY
-        # -------------------------------------------------
+        openrouter_key = get_openrouter_key()
 
-        api_key = get_api_key()
-
-        print("================================")
-        print("WHALE AI / CHAT")
-        print("API KEY EXISTS:", bool(api_key))
-        print("API KEY LENGTH:", len(api_key))
-        print("================================")
-
-        if not api_key:
+        if not openrouter_key:
 
             return jsonify({
                 "error":
-                    "کلید OpenRouter در Environment Variables تنظیم نشده است."
+                    "OPENROUTER_API_KEY تنظیم نشده است."
             }), 500
 
 
@@ -615,6 +755,14 @@ def chat():
         conversation_id = data.get(
             "conversation_id"
         )
+
+        use_web = bool(
+            data.get(
+                "web",
+                False
+            )
+        )
+
 
         if not user_message:
 
@@ -683,9 +831,7 @@ def chat():
 
         rows = conn.execute(
             """
-            SELECT
-                role,
-                content
+            SELECT role, content
             FROM messages
             WHERE conversation_id = ?
             ORDER BY id ASC
@@ -723,7 +869,52 @@ def chat():
         # MEMORY
         # -------------------------------------------------
 
-        memory_context = build_memory_context()
+        memory_context = \
+            build_memory_context()
+
+
+        # -------------------------------------------------
+        # WEB
+        # -------------------------------------------------
+
+        web_data = {
+            "enabled": False,
+            "results": [],
+            "error": None
+        }
+
+        web_context = ""
+
+        if use_web:
+
+            web_data = search_web(
+                user_message
+            )
+
+            if web_data["results"]:
+
+                web_lines = []
+
+                for index, result in enumerate(
+                    web_data["results"],
+                    start=1
+                ):
+
+                    web_lines.append(
+                        "\n".join([
+                            f"[منبع {index}]",
+                            f"عنوان: {result['title']}",
+                            f"URL: {result['url']}",
+                            f"محتوا: {result['content']}"
+                        ])
+                    )
+
+                web_context = (
+                    "\n\n"
+                    "نتایج جست‌وجوی وب:\n"
+                    + "\n\n".join(web_lines)
+                    + "\n"
+                )
 
 
         # -------------------------------------------------
@@ -733,11 +924,11 @@ def chat():
         system_prompt = """
 تو Whale AI هستی؛ یک دستیار هوشمند فارسی.
 
-قوانین پاسخ:
+قوانین:
 
 1. اگر کاربر فارسی صحبت کرد، فارسی پاسخ بده.
 
-2. پاسخ‌ها طبیعی، واضح و خوانا باشند.
+2. پاسخ طبیعی، واضح و خوانا باشد.
 
 3. از Markdown استفاده کن.
 
@@ -745,32 +936,42 @@ def chat():
 
 5. برای مراحل از فهرست شماره‌دار استفاده کن.
 
-6. برای موارد مقایسه‌ای، اگر مناسب بود از جدول Markdown استفاده کن.
+6. برای مقایسه‌ها در صورت مناسب بودن جدول Markdown استفاده کن.
 
-7. برای کد حتماً از code block استفاده کن.
+7. برای کد از code block استفاده کن.
 
-8. پاسخ را بی‌دلیل به خطوط کوتاه و جداگانه تقسیم نکن.
+8. پاسخ را بی‌دلیل به خطوط کوتاه تقسیم نکن.
 
-9. پاسخ باید متناسب با سؤال باشد و بی‌دلیل طولانی نشود.
+9. پاسخ متناسب با سؤال باشد.
 
-10. از اطلاعات حافظه فقط زمانی استفاده کن که به سؤال مربوط باشد.
+10. از اطلاعات حافظه فقط زمانی استفاده کن که مرتبط باشد.
 
-11. اطلاعات خصوصی موجود در حافظه را بی‌دلیل نمایش نده.
+11. اطلاعات خصوصی حافظه را بی‌دلیل نمایش نده.
 
-12. اگر پاسخ نیاز به توضیح دارد، آن را منظم و مرحله‌به‌مرحله ارائه کن.
+12. اگر نتیجه جست‌وجوی وب در اختیار توست، اطلاعات وب را بررسی و با دقت از آن استفاده کن.
+
+13. اگر از نتایج وب استفاده کردی، در انتهای پاسخ یک بخش با عنوان «منابع» ایجاد کن و منابع مرتبط را به صورت لینک Markdown نمایش بده.
+
+14. اگر اطلاعات وب کافی نیست، وانمود نکن که اطلاعات قطعی است.
+
+15. اگر کاربر سؤال ساده‌ای پرسید که نیازی به وب ندارد، پاسخ را مستقیم بده.
 """
 
         system_prompt += memory_context
+        system_prompt += web_context
 
 
         # -------------------------------------------------
-        # BUILD OPENROUTER MESSAGES
+        # BUILD MESSAGES
         # -------------------------------------------------
 
         messages = [
             {
-                "role": "system",
-                "content": system_prompt
+                "role":
+                    "system",
+
+                "content":
+                    system_prompt
             }
         ]
 
@@ -786,43 +987,41 @@ def chat():
                 continue
 
             messages.append({
-                "role": role,
-                "content": row["content"]
+                "role":
+                    role,
+
+                "content":
+                    row["content"]
             })
 
 
-        # -------------------------------------------------
-        # CURRENT MESSAGE
-        # -------------------------------------------------
-
         messages.append({
-            "role": "user",
-            "content": user_message
+            "role":
+                "user",
+
+            "content":
+                user_message
         })
 
 
         # -------------------------------------------------
-        # OPENROUTER HEADERS
+        # OPENROUTER
         # -------------------------------------------------
 
         headers = {
             "Authorization":
-                "Bearer " + api_key,
+                "Bearer " + openrouter_key,
 
             "Content-Type":
                 "application/json",
 
             "HTTP-Referer":
-                "https://snapdeploy.dev",
+                "http://localhost:5000",
 
             "X-Title":
                 "Whale AI"
         }
 
-
-        # -------------------------------------------------
-        # OPENROUTER PAYLOAD
-        # -------------------------------------------------
 
         payload = {
             "model":
@@ -840,23 +1039,32 @@ def chat():
 
 
         print(
+            "================================"
+        )
+
+        print(
+            "WHALE AI CHAT"
+        )
+
+        print(
             "CONVERSATION:",
             conversation_id
         )
 
         print(
-            "MEMORIES:",
-            len(get_memories())
+            "WEB:",
+            use_web
         )
 
         print(
-            "SENDING REQUEST TO OPENROUTER"
+            "WEB RESULTS:",
+            len(web_data["results"])
         )
 
+        print(
+            "================================"
+        )
 
-        # -------------------------------------------------
-        # REQUEST
-        # -------------------------------------------------
 
         response = requests.post(
             OPENROUTER_URL,
@@ -871,17 +1079,12 @@ def chat():
             response.status_code
         )
 
-        print(
-            "OPENROUTER RESPONSE:",
-            response.text[:3000]
-        )
-
-
-        # -------------------------------------------------
-        # OPENROUTER ERROR
-        # -------------------------------------------------
 
         if response.status_code != 200:
+
+            print(
+                response.text[:3000]
+            )
 
             return jsonify({
 
@@ -909,33 +1112,22 @@ def chat():
 
             return jsonify({
                 "error":
-                    "پاسخ OpenRouter JSON معتبر نبود."
+                    "پاسخ OpenRouter معتبر نبود."
             }), 502
 
 
-        # -------------------------------------------------
-        # ERROR OBJECT
-        # -------------------------------------------------
-
         if result.get("error"):
 
-            print(
-                "OPENROUTER API ERROR:",
-                result["error"]
-            )
-
             return jsonify({
+
                 "error":
                     "OpenRouter خطا داد.",
 
                 "details":
                     result["error"]
+
             }), 502
 
-
-        # -------------------------------------------------
-        # CHOICES
-        # -------------------------------------------------
 
         choices = result.get(
             "choices"
@@ -944,17 +1136,15 @@ def chat():
         if not choices:
 
             return jsonify({
+
                 "error":
                     "OpenRouter پاسخ قابل استفاده‌ای برنگرداند.",
 
                 "details":
                     result
+
             }), 502
 
-
-        # -------------------------------------------------
-        # MESSAGE
-        # -------------------------------------------------
 
         message_data = choices[0].get(
             "message",
@@ -1012,7 +1202,7 @@ def chat():
 
             return jsonify({
                 "error":
-                    "متن پاسخ OpenRouter خالی است."
+                    "متن پاسخ خالی است."
             }), 502
 
 
@@ -1056,14 +1246,19 @@ def chat():
                 reply,
 
             "conversation_id":
-                conversation_id
+                conversation_id,
+
+            "web":
+                web_data["results"],
+
+            "web_enabled":
+                web_data["enabled"],
+
+            "web_error":
+                web_data["error"]
 
         }), 200
 
-
-    # =====================================================
-    # REQUEST ERROR
-    # =====================================================
 
     except requests.RequestException as error:
 
@@ -1082,10 +1277,6 @@ def chat():
 
         }), 502
 
-
-    # =====================================================
-    # GENERAL ERROR
-    # =====================================================
 
     except Exception as error:
 
@@ -1139,7 +1330,8 @@ def delete_conversation(conversation_id):
         conn.close()
 
         return jsonify({
-            "success": True
+            "success":
+                True
         })
 
     except Exception as error:
@@ -1156,7 +1348,7 @@ def delete_conversation(conversation_id):
 
 
 # =========================================================
-# DELETE ALL CONVERSATIONS
+# DELETE ALL
 # =========================================================
 
 @app.route(
@@ -1181,7 +1373,8 @@ def delete_all():
         conn.close()
 
         return jsonify({
-            "success": True
+            "success":
+                True
         })
 
     except Exception as error:
@@ -1210,27 +1403,40 @@ if __name__ == "__main__":
         )
     )
 
-    api_key = get_api_key()
-
-    print("================================")
-    print("WHALE AI STARTING")
-    print("PORT:", port)
-
     print(
-        "OPENROUTER KEY:",
-        bool(api_key)
+        "================================"
     )
 
     print(
-        "KEY LENGTH:",
-        len(api_key)
+        "WHALE AI STARTING"
     )
 
     print(
-        "MEMORY SYSTEM: ENABLED"
+        "PORT:",
+        port
     )
 
-    print("================================")
+    print(
+        "OPENROUTER:",
+        bool(get_openrouter_key())
+    )
+
+    print(
+        "TAVILY:",
+        bool(get_tavily_key())
+    )
+
+    print(
+        "MEMORY: ENABLED"
+    )
+
+    print(
+        "WEB SEARCH: ENABLED"
+    )
+
+    print(
+        "================================"
+    )
 
     app.run(
         host="0.0.0.0",
