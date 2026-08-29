@@ -1,8 +1,9 @@
 import os
 import sqlite3
+import json
 import requests
 
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify, send_from_directory, Response
 
 
 # =========================================================
@@ -94,9 +95,8 @@ def health():
 
     return jsonify({
         "status": "ok",
-        "openrouter_key": bool(API_KEY),
-        "key_length": len(API_KEY)
-    }), 200
+        "openrouter_key": bool(API_KEY)
+    })
 
 
 # =========================================================
@@ -118,12 +118,15 @@ def get_conversations():
             c.created_at,
             COUNT(m.id) AS message_count
         FROM conversations c
+
         LEFT JOIN messages m
-            ON m.conversation_id = c.id
+        ON m.conversation_id = c.id
+
         GROUP BY
             c.id,
             c.title,
             c.created_at
+
         ORDER BY c.id DESC
     """).fetchall()
 
@@ -169,7 +172,7 @@ def create_conversation():
     return jsonify({
         "id": conversation_id,
         "title": "گفتگوی جدید"
-    }), 200
+    })
 
 
 # =========================================================
@@ -224,7 +227,7 @@ def chat():
     try:
 
         # -------------------------------------------------
-        # READ REQUEST
+        # REQUEST
         # -------------------------------------------------
 
         data = request.get_json(
@@ -244,7 +247,7 @@ def chat():
 
 
         # -------------------------------------------------
-        # EMPTY MESSAGE
+        # VALIDATION
         # -------------------------------------------------
 
         if not user_message:
@@ -254,10 +257,6 @@ def chat():
             }), 400
 
 
-        # -------------------------------------------------
-        # CHECK API KEY
-        # -------------------------------------------------
-
         if not API_KEY:
 
             print(
@@ -266,17 +265,34 @@ def chat():
 
             return jsonify({
                 "error":
-                    "کلید OpenRouter در Environment Variables تنظیم نشده است."
+                    "کلید OpenRouter تنظیم نشده است."
             }), 500
 
 
         # -------------------------------------------------
-        # CREATE CONVERSATION IF NEEDED
+        # CONVERSATION
         # -------------------------------------------------
 
-        if not conversation_id:
+        conn = get_db()
 
-            conn = get_db()
+
+        if conversation_id:
+
+            conversation = conn.execute(
+                """
+                SELECT id
+                FROM conversations
+                WHERE id = ?
+                """,
+                (conversation_id,)
+            ).fetchone()
+
+            if not conversation:
+
+                conversation_id = None
+
+
+        if not conversation_id:
 
             cursor = conn.execute(
                 """
@@ -292,14 +308,11 @@ def chat():
             conversation_id = cursor.lastrowid
 
             conn.commit()
-            conn.close()
 
 
         # -------------------------------------------------
-        # GET OLD MESSAGES
+        # OLD MESSAGES
         # -------------------------------------------------
-
-        conn = get_db()
 
         rows = conn.execute(
             """
@@ -338,23 +351,36 @@ def chat():
         )
 
         conn.commit()
+
         conn.close()
 
 
         # -------------------------------------------------
-        # BUILD MESSAGES FOR OPENROUTER
+        # BUILD AI MESSAGES
         # -------------------------------------------------
 
         messages = [
 
             {
                 "role": "system",
-                "content": (
-                    "تو Whale AI هستی. "
-                    "دقیق، مفید و طبیعی پاسخ بده. "
-                    "اگر کاربر فارسی صحبت کرد، فارسی پاسخ بده. "
-                    "پاسخ‌ها را واضح و قابل فهم ارائه کن."
-                )
+                "content": """
+تو Whale AI هستی؛ یک دستیار هوش مصنوعی فارسی‌زبان.
+
+قوانین پاسخ‌دهی:
+
+- اگر کاربر فارسی صحبت کرد، فارسی پاسخ بده.
+- پاسخ‌ها طبیعی، روان و حرفه‌ای باشند.
+- پاسخ را بی‌دلیل خط‌خطی نکن.
+- از پاراگراف‌های مرتب استفاده کن.
+- برای فهرست‌ها از bullet استفاده کن.
+- اگر جدول واقعاً مفید بود از جدول Markdown استفاده کن.
+- برای توضیحات آموزشی مرحله‌بندی واضح داشته باش.
+- از تیترهای مناسب استفاده کن.
+- پاسخ‌ها بیش از حد خشک و رباتی نباشند.
+- اگر سؤال ساده است، پاسخ را کوتاه و مستقیم بده.
+- اگر سؤال پیچیده است، کامل توضیح بده.
+- کدها را داخل code block قرار بده.
+"""
             }
 
         ]
@@ -368,6 +394,9 @@ def chat():
             })
 
 
+        # پیام جدید قبلاً در دیتابیس ذخیره شده
+        # اما برای OpenRouter باید در درخواست هم باشد.
+
         messages.append({
             "role": "user",
             "content": user_message
@@ -375,46 +404,28 @@ def chat():
 
 
         # -------------------------------------------------
-        # LOG
-        # -------------------------------------------------
-
-        print("================================")
-        print("WHALE AI")
-        print(
-            "OPENROUTER KEY:",
-            bool(API_KEY)
-        )
-        print(
-            "KEY LENGTH:",
-            len(API_KEY)
-        )
-        print(
-            "SENDING REQUEST TO OPENROUTER"
-        )
-        print("================================")
-
-
-        # -------------------------------------------------
-        # OPENROUTER HEADERS
+        # HEADERS
         # -------------------------------------------------
 
         headers = {
+
             "Authorization":
-                "Bearer " + API_KEY,
+                f"Bearer {API_KEY}",
 
             "Content-Type":
                 "application/json",
 
             "HTTP-Referer":
-                "https://snapdeploy.dev",
+                "https://whale-ai-c216d.containers.snapdeploy.app",
 
             "X-Title":
                 "Whale AI"
+
         }
 
 
         # -------------------------------------------------
-        # OPENROUTER PAYLOAD
+        # PAYLOAD
         # -------------------------------------------------
 
         payload = {
@@ -434,8 +445,16 @@ def chat():
         }
 
 
+        print("================================")
+        print("WHALE AI")
+        print("OPENROUTER KEY:", bool(API_KEY))
+        print("CONVERSATION:", conversation_id)
+        print("SENDING REQUEST")
+        print("================================")
+
+
         # -------------------------------------------------
-        # SEND REQUEST
+        # REQUEST
         # -------------------------------------------------
 
         response = requests.post(
@@ -451,18 +470,9 @@ def chat():
         )
 
 
-        # -------------------------------------------------
-        # LOG RESPONSE
-        # -------------------------------------------------
-
         print(
             "OPENROUTER STATUS:",
             response.status_code
-        )
-
-        print(
-            "OPENROUTER RESPONSE:",
-            response.text[:3000]
         )
 
 
@@ -471,6 +481,14 @@ def chat():
         # -------------------------------------------------
 
         if response.status_code != 200:
+
+            print(
+                "OPENROUTER REQUEST ERROR"
+            )
+
+            print(
+                response.text[:3000]
+            )
 
             return jsonify({
 
@@ -487,17 +505,30 @@ def chat():
 
 
         # -------------------------------------------------
-        # PARSE JSON
+        # JSON
         # -------------------------------------------------
 
-        result = response.json()
+        try:
+
+            result = response.json()
+
+        except Exception:
+
+            return jsonify({
+                "error":
+                    "پاسخ OpenRouter معتبر نیست."
+            }), 502
 
 
         # -------------------------------------------------
-        # CHECK CHOICES
+        # CHOICES
         # -------------------------------------------------
 
-        if "choices" not in result:
+        choices = result.get(
+            "choices"
+        )
+
+        if not choices:
 
             print(
                 "ERROR: choices not found"
@@ -505,23 +536,15 @@ def chat():
 
             return jsonify({
                 "error":
-                    "OpenRouter پاسخ قابل استفاده‌ای برنگرداند."
-            }), 502
-
-
-        if not result["choices"]:
-
-            return jsonify({
-                "error":
-                    "OpenRouter پاسخ خالی برگرداند."
+                    "OpenRouter پاسخ قابل استفاده‌ای نداد."
             }), 502
 
 
         # -------------------------------------------------
-        # GET REPLY
+        # REPLY
         # -------------------------------------------------
 
-        message_data = result["choices"][0].get(
+        message_data = choices[0].get(
             "message",
             {}
         )
@@ -530,6 +553,19 @@ def chat():
             "content",
             ""
         )
+
+
+        if isinstance(reply, list):
+
+            reply = "".join(
+                str(item)
+                for item in reply
+            )
+
+
+        reply = str(
+            reply
+        ).strip()
 
 
         if not reply:
@@ -541,7 +577,7 @@ def chat():
 
 
         # -------------------------------------------------
-        # SAVE ASSISTANT MESSAGE
+        # SAVE ASSISTANT
         # -------------------------------------------------
 
         conn = get_db()
@@ -568,21 +604,61 @@ def chat():
 
 
         # -------------------------------------------------
-        # RETURN TO FRONTEND
+        # UPDATE TITLE
         # -------------------------------------------------
 
-        return jsonify({
+        conn = get_db()
 
-            "type":
-                "done",
-
-            "content":
-                reply,
-
-            "conversation_id":
+        conn.execute(
+            """
+            UPDATE conversations
+            SET title = ?
+            WHERE id = ?
+            AND title = 'گفتگوی جدید'
+            """,
+            (
+                user_message[:40],
                 conversation_id
+            )
+        )
 
-        }), 200
+        conn.commit()
+        conn.close()
+
+
+        # -------------------------------------------------
+        # STREAM-LIKE RESPONSE
+        # -------------------------------------------------
+
+        def generate():
+
+            # ابتدا متن پاسخ
+
+            yield json.dumps(
+                {
+                    "type": "text",
+                    "content": reply
+                },
+                ensure_ascii=False
+            ) + "\n"
+
+
+            # پایان
+
+            yield json.dumps(
+                {
+                    "type": "done",
+                    "conversation_id":
+                        conversation_id
+                },
+                ensure_ascii=False
+            ) + "\n"
+
+
+        return Response(
+            generate(),
+            mimetype="application/x-ndjson"
+        )
 
 
     # =====================================================
@@ -660,7 +736,7 @@ def delete_conversation(conversation_id):
 
 
 # =========================================================
-# DELETE ALL CONVERSATIONS
+# DELETE ALL
 # =========================================================
 
 @app.route(
@@ -706,10 +782,6 @@ if __name__ == "__main__":
     print(
         "OPENROUTER KEY:",
         bool(API_KEY)
-    )
-    print(
-        "KEY LENGTH:",
-        len(API_KEY)
     )
     print("================================")
 
