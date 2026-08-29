@@ -1,15 +1,20 @@
 import os
 import sqlite3
-import json
 import requests
+import mimetypes
+from flask import Flask, request, jsonify, send_from_directory
 
-from flask import (
-    Flask,
-    request,
-    jsonify,
-    send_from_directory,
-    Response,
-)
+# Optional file readers
+try:
+    from pypdf import PdfReader
+except Exception:
+    PdfReader = None
+
+try:
+    from docx import Document
+except Exception:
+    Document = None
+
 
 # =========================================================
 # APP
@@ -21,6 +26,15 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_FILE = os.path.join(BASE_DIR, "whale.db")
 
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
+
+DEFAULT_MODEL = os.environ.get(
+    "OPENROUTER_MODEL",
+    "openrouter/free"
+)
+
+MAX_HISTORY_MESSAGES = 40
+MAX_FILE_CHARS = 50000
+MAX_MESSAGE_CHARS = 20000
 
 
 # =========================================================
@@ -39,7 +53,6 @@ def get_api_key():
 # =========================================================
 
 def get_db():
-
     conn = sqlite3.connect(
         DB_FILE,
         timeout=30
@@ -50,7 +63,7 @@ def get_db():
     conn.execute("""
         CREATE TABLE IF NOT EXISTS conversations (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            title TEXT DEFAULT 'گفتگوی جدید',
+            title TEXT DEFAULT 'New Chat',
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     """)
@@ -134,7 +147,10 @@ def save_memory(key, value):
                 updated_at = CURRENT_TIMESTAMP
             WHERE key = ?
             """,
-            (value, key)
+            (
+                value,
+                key
+            )
         )
 
     else:
@@ -145,7 +161,10 @@ def save_memory(key, value):
             (key, value)
             VALUES (?, ?)
             """,
-            (key, value)
+            (
+                key,
+                value
+            )
         )
 
     conn.commit()
@@ -200,9 +219,105 @@ def build_memory_context():
 
     return (
         "\n\n"
-        "اطلاعات ذخیره‌شده درباره کاربر:\n"
+        "Stored user memory:\n"
         + "\n".join(lines)
         + "\n"
+    )
+
+
+# =========================================================
+# FILE EXTRACTION
+# =========================================================
+
+def extract_file_text(file):
+
+    filename = file.filename or ""
+    extension = (
+        os.path.splitext(filename)[1]
+        .lower()
+        .replace(".", "")
+    )
+
+    if extension in ("txt", "md", "csv", "json"):
+
+        raw = file.read()
+
+        try:
+            text = raw.decode("utf-8")
+
+        except UnicodeDecodeError:
+
+            text = raw.decode(
+                "utf-8",
+                errors="replace"
+            )
+
+        return text[:MAX_FILE_CHARS], extension
+
+
+    if extension == "pdf":
+
+        if PdfReader is None:
+
+            raise RuntimeError(
+                "PDF support is not installed. "
+                "Install pypdf."
+            )
+
+        reader = PdfReader(file)
+
+        parts = []
+
+        for page in reader.pages:
+
+            try:
+
+                page_text = page.extract_text() or ""
+
+            except Exception:
+
+                page_text = ""
+
+            if page_text:
+                parts.append(page_text)
+
+            if sum(
+                len(x)
+                for x in parts
+            ) >= MAX_FILE_CHARS:
+
+                break
+
+        text = "\n\n".join(parts)
+
+        return text[:MAX_FILE_CHARS], extension
+
+
+    if extension == "docx":
+
+        if Document is None:
+
+            raise RuntimeError(
+                "DOCX support is not installed. "
+                "Install python-docx."
+            )
+
+        # DOCX expects a file path or file-like object.
+        document = Document(file)
+
+        paragraphs = [
+            paragraph.text
+            for paragraph in document.paragraphs
+            if paragraph.text.strip()
+        ]
+
+        text = "\n".join(paragraphs)
+
+        return text[:MAX_FILE_CHARS], extension
+
+
+    raise ValueError(
+        "Unsupported file type."
     )
 
 
@@ -213,19 +328,10 @@ def build_memory_context():
 @app.route("/")
 def home():
 
-    index_file = os.path.join(
+    return send_from_directory(
         BASE_DIR,
         "index.html"
     )
-
-    if os.path.exists(index_file):
-
-        return send_from_directory(
-            BASE_DIR,
-            "index.html"
-        )
-
-    return "Whale AI is running."
 
 
 # =========================================================
@@ -240,7 +346,11 @@ def health():
     try:
 
         conn = get_db()
-        conn.execute("SELECT 1").fetchone()
+
+        conn.execute(
+            "SELECT 1"
+        ).fetchone()
+
         conn.close()
 
         database = True
@@ -255,19 +365,100 @@ def health():
         database = False
 
     return jsonify({
+
         "status": "ok",
-        "openrouter_key": bool(api_key),
-        "key_length": len(api_key),
-        "database": database,
-        "memory": True
+
+        "openrouter_key":
+            bool(api_key),
+
+        "key_length":
+            len(api_key),
+
+        "database":
+            database,
+
+        "model":
+            DEFAULT_MODEL
+
     })
 
 
 # =========================================================
-# CONVERSATIONS
+# UPLOAD
 # =========================================================
 
-@app.route("/conversations", methods=["GET"])
+@app.route(
+    "/upload",
+    methods=["POST"]
+)
+def upload_file():
+
+    try:
+
+        if "file" not in request.files:
+
+            return jsonify({
+                "error":
+                    "No file was uploaded."
+            }), 400
+
+        file = request.files["file"]
+
+        if not file.filename:
+
+            return jsonify({
+                "error":
+                    "The file has no name."
+            }), 400
+
+        text, extension = extract_file_text(file)
+
+        return jsonify({
+
+            "success":
+                True,
+
+            "filename":
+                file.filename,
+
+            "extension":
+                extension,
+
+            "text":
+                text
+
+        })
+
+    except ValueError as error:
+
+        return jsonify({
+            "error":
+                str(error)
+        }), 400
+
+    except Exception as error:
+
+        print(
+            "UPLOAD ERROR:",
+            repr(error)
+        )
+
+        return jsonify({
+            "error":
+                "File processing failed.",
+            "details":
+                str(error)
+        }), 500
+
+
+# =========================================================
+# GET CONVERSATIONS
+# =========================================================
+
+@app.route(
+    "/conversations",
+    methods=["GET"]
+)
 def get_conversations():
 
     try:
@@ -294,10 +485,17 @@ def get_conversations():
 
         return jsonify([
             {
-                "id": row["id"],
-                "title": row["title"],
-                "created_at": row["created_at"],
-                "message_count": row["message_count"]
+                "id":
+                    row["id"],
+
+                "title":
+                    row["title"],
+
+                "created_at":
+                    row["created_at"],
+
+                "message_count":
+                    row["message_count"]
             }
             for row in rows
         ])
@@ -310,11 +508,19 @@ def get_conversations():
         )
 
         return jsonify({
-            "error": "خطا در دریافت گفتگوها."
+            "error":
+                "Failed to load conversations."
         }), 500
 
 
-@app.route("/conversations", methods=["POST"])
+# =========================================================
+# CREATE CONVERSATION
+# =========================================================
+
+@app.route(
+    "/conversations",
+    methods=["POST"]
+)
 def create_conversation():
 
     try:
@@ -323,10 +529,11 @@ def create_conversation():
 
         cursor = conn.execute(
             """
-            INSERT INTO conversations (title)
+            INSERT INTO conversations
+            (title)
             VALUES (?)
             """,
-            ("گفتگوی جدید",)
+            ("New Chat",)
         )
 
         conversation_id = cursor.lastrowid
@@ -335,9 +542,15 @@ def create_conversation():
         conn.close()
 
         return jsonify({
-            "id": conversation_id,
-            "title": "گفتگوی جدید"
+
+            "id":
+                conversation_id,
+
+            "title":
+                "New Chat"
+
         })
+
 
     except Exception as error:
 
@@ -347,9 +560,14 @@ def create_conversation():
         )
 
         return jsonify({
-            "error": "خطا در ساخت گفتگو."
+            "error":
+                "Failed to create conversation."
         }), 500
 
+
+# =========================================================
+# GET MESSAGES
+# =========================================================
 
 @app.route(
     "/conversations/<int:conversation_id>/messages",
@@ -363,7 +581,11 @@ def get_messages(conversation_id):
 
         rows = conn.execute(
             """
-            SELECT id, role, content, created_at
+            SELECT
+                id,
+                role,
+                content,
+                created_at
             FROM messages
             WHERE conversation_id = ?
             ORDER BY id ASC
@@ -375,10 +597,17 @@ def get_messages(conversation_id):
 
         return jsonify([
             {
-                "id": row["id"],
-                "role": row["role"],
-                "content": row["content"],
-                "created_at": row["created_at"]
+                "id":
+                    row["id"],
+
+                "role":
+                    row["role"],
+
+                "content":
+                    row["content"],
+
+                "created_at":
+                    row["created_at"]
             }
             for row in rows
         ])
@@ -391,9 +620,816 @@ def get_messages(conversation_id):
         )
 
         return jsonify({
-            "error": "خطا در دریافت پیام‌ها."
+            "error":
+                "Failed to load messages."
         }), 500
 
+
+# =========================================================
+# MEMORY GET
+# =========================================================
+
+@app.route(
+    "/memory",
+    methods=["GET"]
+)
+def memory_get():
+
+    try:
+
+        return jsonify({
+            "memories":
+                get_memories()
+        })
+
+    except Exception as error:
+
+        print(
+            "MEMORY GET ERROR:",
+            repr(error)
+        )
+
+        return jsonify({
+            "error":
+                "Failed to load memory."
+        }), 500
+
+
+# =========================================================
+# MEMORY ADD
+# =========================================================
+
+@app.route(
+    "/memory",
+    methods=["POST"]
+)
+def memory_add():
+
+    try:
+
+        data = request.get_json(
+            silent=True
+        ) or {}
+
+        key = str(
+            data.get("key", "")
+        ).strip()
+
+        value = str(
+            data.get("value", "")
+        ).strip()
+
+        if not key or not value:
+
+            return jsonify({
+                "error":
+                    "key and value are required."
+            }), 400
+
+        save_memory(
+            key,
+            value
+        )
+
+        return jsonify({
+
+            "success":
+                True,
+
+            "key":
+                key,
+
+            "value":
+                value
+
+        })
+
+    except Exception as error:
+
+        print(
+            "MEMORY ADD ERROR:",
+            repr(error)
+        )
+
+        return jsonify({
+            "error":
+                "Failed to save memory."
+        }), 500
+
+
+# =========================================================
+# MEMORY DELETE
+# =========================================================
+
+@app.route(
+    "/memory/<path:key>",
+    methods=["DELETE"]
+)
+def memory_delete(key):
+
+    try:
+
+        delete_memory(key)
+
+        return jsonify({
+            "success":
+                True
+        })
+
+    except Exception as error:
+
+        print(
+            "MEMORY DELETE ERROR:",
+            repr(error)
+        )
+
+        return jsonify({
+            "error":
+                "Failed to delete memory."
+        }), 500
+
+
+# =========================================================
+# MEMORY DELETE ALL
+# =========================================================
+
+@app.route(
+    "/memory",
+    methods=["DELETE"]
+)
+def memory_delete_all():
+
+    try:
+
+        clear_memories()
+
+        return jsonify({
+            "success":
+                True
+        })
+
+    except Exception as error:
+
+        print(
+            "MEMORY DELETE ALL ERROR:",
+            repr(error)
+        )
+
+        return jsonify({
+            "error":
+                "Failed to clear memory."
+        }), 500
+
+
+# =========================================================
+# BUILD MODEL MESSAGES
+# =========================================================
+
+def build_model_messages(
+    conversation_id,
+    user_message,
+    file_text=""
+):
+
+    conn = get_db()
+
+    rows = conn.execute(
+        """
+        SELECT
+            role,
+            content
+        FROM messages
+        WHERE conversation_id = ?
+        ORDER BY id DESC
+        LIMIT ?
+        """,
+        (
+            conversation_id,
+            MAX_HISTORY_MESSAGES
+        )
+    ).fetchall()
+
+    conn.close()
+
+    rows = list(
+        reversed(rows)
+    )
+
+    system_prompt = """
+You are Whale AI, a helpful AI assistant.
+
+Rules:
+
+1. Answer in the same language as the user.
+2. If the user writes Persian, answer in Persian.
+3. Be direct and natural.
+4. Do not unnecessarily delay simple questions.
+5. Use Markdown when useful.
+6. Use headings when they improve readability.
+7. Use numbered lists for procedures.
+8. Use code blocks for code.
+9. Do not repeat the user's message.
+10. Do not claim that you searched the web unless web search was actually enabled and used.
+11. If web search results are available, use them when relevant.
+12. Never expose private memory unless it is relevant to the request.
+"""
+
+    system_prompt += build_memory_context()
+
+    if file_text:
+
+        system_prompt += """
+
+The user attached a file.
+
+Use the following extracted file content when relevant:
+
+--- FILE CONTENT ---
+{}
+--- END FILE CONTENT ---
+""".format(
+            file_text[:MAX_FILE_CHARS]
+        )
+
+    messages = [
+        {
+            "role":
+                "system",
+
+            "content":
+                system_prompt
+        }
+    ]
+
+    for row in rows:
+
+        role = row["role"]
+
+        if role not in (
+            "user",
+            "assistant",
+            "system"
+        ):
+            continue
+
+        messages.append({
+
+            "role":
+                role,
+
+            "content":
+                row["content"]
+
+        })
+
+    # IMPORTANT:
+    # The current user message is already saved
+    # in the database before this function is called.
+    #
+    # Therefore DO NOT append user_message again.
+    #
+    # This prevents duplicate user messages.
+
+    return messages
+
+
+# =========================================================
+# CHAT
+# =========================================================
+
+@app.route(
+    "/chat",
+    methods=["POST"]
+)
+def chat():
+
+    try:
+
+        api_key = get_api_key()
+
+        if not api_key:
+
+            return jsonify({
+                "error":
+                    "OPENROUTER_API_KEY is not configured."
+            }), 500
+
+
+        data = request.get_json(
+            silent=True
+        ) or {}
+
+
+        user_message = str(
+            data.get(
+                "message",
+                ""
+            )
+        ).strip()
+
+
+        if len(user_message) > MAX_MESSAGE_CHARS:
+
+            return jsonify({
+                "error":
+                    "Message is too long."
+            }), 400
+
+
+        file_name = str(
+            data.get(
+                "file_name",
+                ""
+            )
+        ).strip()
+
+
+        file_text = str(
+            data.get(
+                "file_text",
+                ""
+            )
+        )
+
+
+        web_search = bool(
+            data.get(
+                "web_search",
+                False
+            )
+        )
+
+
+        conversation_id = data.get(
+            "conversation_id"
+        )
+
+
+        if not user_message and not file_text:
+
+            return jsonify({
+                "error":
+                    "Message is empty."
+            }), 400
+
+
+        # -------------------------------------------------
+        # DATABASE / CONVERSATION
+        # -------------------------------------------------
+
+        conn = get_db()
+
+
+        if conversation_id:
+
+            try:
+
+                conversation_id = int(
+                    conversation_id
+                )
+
+            except (
+                TypeError,
+                ValueError
+            ):
+
+                conversation_id = None
+
+
+        if conversation_id:
+
+            exists = conn.execute(
+                """
+                SELECT id
+                FROM conversations
+                WHERE id = ?
+                """,
+                (conversation_id,)
+            ).fetchone()
+
+            if not exists:
+
+                conversation_id = None
+
+
+        if not conversation_id:
+
+            title_source = (
+                user_message
+                or file_name
+                or "New Chat"
+            )
+
+            cursor = conn.execute(
+                """
+                INSERT INTO conversations
+                (title)
+                VALUES (?)
+                """,
+                (
+                    title_source[:50],
+                )
+            )
+
+            conversation_id = cursor.lastrowid
+
+
+        # -------------------------------------------------
+        # SAVE CURRENT USER MESSAGE ONCE
+        # -------------------------------------------------
+
+        display_message = user_message
+
+        if file_text:
+
+            display_message += (
+                "\n\n"
+                "[Attached file: {}]"
+                .format(
+                    file_name or "file"
+                )
+            )
+
+
+        if not display_message:
+
+            display_message = (
+                "[Attached file: {}]"
+                .format(
+                    file_name or "file"
+                )
+            )
+
+
+        conn.execute(
+            """
+            INSERT INTO messages
+            (
+                conversation_id,
+                role,
+                content
+            )
+            VALUES (?, ?, ?)
+            """,
+            (
+                conversation_id,
+                "user",
+                display_message
+            )
+        )
+
+
+        conn.commit()
+        conn.close()
+
+
+        # -------------------------------------------------
+        # MODEL MESSAGES
+        # -------------------------------------------------
+
+        messages = build_model_messages(
+            conversation_id,
+            user_message,
+            file_text
+        )
+
+
+        # -------------------------------------------------
+        # HEADERS
+        # -------------------------------------------------
+
+        headers = {
+
+            "Authorization":
+                "Bearer " + api_key,
+
+            "Content-Type":
+                "application/json",
+
+            "HTTP-Referer":
+                "http://localhost:5000",
+
+            "X-Title":
+                "Whale AI"
+
+        }
+
+
+        # -------------------------------------------------
+        # PAYLOAD
+        # -------------------------------------------------
+
+        payload = {
+
+            "model":
+                DEFAULT_MODEL,
+
+            "messages":
+                messages,
+
+            "temperature":
+                0.7,
+
+            "stream":
+                False
+
+        }
+
+
+        # -------------------------------------------------
+        # WEB SEARCH
+        # -------------------------------------------------
+
+        if web_search:
+
+            payload["plugins"] = [
+                {
+                    "id":
+                        "web",
+
+                    "max_results":
+                        5
+                }
+            ]
+
+
+        print("\n==============================")
+        print("WHALE AI REQUEST")
+        print("==============================")
+        print(
+            "Conversation:",
+            conversation_id
+        )
+        print(
+            "Model:",
+            DEFAULT_MODEL
+        )
+        print(
+            "Web Search:",
+            web_search
+        )
+        print(
+            "Message:",
+            user_message[:200]
+        )
+        print("==============================\n")
+
+
+        # -------------------------------------------------
+        # OPENROUTER REQUEST
+        # -------------------------------------------------
+
+        response = requests.post(
+            OPENROUTER_URL,
+            headers=headers,
+            json=payload,
+            timeout=120
+        )
+
+
+        print(
+            "OPENROUTER STATUS:",
+            response.status_code
+        )
+
+
+        if response.status_code != 200:
+
+            print(
+                "OPENROUTER ERROR:",
+                response.text[:3000]
+            )
+
+            return jsonify({
+
+                "error":
+                    "OpenRouter request failed.",
+
+                "status":
+                    response.status_code,
+
+                "details":
+                    response.text[:2000]
+
+            }), 502
+
+
+        # -------------------------------------------------
+        # PARSE JSON
+        # -------------------------------------------------
+
+        try:
+
+            result = response.json()
+
+        except ValueError:
+
+            return jsonify({
+                "error":
+                    "OpenRouter returned invalid JSON."
+            }), 502
+
+
+        if result.get("error"):
+
+            print(
+                "OPENROUTER API ERROR:",
+                result["error"]
+            )
+
+            return jsonify({
+
+                "error":
+                    "OpenRouter returned an error.",
+
+                "details":
+                    result["error"]
+
+            }), 502
+
+
+        choices = result.get(
+            "choices"
+        )
+
+
+        if not choices:
+
+            return jsonify({
+
+                "error":
+                    "No response was returned by the model.",
+
+                "details":
+                    result
+
+            }), 502
+
+
+        message_data = choices[0].get(
+            "message",
+            {}
+        )
+
+
+        reply = message_data.get(
+            "content",
+            ""
+        )
+
+
+        # -------------------------------------------------
+        # NORMALIZE CONTENT
+        # -------------------------------------------------
+
+        if isinstance(
+            reply,
+            list
+        ):
+
+            parts = []
+
+            for item in reply:
+
+                if isinstance(
+                    item,
+                    dict
+                ):
+
+                    text = item.get(
+                        "text",
+                        ""
+                    )
+
+                    if text:
+                        parts.append(text)
+
+                elif isinstance(
+                    item,
+                    str
+                ):
+
+                    parts.append(item)
+
+            reply = "".join(parts)
+
+
+        reply = str(
+            reply
+        ).strip()
+
+
+        if not reply:
+
+            return jsonify({
+
+                "error":
+                    "The model returned an empty response."
+
+            }), 502
+
+
+        # -------------------------------------------------
+        # SAVE ASSISTANT
+        # -------------------------------------------------
+
+        conn = get_db()
+
+        conn.execute(
+            """
+            INSERT INTO messages
+            (
+                conversation_id,
+                role,
+                content
+            )
+            VALUES (?, ?, ?)
+            """,
+            (
+                conversation_id,
+                "assistant",
+                reply
+            )
+        )
+
+        conn.commit()
+        conn.close()
+
+
+        # -------------------------------------------------
+        # RESPONSE
+        # -------------------------------------------------
+
+        return jsonify({
+
+            "type":
+                "done",
+
+            "content":
+                reply,
+
+            "conversation_id":
+                conversation_id,
+
+            "web_search":
+                web_search
+
+        })
+
+
+    except requests.Timeout:
+
+        print(
+            "OPENROUTER TIMEOUT"
+        )
+
+        return jsonify({
+
+            "error":
+                "The request timed out."
+
+        }), 504
+
+
+    except requests.RequestException as error:
+
+        print(
+            "OPENROUTER REQUEST ERROR:",
+            repr(error)
+        )
+
+        return jsonify({
+
+            "error":
+                "Could not connect to OpenRouter.",
+
+            "details":
+                str(error)
+
+        }), 502
+
+
+    except Exception as error:
+
+        print(
+            "CHAT ERROR:",
+            repr(error)
+        )
+
+        return jsonify({
+
+            "error":
+                "Internal server error.",
+
+            "details":
+                str(error)
+
+        }), 500
+
+
+# =========================================================
+# DELETE ONE CONVERSATION
+# =========================================================
 
 @app.route(
     "/conversations/<int:conversation_id>",
@@ -425,7 +1461,8 @@ def delete_conversation(conversation_id):
         conn.close()
 
         return jsonify({
-            "success": True
+            "success":
+                True
         })
 
     except Exception as error:
@@ -436,12 +1473,20 @@ def delete_conversation(conversation_id):
         )
 
         return jsonify({
-            "error": "خطا در حذف گفتگو."
+            "error":
+                "Failed to delete conversation."
         }), 500
 
 
-@app.route("/conversations", methods=["DELETE"])
-def delete_all_conversations():
+# =========================================================
+# DELETE ALL CONVERSATIONS
+# =========================================================
+
+@app.route(
+    "/conversations",
+    methods=["DELETE"]
+)
+def delete_all():
 
     try:
 
@@ -459,7 +1504,8 @@ def delete_all_conversations():
         conn.close()
 
         return jsonify({
-            "success": True
+            "success":
+                True
         })
 
     except Exception as error:
@@ -470,670 +1516,9 @@ def delete_all_conversations():
         )
 
         return jsonify({
-            "error": "خطا در پاک کردن گفتگوها."
-        }), 500
-
-
-# =========================================================
-# MEMORY API
-# =========================================================
-
-@app.route("/memory", methods=["GET"])
-def memory_get():
-
-    try:
-
-        return jsonify({
-            "memories": get_memories()
-        })
-
-    except Exception as error:
-
-        print(
-            "MEMORY GET ERROR:",
-            repr(error)
-        )
-
-        return jsonify({
-            "error": "خطا در دریافت حافظه."
-        }), 500
-
-
-@app.route("/memory", methods=["POST"])
-def memory_add():
-
-    try:
-
-        data = request.get_json(
-            silent=True
-        ) or {}
-
-        key = str(
-            data.get("key", "")
-        ).strip()
-
-        value = str(
-            data.get("value", "")
-        ).strip()
-
-        if not key or not value:
-
-            return jsonify({
-                "error": "key و value الزامی هستند."
-            }), 400
-
-        save_memory(
-            key,
-            value
-        )
-
-        return jsonify({
-            "success": True,
-            "key": key,
-            "value": value
-        })
-
-    except Exception as error:
-
-        print(
-            "MEMORY ADD ERROR:",
-            repr(error)
-        )
-
-        return jsonify({
-            "error": "خطا در ذخیره حافظه."
-        }), 500
-
-
-@app.route(
-    "/memory/<path:key>",
-    methods=["DELETE"]
-)
-def memory_delete(key):
-
-    try:
-
-        delete_memory(key)
-
-        return jsonify({
-            "success": True
-        })
-
-    except Exception as error:
-
-        print(
-            "MEMORY DELETE ERROR:",
-            repr(error)
-        )
-
-        return jsonify({
-            "error": "خطا در حذف حافظه."
-        }), 500
-
-
-@app.route("/memory", methods=["DELETE"])
-def memory_delete_all():
-
-    try:
-
-        clear_memories()
-
-        return jsonify({
-            "success": True
-        })
-
-    except Exception as error:
-
-        print(
-            "MEMORY DELETE ALL ERROR:",
-            repr(error)
-        )
-
-        return jsonify({
-            "error": "خطا در پاک کردن حافظه."
-        }), 500
-
-
-# =========================================================
-# FILE UPLOAD
-# =========================================================
-
-@app.route("/upload", methods=["POST"])
-def upload_file():
-
-    try:
-
-        if "file" not in request.files:
-
-            return jsonify({
-                "error": "فایلی ارسال نشده است."
-            }), 400
-
-        file = request.files["file"]
-
-        if not file or not file.filename:
-
-            return jsonify({
-                "error": "نام فایل نامعتبر است."
-            }), 400
-
-        filename = file.filename
-
-        extension = (
-            os.path.splitext(filename)[1]
-            .lower()
-            .replace(".", "")
-        )
-
-        allowed = {
-            "txt",
-            "md",
-            "csv",
-            "json"
-        }
-
-        if extension not in allowed:
-
-            return jsonify({
-                "error":
-                    "در این نسخه فقط TXT، MD، CSV و JSON قابل خواندن هستند."
-            }), 400
-
-        raw = file.read()
-
-        if len(raw) > 20 * 1024 * 1024:
-
-            return jsonify({
-                "error":
-                    "حجم فایل نباید بیشتر از 20MB باشد."
-            }), 400
-
-        text = raw.decode(
-            "utf-8",
-            errors="replace"
-        )
-
-        return jsonify({
-            "success": True,
-            "filename": filename,
-            "extension": extension,
-            "text": text
-        })
-
-    except Exception as error:
-
-        print(
-            "UPLOAD ERROR:",
-            repr(error)
-        )
-
-        return jsonify({
-            "error": "خواندن فایل انجام نشد."
-        }), 500
-
-
-# =========================================================
-# CHAT
-# =========================================================
-
-def build_system_prompt():
-
-    prompt = """
-تو Whale AI هستی؛ یک دستیار هوشمند فارسی.
-
-قوانین:
-
-1. اگر کاربر فارسی صحبت کرد، فارسی پاسخ بده.
-2. پاسخ طبیعی، دقیق و خوانا باشد.
-3. از Markdown استفاده کن.
-4. برای عنوان‌های مهم از Markdown heading استفاده کن.
-5. برای مراحل از فهرست شماره‌دار استفاده کن.
-6. برای مقایسه‌ها در صورت مناسب بودن جدول Markdown استفاده کن.
-7. برای کد از code block استفاده کن.
-8. پاسخ را بی‌دلیل طولانی نکن.
-9. اگر اطلاعات جدید یا وابسته به زمان لازم است، از ابزار جست‌وجوی وب استفاده کن.
-10. اگر جست‌وجوی وب فعال است، اطلاعات پیدا شده را با دقت در پاسخ استفاده کن.
-11. اطلاعات حافظه فقط در صورت مرتبط بودن استفاده شود.
-12. اطلاعات خصوصی حافظه را بی‌دلیل نمایش نده.
-"""
-
-    prompt += build_memory_context()
-
-    return prompt
-
-
-def create_messages(
-    conversation_id,
-    user_message,
-    file_text=""
-):
-
-    conn = get_db()
-
-    rows = conn.execute(
-        """
-        SELECT role, content
-        FROM messages
-        WHERE conversation_id = ?
-        ORDER BY id ASC
-        """,
-        (conversation_id,)
-    ).fetchall()
-
-    conn.close()
-
-    messages = [
-        {
-            "role": "system",
-            "content": build_system_prompt()
-        }
-    ]
-
-    for row in rows:
-
-        if row["role"] in (
-            "user",
-            "assistant",
-            "system"
-        ):
-
-            messages.append({
-                "role": row["role"],
-                "content": row["content"]
-            })
-
-    current_content = user_message
-
-    if file_text:
-
-        current_content += (
-            "\n\n"
-            "محتوای فایل ارسال‌شده:\n"
-            "--------------------\n"
-            + file_text[:500000]
-            + "\n--------------------"
-        )
-
-    messages.append({
-        "role": "user",
-        "content": current_content
-    })
-
-    return messages
-
-
-# =========================================================
-# CHAT STREAM
-# =========================================================
-
-@app.route("/chat", methods=["POST"])
-def chat():
-
-    data = request.get_json(
-        silent=True
-    ) or {}
-
-    user_message = str(
-        data.get("message", "")
-    ).strip()
-
-    file_text = str(
-        data.get("file_text", "")
-    )
-
-    conversation_id = data.get(
-        "conversation_id"
-    )
-
-    web_search = bool(
-        data.get("web_search", False)
-    )
-
-    if not user_message and not file_text:
-
-        return jsonify({
-            "error": "پیام خالی است."
-        }), 400
-
-    api_key = get_api_key()
-
-    if not api_key:
-
-        return jsonify({
             "error":
-                "OPENROUTER_API_KEY در Environment Variables تنظیم نشده است."
+                "Failed to delete conversations."
         }), 500
-
-    conn = get_db()
-
-    if conversation_id:
-
-        try:
-            conversation_id = int(
-                conversation_id
-            )
-        except:
-            conversation_id = None
-
-    if conversation_id:
-
-        exists = conn.execute(
-            """
-            SELECT id
-            FROM conversations
-            WHERE id = ?
-            """,
-            (conversation_id,)
-        ).fetchone()
-
-        if not exists:
-            conversation_id = None
-
-    if not conversation_id:
-
-        title = (
-            user_message[:45]
-            if user_message
-            else "فایل جدید"
-        )
-
-        cursor = conn.execute(
-            """
-            INSERT INTO conversations (title)
-            VALUES (?)
-            """,
-            (title,)
-        )
-
-        conversation_id = cursor.lastrowid
-
-    conn.execute(
-        """
-        INSERT INTO messages
-        (conversation_id, role, content)
-        VALUES (?, ?, ?)
-        """,
-        (
-            conversation_id,
-            "user",
-            user_message
-        )
-    )
-
-    conn.commit()
-    conn.close()
-
-    messages = create_messages(
-        conversation_id,
-        user_message,
-        file_text
-    )
-
-    headers = {
-        "Authorization":
-            "Bearer " + api_key,
-        "Content-Type":
-            "application/json",
-        "HTTP-Referer":
-            "https://snapdeploy.dev",
-        "X-Title":
-            "Whale AI"
-    }
-
-    payload = {
-        "model": "openrouter/free",
-        "messages": messages,
-        "temperature": 0.7,
-        "stream": True
-    }
-
-    # =====================================================
-    # WEB SEARCH
-    # =====================================================
-
-    if web_search:
-
-        payload["plugins"] = [
-            {
-                "id": "web",
-                "max_results": 5
-            }
-        ]
-
-    print("================================")
-    print("WHALE AI CHAT")
-    print("CONVERSATION:", conversation_id)
-    print("WEB SEARCH:", web_search)
-    print("KEY:", bool(api_key))
-    print("================================")
-
-    def generate():
-
-        assistant_text = ""
-
-        try:
-
-            response = requests.post(
-                OPENROUTER_URL,
-                headers=headers,
-                json=payload,
-                timeout=180,
-                stream=True
-            )
-
-            if response.status_code != 200:
-
-                error_text = response.text[:3000]
-
-                yield "data: " + json.dumps(
-                    {
-                        "type": "error",
-                        "error":
-                            "OpenRouter خطا داد.",
-                        "details":
-                            error_text,
-                        "conversation_id":
-                            conversation_id
-                    },
-                    ensure_ascii=False
-                ) + "\n\n"
-
-                yield "data: [DONE]\n\n"
-
-                return
-
-            for raw_line in response.iter_lines(
-                decode_unicode=True
-            ):
-
-                if not raw_line:
-                    continue
-
-                line = raw_line.strip()
-
-                if not line.startswith("data:"):
-                    continue
-
-                raw_data = line[5:].strip()
-
-                if raw_data == "[DONE]":
-
-                    break
-
-                try:
-
-                    chunk = json.loads(
-                        raw_data
-                    )
-
-                except Exception:
-
-                    continue
-
-                if chunk.get("error"):
-
-                    yield "data: " + json.dumps(
-                        {
-                            "type": "error",
-                            "error":
-                                "OpenRouter خطا داد.",
-                            "details":
-                                chunk["error"]
-                        },
-                        ensure_ascii=False
-                    ) + "\n\n"
-
-                    return
-
-                choices = chunk.get(
-                    "choices",
-                    []
-                )
-
-                if not choices:
-                    continue
-
-                delta = choices[0].get(
-                    "delta",
-                    {}
-                )
-
-                content = delta.get(
-                    "content",
-                    ""
-                )
-
-                if isinstance(
-                    content,
-                    list
-                ):
-
-                    parts = []
-
-                    for item in content:
-
-                        if isinstance(
-                            item,
-                            dict
-                        ):
-
-                            text = item.get(
-                                "text",
-                                ""
-                            )
-
-                            if text:
-                                parts.append(
-                                    text
-                                )
-
-                        elif isinstance(
-                            item,
-                            str
-                        ):
-
-                            parts.append(item)
-
-                    content = "".join(parts)
-
-                if content:
-
-                    assistant_text += content
-
-                    yield "data: " + json.dumps(
-                        {
-                            "type": "delta",
-                            "content": content,
-                            "conversation_id":
-                                conversation_id
-                        },
-                        ensure_ascii=False
-                    ) + "\n\n"
-
-            assistant_text = assistant_text.strip()
-
-            if assistant_text:
-
-                conn = get_db()
-
-                conn.execute(
-                    """
-                    INSERT INTO messages
-                    (conversation_id, role, content)
-                    VALUES (?, ?, ?)
-                    """,
-                    (
-                        conversation_id,
-                        "assistant",
-                        assistant_text
-                    )
-                )
-
-                conn.commit()
-                conn.close()
-
-            yield "data: " + json.dumps(
-                {
-                    "type": "done",
-                    "conversation_id":
-                        conversation_id
-                },
-                ensure_ascii=False
-            ) + "\n\n"
-
-            yield "data: [DONE]\n\n"
-
-        except requests.RequestException as error:
-
-            print(
-                "OPENROUTER REQUEST ERROR:",
-                repr(error)
-            )
-
-            yield "data: " + json.dumps(
-                {
-                    "type": "error",
-                    "error":
-                        "ارتباط با OpenRouter برقرار نشد.",
-                    "details":
-                        str(error)
-                },
-                ensure_ascii=False
-            ) + "\n\n"
-
-        except GeneratorExit:
-
-            print(
-                "CLIENT DISCONNECTED"
-            )
-
-        except Exception as error:
-
-            print(
-                "STREAM ERROR:",
-                repr(error)
-            )
-
-            yield "data: " + json.dumps(
-                {
-                    "type": "error",
-                    "error":
-                        "خطای داخلی سرور.",
-                    "details":
-                        str(error)
-                },
-                ensure_ascii=False
-            ) + "\n\n"
-
-    return Response(
-        generate(),
-        mimetype="text/event-stream",
-        headers={
-            "Cache-Control": "no-cache",
-            "X-Accel-Buffering": "no",
-            "Connection": "keep-alive"
-        }
-    )
 
 
 # =========================================================
@@ -1149,20 +1534,28 @@ if __name__ == "__main__":
         )
     )
 
+    print("\n================================")
+    print("WHALE AI")
     print("================================")
-    print("WHALE AI STARTING")
-    print("PORT:", port)
     print(
-        "OPENROUTER KEY:",
+        "PORT:",
+        port
+    )
+    print(
+        "MODEL:",
+        DEFAULT_MODEL
+    )
+    print(
+        "API KEY:",
         bool(get_api_key())
     )
     print(
-        "MEMORY SYSTEM: ENABLED"
+        "MEMORY: ENABLED"
     )
     print(
         "WEB SEARCH: ENABLED"
     )
-    print("================================")
+    print("================================\n")
 
     app.run(
         host="0.0.0.0",
