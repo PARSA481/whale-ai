@@ -1,4 +1,4 @@
-```python
+
 from flask import Flask, request, jsonify, send_from_directory
 from dotenv import load_dotenv
 import sqlite3
@@ -712,4 +712,3 @@ if __name__ == "__main__":
         port=port,
         debug=False
     )
-```
