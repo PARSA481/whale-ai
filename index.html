@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
@@ -75,10 +76,6 @@ button{
     color:inherit;
 }
 
-/* =========================
-   APP
-========================= */
-
 .app{
     width:100%;
     height:100dvh;
@@ -87,9 +84,7 @@ button{
     position:relative;
 }
 
-/* =========================
-   SIDEBAR
-========================= */
+/* SIDEBAR */
 
 .sidebar{
     width:292px;
@@ -116,11 +111,9 @@ button{
 
 .sidebar::after{
     content:"";
-
     position:absolute;
     left:0;
     top:0;
-
     width:1px;
     height:100%;
 
@@ -131,10 +124,6 @@ button{
             transparent
         );
 }
-
-/* =========================
-   BRAND
-========================= */
 
 .brand{
     padding:18px;
@@ -189,10 +178,6 @@ button{
     margin-top:3px;
 }
 
-/* =========================
-   NEW CHAT
-========================= */
-
 .new-chat{
     margin:16px;
     height:46px;
@@ -234,10 +219,6 @@ button{
     width:18px;
 }
 
-/* =========================
-   HISTORY
-========================= */
-
 .history-head{
     padding:1px 17px 10px;
 
@@ -270,10 +251,6 @@ button{
     padding:34px 12px;
     line-height:2;
 }
-
-/* =========================
-   CONVERSATIONS
-========================= */
 
 .conversation{
     display:flex;
@@ -379,10 +356,6 @@ button{
     width:13px;
 }
 
-/* =========================
-   SIDEBAR BOTTOM
-========================= */
-
 .sidebar-bottom{
     padding:10px;
     border-top:1px solid var(--border);
@@ -417,9 +390,7 @@ button{
     height:13px;
 }
 
-/* =========================
-   MAIN
-========================= */
+/* MAIN */
 
 .main{
     flex:1;
@@ -432,9 +403,7 @@ button{
     position:relative;
 }
 
-/* =========================
-   TOPBAR
-========================= */
+/* TOPBAR */
 
 .topbar{
     height:70px;
@@ -546,9 +515,7 @@ button{
     width:14px;
 }
 
-/* =========================
-   CHAT
-========================= */
+/* CHAT */
 
 #chat{
     flex:1;
@@ -562,10 +529,6 @@ button{
 
     scroll-behavior:smooth;
 }
-
-/* =========================
-   WELCOME
-========================= */
 
 .welcome{
     min-height:440px;
@@ -648,10 +611,6 @@ button{
     margin-top:8px;
 }
 
-/* =========================
-   QUICK ACTIONS
-========================= */
-
 .quick-actions{
     display:grid;
     grid-template-columns:repeat(3,1fr);
@@ -723,9 +682,7 @@ button{
     margin-top:2px;
 }
 
-/* =========================
-   MESSAGES
-========================= */
+/* MESSAGES */
 
 .message-row{
     display:flex;
@@ -796,10 +753,6 @@ button{
         invert(1);
 }
 
-/* =========================
-   MESSAGE
-========================= */
-
 .message-box{
     max-width:min(76%,760px);
     min-width:0;
@@ -847,10 +800,6 @@ button{
     border-bottom-right-radius:5px;
 }
 
-/* =========================
-   MESSAGE ACTIONS
-========================= */
-
 .message-actions{
     direction:ltr;
 
@@ -889,9 +838,7 @@ button{
     width:12px;
 }
 
-/* =========================
-   TYPING
-========================= */
+/* TYPING */
 
 #typing{
     display:none;
@@ -936,9 +883,7 @@ button{
     animation-delay:.3s;
 }
 
-/* =========================
-   INPUT
-========================= */
+/* INPUT */
 
 .input-area{
     position:absolute;
@@ -1055,10 +1000,6 @@ button{
     color:#5e748b;
 }
 
-/* =========================
-   SEND / STOP BUTTON
-========================= */
-
 #send{
     width:43px;
     height:43px;
@@ -1119,9 +1060,7 @@ button{
     margin-top:7px;
 }
 
-/* =========================
-   OVERLAY
-========================= */
+/* OVERLAY */
 
 .overlay{
     display:none;
@@ -1140,9 +1079,7 @@ button{
     display:block;
 }
 
-/* =========================
-   SCROLLBAR
-========================= */
+/* SCROLLBAR */
 
 ::-webkit-scrollbar{
     width:6px;
@@ -1158,9 +1095,7 @@ button{
     border-radius:20px;
 }
 
-/* =========================
-   ANIMATIONS
-========================= */
+/* ANIMATIONS */
 
 @keyframes welcomeIn{
     from{
@@ -1210,9 +1145,7 @@ button{
     }
 }
 
-/* =========================
-   MOBILE
-========================= */
+/* MOBILE */
 
 @media(max-width:800px){
 
@@ -1733,19 +1666,17 @@ button{
 <script>
 
 /* =========================================================
-   WEB WHALE ICON
-   URL intentionally assembled so the HTML remains portable.
+   WHALE IMAGE
 ========================================================= */
 
 const WHALE_IMAGE =
-    [
-        "https://",
-        "cdn-icons-png.flaticon.com/",
-        "512/8827/8827658.png"
-    ].join("");
+    "https://cdn-icons-png.flaticon.com/512/8827/8827658.png";
 
-document.getElementById("brandWhale").src = WHALE_IMAGE;
-document.getElementById("welcomeWhale").src = WHALE_IMAGE;
+document.getElementById("brandWhale").src =
+    WHALE_IMAGE;
+
+document.getElementById("welcomeWhale").src =
+    WHALE_IMAGE;
 
 
 /* =========================================================
@@ -1887,7 +1818,7 @@ const icons = {
 
 
 /* =========================================================
-   UI HELPERS
+   UI
 ========================================================= */
 
 function showWelcome(){
@@ -1901,15 +1832,17 @@ function hideWelcome(){
 function scrollBottom(){
 
     requestAnimationFrame(() => {
-        chat.scrollTop = chat.scrollHeight;
+
+        chat.scrollTop =
+            chat.scrollHeight;
+
     });
 
 }
 
 
 /* =========================================================
-   SEND BUTTON
-   مهم: هر بار وضعیت پایان پاسخ به این تابع برمی‌گردد.
+   SEND UI
 ========================================================= */
 
 function setSendingUI(value){
@@ -1927,7 +1860,8 @@ function setSendingUI(value){
             "توقف پاسخ"
         );
 
-        send.innerHTML = icons.stop;
+        send.innerHTML =
+            icons.stop;
 
         statusText.textContent =
             "در حال پاسخ‌گویی...";
@@ -1943,7 +1877,8 @@ function setSendingUI(value){
             "ارسال پیام"
         );
 
-        send.innerHTML = icons.send;
+        send.innerHTML =
+            icons.send;
 
         statusText.textContent =
             "آماده پاسخ‌گویی";
@@ -1966,18 +1901,22 @@ function addMessage(text,type){
 
     row.className =
         "message-row " +
-        (type === "user"
-            ? "user-row"
-            : "bot-row");
+        (
+            type === "user"
+                ? "user-row"
+                : "bot-row"
+        );
 
     const avatar =
         document.createElement("div");
 
     avatar.className =
         "avatar " +
-        (type === "user"
-            ? "user-avatar"
-            : "bot-avatar");
+        (
+            type === "user"
+                ? "user-avatar"
+                : "bot-avatar"
+        );
 
     if(type === "user"){
 
@@ -1989,10 +1928,15 @@ function addMessage(text,type){
         const image =
             document.createElement("img");
 
-        image.src = WHALE_IMAGE;
-        image.alt = "Whale";
+        image.src =
+            WHALE_IMAGE;
 
-        avatar.appendChild(image);
+        image.alt =
+            "Whale";
+
+        avatar.appendChild(
+            image
+        );
 
     }
 
@@ -2007,13 +1951,18 @@ function addMessage(text,type){
 
     message.className =
         "message " +
-        (type === "user"
-            ? "user-message"
-            : "bot-message");
+        (
+            type === "user"
+                ? "user-message"
+                : "bot-message"
+        );
 
-    message.textContent = text;
+    message.textContent =
+        text;
 
-    box.appendChild(message);
+    box.appendChild(
+        message
+    );
 
 
     if(type === "bot"){
@@ -2057,15 +2006,21 @@ function addMessage(text,type){
 
                 }catch(error){
 
-                    console.error(error);
+                    console.error(
+                        error
+                    );
 
                 }
 
             };
 
-        actions.appendChild(copy);
+        actions.appendChild(
+            copy
+        );
 
-        box.appendChild(actions);
+        box.appendChild(
+            actions
+        );
 
     }
 
@@ -2101,8 +2056,12 @@ function addMessage(text,type){
 function clearChat(){
 
     chat
-        .querySelectorAll(".message-row")
-        .forEach(el => el.remove());
+        .querySelectorAll(
+            ".message-row"
+        )
+        .forEach(
+            el => el.remove()
+        );
 
     showWelcome();
 
@@ -2149,7 +2108,15 @@ async function createNewConversation(){
 
     }catch(error){
 
-        console.error(error);
+        console.error(
+            error
+        );
+
+        addMessage(
+            error.message ||
+            "خطا در ساخت گفتگو",
+            "bot"
+        );
 
     }
 
@@ -2158,6 +2125,7 @@ async function createNewConversation(){
 
 /* =========================================================
    SEND MESSAGE
+   نسخه هماهنگ با server.py فعلی
 ========================================================= */
 
 async function sendMessage(){
@@ -2174,9 +2142,10 @@ async function sendMessage(){
         input.value.trim();
 
     if(!text){
-        return;
-    }
 
+        return;
+
+    }
 
     setSendingUI(true);
 
@@ -2187,14 +2156,14 @@ async function sendMessage(){
 
     input.value = "";
 
-    input.style.height = "auto";
+    input.style.height =
+        "auto";
 
-    typing.style.display = "flex";
+    typing.style.display =
+        "flex";
 
     abortController =
         new AbortController();
-
-    let botMessage = null;
 
 
     try{
@@ -2222,227 +2191,132 @@ async function sendMessage(){
             );
 
 
+        /*
+            سرور فعلی JSON معمولی برمی‌گرداند.
+            بنابراین اینجا stream نمی‌خوانیم.
+        */
+
+        const data =
+            await response.json();
+
+
         if(!response.ok){
 
-            const errorData =
-                await response
-                    .json()
-                    .catch(() => ({}));
-
             throw new Error(
-                errorData.error ||
+                data.error ||
                 "خطا در ارتباط با سرور"
             );
 
         }
 
 
-        if(!response.body){
+        /*
+            دریافت شناسه گفتگو
+        */
 
-            throw new Error(
-                "سرور جریان پاسخ را ارسال نکرد."
-            );
+        if(
+            data.conversation_id !==
+            undefined &&
+            data.conversation_id !==
+            null
+        ){
 
-        }
-
-
-        typing.style.display = "none";
-
-        botMessage =
-            addMessage(
-                "",
-                "bot"
-            );
-
-
-        const reader =
-            response.body.getReader();
-
-        const decoder =
-            new TextDecoder("utf-8");
-
-        let buffer = "";
-
-
-        while(true){
-
-            const result =
-                await reader.read();
-
-
-            if(result.done){
-
-                /*
-                    مهم:
-                    حتی اگر سرور پیام done
-                    نفرستد، پایان stream باعث
-                    برگشت دکمه می‌شود.
-                */
-
-                break;
-
-            }
-
-
-            buffer +=
-                decoder.decode(
-                    result.value,
-                    {
-                        stream:true
-                    }
-                );
-
-
-            const lines =
-                buffer.split("\n");
-
-            buffer =
-                lines.pop();
-
-
-            for(const line of lines){
-
-                const clean =
-                    line.trim();
-
-                if(!clean){
-                    continue;
-                }
-
-
-                try{
-
-                    const data =
-                        JSON.parse(clean);
-
-
-                    if(data.type === "text"){
-
-                        if(botMessage){
-
-                            botMessage.textContent +=
-                                data.content || "";
-
-                            scrollBottom();
-
-                        }
-
-                    }
-
-
-                    if(data.type === "done"){
-
-                        if(
-                            data.conversation_id !==
-                            undefined
-                        ){
-
-                            currentConversationId =
-                                data.conversation_id;
-
-                        }
-
-                    }
-
-
-                    if(data.type === "error"){
-
-                        if(botMessage){
-
-                            botMessage.textContent =
-                                data.content ||
-                                "خطای نامشخص";
-
-                        }
-
-                    }
-
-                }catch(parseError){
-
-                    console.debug(
-                        "Invalid stream line:",
-                        clean
-                    );
-
-                }
-
-            }
+            currentConversationId =
+                data.conversation_id;
 
         }
 
 
         /*
-            پاسخ کامل شده.
-            دکمه همین‌جا به ارسال برمی‌گردد.
+            دریافت متن پاسخ
         */
 
-        typing.style.display = "none";
+        const reply =
+            data.content;
 
-        setSendingUI(false);
+
+        if(
+            typeof reply !==
+            "string"
+        ){
+
+            console.error(
+                "Invalid server response:",
+                data
+            );
+
+            throw new Error(
+                "پاسخ معتبر از سرور دریافت نشد."
+            );
+
+        }
+
+
+        typing.style.display =
+            "none";
+
+
+        /*
+            نمایش مستقیم پاسخ
+        */
+
+        addMessage(
+            reply,
+            "bot"
+        );
+
+
+        scrollBottom();
+
+
+        /*
+            به‌روزرسانی تاریخچه
+        */
 
         await loadConversations();
 
 
     }catch(error){
 
-        typing.style.display = "none";
+        typing.style.display =
+            "none";
 
 
-        if(error.name === "AbortError"){
+        if(
+            error.name ===
+            "AbortError"
+        ){
 
-            if(botMessage){
-
-                if(
-                    !botMessage.textContent.trim()
-                ){
-
-                    botMessage.textContent =
-                        "پاسخ متوقف شد.";
-
-                }else{
-
-                    botMessage.textContent +=
-                        "\n\n— پاسخ متوقف شد —";
-
-                }
-
-            }
+            addMessage(
+                "پاسخ متوقف شد.",
+                "bot"
+            );
 
         }else{
 
-            if(botMessage){
+            console.error(
+                "CHAT ERROR:",
+                error
+            );
 
-                botMessage.textContent =
-                    "خطا: " +
-                    (
-                        error.message ||
-                        "ارتباط با سرور برقرار نشد."
-                    );
-
-            }else{
-
-                addMessage(
+            addMessage(
+                "خطا: " +
+                (
                     error.message ||
-                    "ارتباط با سرور برقرار نشد.",
-                    "bot"
-                );
-
-            }
-
-            console.error(error);
+                    "ارتباط با سرور برقرار نشد."
+                ),
+                "bot"
+            );
 
         }
 
     }finally{
 
-        /*
-            این بخش تضمین می‌کند
-            دکمه هیچ‌وقت روی STOP گیر نکند.
-        */
+        typing.style.display =
+            "none";
 
-        typing.style.display = "none";
-
-        abortController = null;
+        abortController =
+            null;
 
         setSendingUI(false);
 
@@ -2454,22 +2328,22 @@ async function sendMessage(){
 
 
 /* =========================================================
-   STOP GENERATION
+   STOP
 ========================================================= */
 
 function stopGeneration(){
 
-    if(
-        abortController
-    ){
+    if(abortController){
 
         abortController.abort();
 
-        abortController = null;
+        abortController =
+            null;
 
     }
 
-    typing.style.display = "none";
+    typing.style.display =
+        "none";
 
     setSendingUI(false);
 
@@ -2500,7 +2374,9 @@ async function loadConversations(){
         const data =
             await response.json();
 
-        historyList.innerHTML = "";
+
+        historyList.innerHTML =
+            "";
 
         historyCount.textContent =
             data.length +
@@ -2596,8 +2472,13 @@ async function loadConversations(){
                     " پیام";
 
 
-                info.appendChild(title);
-                info.appendChild(count);
+                info.appendChild(
+                    title
+                );
+
+                info.appendChild(
+                    count
+                );
 
 
                 info.onclick =
@@ -2637,18 +2518,31 @@ async function loadConversations(){
                     };
 
 
-                row.appendChild(icon);
-                row.appendChild(info);
-                row.appendChild(deleteButton);
+                row.appendChild(
+                    icon
+                );
 
-                historyList.appendChild(row);
+                row.appendChild(
+                    info
+                );
+
+                row.appendChild(
+                    deleteButton
+                );
+
+                historyList.appendChild(
+                    row
+                );
 
             }
         );
 
     }catch(error){
 
-        console.error(error);
+        console.error(
+            "HISTORY ERROR:",
+            error
+        );
 
     }
 
@@ -2681,21 +2575,24 @@ async function openConversation(id){
         const data =
             await response.json();
 
-        currentConversationId = id;
+        currentConversationId =
+            id;
 
         clearChat();
 
 
-        data.forEach(message => {
+        data.forEach(
+            message => {
 
-            addMessage(
-                message.content,
-                message.role === "user"
-                    ? "user"
-                    : "bot"
-            );
+                addMessage(
+                    message.content,
+                    message.role === "user"
+                        ? "user"
+                        : "bot"
+                );
 
-        });
+            }
+        );
 
 
         closeSidebar();
@@ -2706,7 +2603,15 @@ async function openConversation(id){
 
     }catch(error){
 
-        console.error(error);
+        console.error(
+            error
+        );
+
+        addMessage(
+            error.message ||
+            "خطا در دریافت گفتگو",
+            "bot"
+        );
 
     }
 
@@ -2714,7 +2619,7 @@ async function openConversation(id){
 
 
 /* =========================================================
-   DELETE ONE CONVERSATION
+   DELETE ONE
 ========================================================= */
 
 async function deleteConversation(id){
@@ -2752,7 +2657,8 @@ async function deleteConversation(id){
 
 
         if(
-            currentConversationId === id
+            currentConversationId ===
+            id
         ){
 
             currentConversationId =
@@ -2767,7 +2673,9 @@ async function deleteConversation(id){
 
     }catch(error){
 
-        console.error(error);
+        console.error(
+            error
+        );
 
     }
 
@@ -2820,7 +2728,9 @@ async function deleteAll(){
 
     }catch(error){
 
-        console.error(error);
+        console.error(
+            error
+        );
 
     }
 
@@ -2857,7 +2767,7 @@ function closeSidebar(){
 
 
 /* =========================================================
-   INPUT AUTO RESIZE
+   INPUT RESIZE
 ========================================================= */
 
 input.addEventListener(
@@ -2901,49 +2811,53 @@ input.addEventListener(
 
 
 /* =========================================================
-   BUTTON EVENTS
+   BUTTONS
 ========================================================= */
 
 send.addEventListener(
     "click",
-    () => {
-
-        sendMessage();
-
-    }
+    sendMessage
 );
 
 
-document.getElementById(
-    "newChatButton"
-).addEventListener(
-    "click",
-    createNewConversation
-);
+document
+    .getElementById(
+        "newChatButton"
+    )
+    .addEventListener(
+        "click",
+        createNewConversation
+    );
 
 
-document.getElementById(
-    "clearAll"
-).addEventListener(
-    "click",
-    deleteAll
-);
+document
+    .getElementById(
+        "clearAll"
+    )
+    .addEventListener(
+        "click",
+        deleteAll
+    );
 
 
-document.getElementById(
-    "mobileMenu"
-).addEventListener(
-    "click",
-    openSidebar
-);
+document
+    .getElementById(
+        "mobileMenu"
+    )
+    .addEventListener(
+        "click",
+        openSidebar
+    );
 
 
-document.getElementById(
-    "historyButton"
-).addEventListener(
-    "click",
-    openSidebar
-);
+document
+    .getElementById(
+        "historyButton"
+    )
+    .addEventListener(
+        "click",
+        openSidebar
+    );
 
 
 overlay.addEventListener(
@@ -2957,30 +2871,34 @@ overlay.addEventListener(
 ========================================================= */
 
 document
-    .querySelectorAll(".quick")
-    .forEach(button => {
+    .querySelectorAll(
+        ".quick"
+    )
+    .forEach(
+        button => {
 
-        button.addEventListener(
-            "click",
-            () => {
+            button.addEventListener(
+                "click",
+                () => {
 
-                input.value =
-                    button.dataset.prompt;
+                    input.value =
+                        button.dataset.prompt;
 
-                input.dispatchEvent(
-                    new Event("input")
-                );
+                    input.dispatchEvent(
+                        new Event("input")
+                    );
 
-                input.focus();
+                    input.focus();
 
-            }
-        );
+                }
+            );
 
-    });
+        }
+    );
 
 
 /* =========================================================
-   INITIAL LOAD
+   START
 ========================================================= */
 
 loadConversations();
@@ -2991,3 +2909,4 @@ input.focus();
 
 </body>
 </html>
+```
