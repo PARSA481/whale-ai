@@ -14,17 +14,23 @@ app = Flask(__name__)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_FILE = os.path.join(BASE_DIR, "whale.db")
 
-
-# =========================================================
-# OPENROUTER
-# =========================================================
-
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 
-API_KEY = os.environ.get(
-    "OPENROUTER_API_KEY",
-    ""
-).strip()
+
+# =========================================================
+# API KEY
+# =========================================================
+
+def get_api_key():
+    """
+    کلید را هر بار از Environment می‌خوانیم
+    تا اگر محیط تغییر کرد، برنامه کلید قدیمی نداشته باشد.
+    """
+
+    return os.environ.get(
+        "OPENROUTER_API_KEY",
+        ""
+    ).strip()
 
 
 # =========================================================
@@ -52,21 +58,17 @@ def get_db():
         CREATE TABLE IF NOT EXISTS messages (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             conversation_id INTEGER,
-            role TEXT,
-            content TEXT,
+            role TEXT NOT NULL,
+            content TEXT NOT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     """)
 
-    # =====================================================
-    # MEMORY
-    # =====================================================
-
     conn.execute("""
         CREATE TABLE IF NOT EXISTS memories (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            key TEXT UNIQUE,
-            value TEXT,
+            key TEXT UNIQUE NOT NULL,
+            value TEXT NOT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
@@ -87,6 +89,7 @@ def get_memories():
 
     rows = conn.execute("""
         SELECT
+            id,
             key,
             value
         FROM memories
@@ -97,6 +100,7 @@ def get_memories():
 
     return [
         {
+            "id": row["id"],
             "key": row["key"],
             "value": row["value"]
         }
@@ -114,22 +118,47 @@ def save_memory(key, value):
 
     conn = get_db()
 
-    conn.execute("""
-        INSERT INTO memories
-        (
-            key,
-            value
-        )
-        VALUES (?, ?)
+    existing = conn.execute(
+        """
+        SELECT id
+        FROM memories
+        WHERE key = ?
+        """,
+        (key,)
+    ).fetchone()
 
-        ON CONFLICT(key)
-        DO UPDATE SET
-            value = excluded.value,
-            updated_at = CURRENT_TIMESTAMP
-    """, (
-        key,
-        value
-    ))
+    if existing:
+
+        conn.execute(
+            """
+            UPDATE memories
+            SET
+                value = ?,
+                updated_at = CURRENT_TIMESTAMP
+            WHERE key = ?
+            """,
+            (
+                value,
+                key
+            )
+        )
+
+    else:
+
+        conn.execute(
+            """
+            INSERT INTO memories
+            (
+                key,
+                value
+            )
+            VALUES (?, ?)
+            """,
+            (
+                key,
+                value
+            )
+        )
 
     conn.commit()
     conn.close()
@@ -139,12 +168,13 @@ def delete_memory(key):
 
     conn = get_db()
 
-    conn.execute("""
+    conn.execute(
+        """
         DELETE FROM memories
         WHERE key = ?
-    """, (
-        key,
-    ))
+        """,
+        (key,)
+    )
 
     conn.commit()
     conn.close()
@@ -154,17 +184,13 @@ def clear_memories():
 
     conn = get_db()
 
-    conn.execute("""
-        DELETE FROM memories
-    """)
+    conn.execute(
+        "DELETE FROM memories"
+    )
 
     conn.commit()
     conn.close()
 
-
-# =========================================================
-# BUILD MEMORY CONTEXT
-# =========================================================
 
 def build_memory_context():
 
@@ -178,7 +204,10 @@ def build_memory_context():
     for memory in memories:
 
         lines.append(
-            f"- {memory['key']}: {memory['value']}"
+            "- {}: {}".format(
+                memory["key"],
+                memory["value"]
+            )
         )
 
     return (
@@ -218,10 +247,30 @@ def home():
 @app.route("/health")
 def health():
 
+    api_key = get_api_key()
+
+    try:
+
+        conn = get_db()
+        conn.execute("SELECT 1").fetchone()
+        conn.close()
+
+        database = True
+
+    except Exception as error:
+
+        print(
+            "HEALTH DATABASE ERROR:",
+            repr(error)
+        )
+
+        database = False
+
     return jsonify({
         "status": "ok",
-        "openrouter_key": bool(API_KEY),
-        "key_length": len(API_KEY),
+        "openrouter_key": bool(api_key),
+        "key_length": len(api_key),
+        "database": database,
         "memory": True
     }), 200
 
@@ -236,39 +285,52 @@ def health():
 )
 def get_conversations():
 
-    conn = get_db()
+    try:
 
-    rows = conn.execute("""
-        SELECT
-            c.id,
-            c.title,
-            c.created_at,
-            COUNT(m.id) AS message_count
+        conn = get_db()
 
-        FROM conversations c
+        rows = conn.execute("""
+            SELECT
+                c.id,
+                c.title,
+                c.created_at,
+                COUNT(m.id) AS message_count
 
-        LEFT JOIN messages m
-            ON m.conversation_id = c.id
+            FROM conversations c
 
-        GROUP BY
-            c.id,
-            c.title,
-            c.created_at
+            LEFT JOIN messages m
+                ON m.conversation_id = c.id
 
-        ORDER BY c.id DESC
-    """).fetchall()
+            GROUP BY
+                c.id,
+                c.title,
+                c.created_at
 
-    conn.close()
+            ORDER BY c.id DESC
+        """).fetchall()
 
-    return jsonify([
-        {
-            "id": row["id"],
-            "title": row["title"],
-            "created_at": row["created_at"],
-            "message_count": row["message_count"]
-        }
-        for row in rows
-    ])
+        conn.close()
+
+        return jsonify([
+            {
+                "id": row["id"],
+                "title": row["title"],
+                "created_at": row["created_at"],
+                "message_count": row["message_count"]
+            }
+            for row in rows
+        ])
+
+    except Exception as error:
+
+        print(
+            "GET CONVERSATIONS ERROR:",
+            repr(error)
+        )
+
+        return jsonify({
+            "error": "خطا در دریافت تاریخچه گفتگوها."
+        }), 500
 
 
 # =========================================================
@@ -281,28 +343,41 @@ def get_conversations():
 )
 def create_conversation():
 
-    conn = get_db()
+    try:
 
-    cursor = conn.execute(
-        """
-        INSERT INTO conversations
-        (title)
-        VALUES (?)
-        """,
-        (
-            "گفتگوی جدید",
+        conn = get_db()
+
+        cursor = conn.execute(
+            """
+            INSERT INTO conversations
+            (title)
+            VALUES (?)
+            """,
+            (
+                "گفتگوی جدید",
+            )
         )
-    )
 
-    conversation_id = cursor.lastrowid
+        conversation_id = cursor.lastrowid
 
-    conn.commit()
-    conn.close()
+        conn.commit()
+        conn.close()
 
-    return jsonify({
-        "id": conversation_id,
-        "title": "گفتگوی جدید"
-    }), 200
+        return jsonify({
+            "id": conversation_id,
+            "title": "گفتگوی جدید"
+        }), 200
+
+    except Exception as error:
+
+        print(
+            "CREATE CONVERSATION ERROR:",
+            repr(error)
+        )
+
+        return jsonify({
+            "error": "خطا در ساخت گفتگو."
+        }), 500
 
 
 # =========================================================
@@ -315,42 +390,52 @@ def create_conversation():
 )
 def get_messages(conversation_id):
 
-    conn = get_db()
+    try:
 
-    rows = conn.execute(
-        """
-        SELECT
-            id,
-            role,
-            content,
-            created_at
+        conn = get_db()
 
-        FROM messages
+        rows = conn.execute(
+            """
+            SELECT
+                id,
+                role,
+                content,
+                created_at
+            FROM messages
+            WHERE conversation_id = ?
+            ORDER BY id ASC
+            """,
+            (
+                conversation_id,
+            )
+        ).fetchall()
 
-        WHERE conversation_id = ?
+        conn.close()
 
-        ORDER BY id ASC
-        """,
-        (
-            conversation_id,
+        return jsonify([
+            {
+                "id": row["id"],
+                "role": row["role"],
+                "content": row["content"],
+                "created_at": row["created_at"]
+            }
+            for row in rows
+        ])
+
+    except Exception as error:
+
+        print(
+            "GET MESSAGES ERROR:",
+            repr(error)
         )
-    ).fetchall()
 
-    conn.close()
-
-    return jsonify([
-        {
-            "id": row["id"],
-            "role": row["role"],
-            "content": row["content"],
-            "created_at": row["created_at"]
-        }
-        for row in rows
-    ])
+        return jsonify({
+            "error": "خطا در دریافت پیام‌های گفتگو."
+        }), 500
 
 
 # =========================================================
-# MEMORY API - GET
+# MEMORY GET
 # =========================================================
 
 @app.route(
@@ -359,13 +444,26 @@ def get_messages(conversation_id):
 )
 def memory_get():
 
-    return jsonify({
-        "memories": get_memories()
-    }), 200
+    try:
+
+        return jsonify({
+            "memories": get_memories()
+        }), 200
+
+    except Exception as error:
+
+        print(
+            "MEMORY GET ERROR:",
+            repr(error)
+        )
+
+        return jsonify({
+            "error": "خطا در دریافت حافظه."
+        }), 500
 
 
 # =========================================================
-# MEMORY API - ADD / UPDATE
+# MEMORY ADD / UPDATE
 # =========================================================
 
 @app.route(
@@ -374,45 +472,58 @@ def memory_get():
 )
 def memory_add():
 
-    data = request.get_json(
-        silent=True
-    ) or {}
+    try:
 
-    key = str(
-        data.get(
-            "key",
-            ""
+        data = request.get_json(
+            silent=True
+        ) or {}
+
+        key = str(
+            data.get(
+                "key",
+                ""
+            )
+        ).strip()
+
+        value = str(
+            data.get(
+                "value",
+                ""
+            )
+        ).strip()
+
+        if not key or not value:
+
+            return jsonify({
+                "error":
+                    "key و value الزامی هستند."
+            }), 400
+
+        save_memory(
+            key,
+            value
         )
-    ).strip()
-
-    value = str(
-        data.get(
-            "value",
-            ""
-        )
-    ).strip()
-
-    if not key or not value:
 
         return jsonify({
-            "error":
-                "key و value الزامی هستند."
-        }), 400
+            "success": True,
+            "key": key,
+            "value": value
+        }), 200
 
-    save_memory(
-        key,
-        value
-    )
+    except Exception as error:
 
-    return jsonify({
-        "success": True,
-        "key": key,
-        "value": value
-    }), 200
+        print(
+            "MEMORY ADD ERROR:",
+            repr(error)
+        )
+
+        return jsonify({
+            "error": "خطا در ذخیره حافظه."
+        }), 500
 
 
 # =========================================================
-# MEMORY API - DELETE ONE
+# MEMORY DELETE ONE
 # =========================================================
 
 @app.route(
@@ -421,15 +532,28 @@ def memory_add():
 )
 def memory_delete(key):
 
-    delete_memory(key)
+    try:
 
-    return jsonify({
-        "success": True
-    }), 200
+        delete_memory(key)
+
+        return jsonify({
+            "success": True
+        }), 200
+
+    except Exception as error:
+
+        print(
+            "MEMORY DELETE ERROR:",
+            repr(error)
+        )
+
+        return jsonify({
+            "error": "خطا در حذف حافظه."
+        }), 500
 
 
 # =========================================================
-# MEMORY API - DELETE ALL
+# MEMORY DELETE ALL
 # =========================================================
 
 @app.route(
@@ -438,11 +562,24 @@ def memory_delete(key):
 )
 def memory_delete_all():
 
-    clear_memories()
+    try:
 
-    return jsonify({
-        "success": True
-    }), 200
+        clear_memories()
+
+        return jsonify({
+            "success": True
+        }), 200
+
+    except Exception as error:
+
+        print(
+            "MEMORY DELETE ALL ERROR:",
+            repr(error)
+        )
+
+        return jsonify({
+            "error": "خطا در پاک کردن حافظه."
+        }), 500
 
 
 # =========================================================
@@ -458,7 +595,31 @@ def chat():
     try:
 
         # -------------------------------------------------
-        # READ REQUEST
+        # API KEY
+        # -------------------------------------------------
+
+        api_key = get_api_key()
+
+        print("================================")
+        print("WHALE AI / CHAT")
+        print("API KEY EXISTS:", bool(api_key))
+        print("API KEY LENGTH:", len(api_key))
+        print("================================")
+
+        if not api_key:
+
+            print(
+                "ERROR: OPENROUTER_API_KEY is missing"
+            )
+
+            return jsonify({
+                "error":
+                    "کلید OpenRouter در Environment Variables تنظیم نشده است."
+            }), 500
+
+
+        # -------------------------------------------------
+        # REQUEST
         # -------------------------------------------------
 
         data = request.get_json(
@@ -477,10 +638,6 @@ def chat():
         )
 
 
-        # -------------------------------------------------
-        # EMPTY MESSAGE
-        # -------------------------------------------------
-
         if not user_message:
 
             return jsonify({
@@ -490,28 +647,43 @@ def chat():
 
 
         # -------------------------------------------------
-        # API KEY
+        # CONVERSATION
         # -------------------------------------------------
 
-        if not API_KEY:
+        conn = get_db()
 
-            print(
-                "ERROR: OPENROUTER_API_KEY is missing"
-            )
+        if conversation_id:
 
-            return jsonify({
-                "error":
-                    "کلید OpenRouter در Environment Variables تنظیم نشده است."
-            }), 500
+            try:
+
+                conversation_id = int(
+                    conversation_id
+                )
+
+            except (TypeError, ValueError):
+
+                conversation_id = None
 
 
-        # -------------------------------------------------
-        # CREATE CONVERSATION IF NEEDED
-        # -------------------------------------------------
+        if conversation_id:
+
+            exists = conn.execute(
+                """
+                SELECT id
+                FROM conversations
+                WHERE id = ?
+                """,
+                (
+                    conversation_id,
+                )
+            ).fetchone()
+
+            if not exists:
+
+                conversation_id = None
+
 
         if not conversation_id:
-
-            conn = get_db()
 
             cursor = conn.execute(
                 """
@@ -526,26 +698,18 @@ def chat():
 
             conversation_id = cursor.lastrowid
 
-            conn.commit()
-            conn.close()
-
 
         # -------------------------------------------------
-        # GET OLD MESSAGES
+        # OLD MESSAGES
         # -------------------------------------------------
-
-        conn = get_db()
 
         rows = conn.execute(
             """
             SELECT
                 role,
                 content
-
             FROM messages
-
             WHERE conversation_id = ?
-
             ORDER BY id ASC
             """,
             (
@@ -592,120 +756,75 @@ def chat():
         # -------------------------------------------------
 
         system_prompt = """
-
-تو Whale AI هستی.
+تو Whale AI هستی؛ یک دستیار هوشمند فارسی.
 
 قوانین پاسخ:
 
 1. اگر کاربر فارسی صحبت کرد، فارسی پاسخ بده.
 
-2. پاسخ‌ها را طبیعی، مرتب و خوانا بنویس.
+2. پاسخ‌ها طبیعی، واضح و خوانا باشند.
 
 3. از Markdown استفاده کن.
 
-4. برای عنوان‌ها از تیتر مناسب استفاده کن.
+4. برای عنوان‌های مهم از تیتر Markdown استفاده کن.
 
-5. برای موارد چندمرحله‌ای از لیست استفاده کن.
+5. برای مراحل از فهرست شماره‌دار استفاده کن.
 
-6. اگر مقایسه لازم بود، در صورت مناسب بودن از جدول Markdown استفاده کن.
+6. برای موارد مقایسه‌ای، اگر مناسب بود از جدول Markdown استفاده کن.
 
-7. برای کد از code block استفاده کن.
+7. برای کد حتماً از code block استفاده کن.
 
-8. پاسخ را بی‌دلیل خط‌خطی و تکه‌تکه نکن.
+8. پاسخ را بی‌دلیل به خطوط کوتاه و جداگانه تقسیم نکن.
 
-9. پاسخ را متناسب با سؤال کاربر بده.
+9. پاسخ باید متناسب با سؤال باشد و بی‌دلیل طولانی نشود.
 
-10. اطلاعات بخش حافظه را فقط در صورت مرتبط بودن با سؤال در نظر بگیر.
+10. از اطلاعات حافظه فقط زمانی استفاده کن که به سؤال مربوط باشد.
 
-11. اطلاعات حافظه را بی‌دلیل به کاربر نمایش نده.
+11. اطلاعات خصوصی موجود در حافظه را بی‌دلیل نمایش نده.
 
+12. اگر پاسخ نیاز به توضیح دارد، آن را منظم و مرحله‌به‌مرحله ارائه کن.
 """
 
-
-        system_prompt += \
-            memory_context
+        system_prompt += memory_context
 
 
         # -------------------------------------------------
-        # BUILD MESSAGES
+        # BUILD OPENROUTER MESSAGES
         # -------------------------------------------------
 
         messages = [
-
             {
-                "role":
-                    "system",
-
-                "content":
-                    system_prompt
+                "role": "system",
+                "content": system_prompt
             }
-
         ]
 
 
         for row in rows:
 
+            role = row["role"]
+
+            if role not in (
+                "user",
+                "assistant",
+                "system"
+            ):
+                continue
+
             messages.append({
-
-                "role":
-                    row["role"],
-
-                "content":
-                    row["content"]
-
+                "role": role,
+                "content": row["content"]
             })
 
 
+        # -------------------------------------------------
+        # CURRENT MESSAGE
+        # -------------------------------------------------
+
         messages.append({
-
-            "role":
-                "user",
-
-            "content":
-                user_message
-
+            "role": "user",
+            "content": user_message
         })
-
-
-        # -------------------------------------------------
-        # LOG
-        # -------------------------------------------------
-
-        print(
-            "================================"
-        )
-
-        print(
-            "WHALE AI"
-        )
-
-        print(
-            "OPENROUTER KEY:",
-            bool(API_KEY)
-        )
-
-        print(
-            "KEY LENGTH:",
-            len(API_KEY)
-        )
-
-        print(
-            "CONVERSATION:",
-            conversation_id
-        )
-
-        print(
-            "MEMORIES:",
-            len(get_memories())
-        )
-
-        print(
-            "SENDING REQUEST TO OPENROUTER"
-        )
-
-        print(
-            "================================"
-        )
 
 
         # -------------------------------------------------
@@ -713,19 +832,10 @@ def chat():
         # -------------------------------------------------
 
         headers = {
-
-            "Authorization":
-                "Bearer " + API_KEY,
-
-            "Content-Type":
-                "application/json",
-
-            "HTTP-Referer":
-                "https://snapdeploy.dev",
-
-            "X-Title":
-                "Whale AI"
-
+            "Authorization": "Bearer " + api_key,
+            "Content-Type": "application/json",
+            "HTTP-Referer": "https://snapdeploy.dev",
+            "X-Title": "Whale AI"
         }
 
 
@@ -734,42 +844,29 @@ def chat():
         # -------------------------------------------------
 
         payload = {
-
-            "model":
-                "openrouter/free",
-
-            "messages":
-                messages,
-
-            "temperature":
-                0.7,
-
-            "stream":
-                False
-
+            "model": "openrouter/free",
+            "messages": messages,
+            "temperature": 0.7,
+            "stream": False
         }
 
 
+        print("CONVERSATION:", conversation_id)
+        print("MEMORIES:", len(get_memories()))
+        print("SENDING REQUEST TO OPENROUTER")
+
+
         # -------------------------------------------------
-        # SEND REQUEST
+        # REQUEST
         # -------------------------------------------------
 
         response = requests.post(
-
             OPENROUTER_URL,
-
             headers=headers,
-
             json=payload,
-
             timeout=120
-
         )
 
-
-        # -------------------------------------------------
-        # LOG RESPONSE
-        # -------------------------------------------------
 
         print(
             "OPENROUTER STATUS:",
@@ -797,51 +894,80 @@ def chat():
                     response.status_code,
 
                 "details":
-                    response.text[:1000]
+                    response.text[:2000]
 
             }), 502
 
 
         # -------------------------------------------------
-        # PARSE JSON
+        # JSON
         # -------------------------------------------------
 
-        result = response.json()
+        try:
 
+            result = response.json()
 
-        # -------------------------------------------------
-        # CHECK CHOICES
-        # -------------------------------------------------
+        except ValueError:
 
-        if "choices" not in result:
-
-            return jsonify({
-
-                "error":
-                    "OpenRouter پاسخ قابل استفاده‌ای برنگرداند."
-
-            }), 502
-
-
-        if not result["choices"]:
-
-            return jsonify({
-
-                "error":
-                    "OpenRouter پاسخ خالی برگرداند."
-
-            }), 502
-
-
-        # -------------------------------------------------
-        # GET REPLY
-        # -------------------------------------------------
-
-        message_data = \
-            result["choices"][0].get(
-                "message",
-                {}
+            print(
+                "OPENROUTER JSON ERROR"
             )
+
+            return jsonify({
+                "error":
+                    "پاسخ OpenRouter JSON معتبر نبود."
+            }), 502
+
+
+        # -------------------------------------------------
+        # ERROR OBJECT
+        # -------------------------------------------------
+
+        if result.get("error"):
+
+            print(
+                "OPENROUTER API ERROR:",
+                result["error"]
+            )
+
+            return jsonify({
+                "error":
+                    "OpenRouter خطا داد.",
+                "details":
+                    result["error"]
+            }), 502
+
+
+        # -------------------------------------------------
+        # CHOICES
+        # -------------------------------------------------
+
+        choices = result.get(
+            "choices"
+        )
+
+        if not choices:
+
+            print(
+                "ERROR: choices not found"
+            )
+
+            return jsonify({
+                "error":
+                    "OpenRouter پاسخ قابل استفاده‌ای برنگرداند.",
+                "details":
+                    result
+            }), 502
+
+
+        # -------------------------------------------------
+        # MESSAGE
+        # -------------------------------------------------
+
+        message_data = choices[0].get(
+            "message",
+            {}
+        )
 
         reply = message_data.get(
             "content",
@@ -850,7 +976,7 @@ def chat():
 
 
         # -------------------------------------------------
-        # NORMALIZE REPLY
+        # NORMALIZE
         # -------------------------------------------------
 
         if isinstance(
@@ -890,22 +1016,16 @@ def chat():
         ).strip()
 
 
-        # -------------------------------------------------
-        # EMPTY REPLY
-        # -------------------------------------------------
-
         if not reply:
 
             return jsonify({
-
                 "error":
                     "متن پاسخ OpenRouter خالی است."
-
             }), 502
 
 
         # -------------------------------------------------
-        # SAVE ASSISTANT MESSAGE
+        # SAVE ASSISTANT
         # -------------------------------------------------
 
         conn = get_db()
@@ -956,14 +1076,17 @@ def chat():
     except requests.RequestException as error:
 
         print(
-            "OPENROUTER CONNECTION ERROR:",
+            "OPENROUTER REQUEST ERROR:",
             repr(error)
         )
 
         return jsonify({
 
             "error":
-                "ارتباط با OpenRouter برقرار نشد."
+                "ارتباط با OpenRouter برقرار نشد.",
+
+            "details":
+                str(error)
 
         }), 502
 
@@ -982,7 +1105,10 @@ def chat():
         return jsonify({
 
             "error":
-                "خطای داخلی سرور."
+                "خطای داخلی سرور.",
+
+            "details":
+                str(error)
 
         }), 500
 
@@ -997,34 +1123,48 @@ def chat():
 )
 def delete_conversation(conversation_id):
 
-    conn = get_db()
+    try:
 
-    conn.execute(
-        """
-        DELETE FROM messages
-        WHERE conversation_id = ?
-        """,
-        (
-            conversation_id,
+        conn = get_db()
+
+        conn.execute(
+            """
+            DELETE FROM messages
+            WHERE conversation_id = ?
+            """,
+            (
+                conversation_id,
+            )
         )
-    )
 
-    conn.execute(
-        """
-        DELETE FROM conversations
-        WHERE id = ?
-        """,
-        (
-            conversation_id,
+        conn.execute(
+            """
+            DELETE FROM conversations
+            WHERE id = ?
+            """,
+            (
+                conversation_id,
+            )
         )
-    )
 
-    conn.commit()
-    conn.close()
+        conn.commit()
+        conn.close()
 
-    return jsonify({
-        "success": True
-    })
+        return jsonify({
+            "success": True
+        })
+
+    except Exception as error:
+
+        print(
+            "DELETE CONVERSATION ERROR:",
+            repr(error)
+        )
+
+        return jsonify({
+            "error":
+                "خطا در حذف گفتگو."
+        }), 500
 
 
 # =========================================================
@@ -1037,22 +1177,36 @@ def delete_conversation(conversation_id):
 )
 def delete_all():
 
-    conn = get_db()
+    try:
 
-    conn.execute(
-        "DELETE FROM messages"
-    )
+        conn = get_db()
 
-    conn.execute(
-        "DELETE FROM conversations"
-    )
+        conn.execute(
+            "DELETE FROM messages"
+        )
 
-    conn.commit()
-    conn.close()
+        conn.execute(
+            "DELETE FROM conversations"
+        )
 
-    return jsonify({
-        "success": True
-    })
+        conn.commit()
+        conn.close()
+
+        return jsonify({
+            "success": True
+        })
+
+    except Exception as error:
+
+        print(
+            "DELETE ALL ERROR:",
+            repr(error)
+        )
+
+        return jsonify({
+            "error":
+                "خطا در حذف گفتگوها."
+        }), 500
 
 
 # =========================================================
@@ -1068,38 +1222,26 @@ if __name__ == "__main__":
         )
     )
 
-    print(
-        "================================"
-    )
+    api_key = get_api_key()
 
-    print(
-        "WHALE AI STARTING"
-    )
-
-    print(
-        "PORT:",
-        port
-    )
-
+    print("================================")
+    print("WHALE AI STARTING")
+    print("PORT:", port)
     print(
         "OPENROUTER KEY:",
-        bool(API_KEY)
+        bool(api_key)
     )
-
     print(
         "KEY LENGTH:",
-        len(API_KEY)
+        len(api_key)
     )
-
     print(
         "MEMORY SYSTEM: ENABLED"
     )
-
-    print(
-        "================================"
-    )
+    print("================================")
 
     app.run(
         host="0.0.0.0",
-        port=port
+        port=port,
+        debug=False
     )
