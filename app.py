@@ -1,14 +1,16 @@
+```python
 from flask import Flask, request, jsonify, send_from_directory
-from openai import OpenAI
 from dotenv import load_dotenv
 import sqlite3
 import os
+import requests
 
 # =========================
 # PATHS
 # =========================
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
 load_dotenv(os.path.join(BASE_DIR, ".env"))
 
 # =========================
@@ -23,20 +25,12 @@ app = Flask(__name__)
 
 API_KEY = os.getenv("OPENROUTER_API_KEY")
 
+OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
+
 print("================================")
 print("WHALE AI")
 print("OPENROUTER KEY:", bool(API_KEY))
 print("================================")
-
-if API_KEY:
-    client = OpenAI(
-        api_key=API_KEY,
-        base_url="https://openrouter.ai/api/v1",
-        timeout=120.0,
-        max_retries=2
-    )
-else:
-    client = None
 
 # =========================
 # DATABASE
@@ -46,6 +40,7 @@ DB_FILE = os.path.join("/tmp", "whale_ai.db")
 
 
 def get_db():
+
     conn = sqlite3.connect(
         DB_FILE,
         timeout=30
@@ -117,7 +112,7 @@ def index():
 
 
 # =========================
-# HEALTH
+# HEALTH CHECK
 # =========================
 
 @app.route("/health")
@@ -126,7 +121,6 @@ def health():
     try:
 
         conn = get_db()
-
         cursor = conn.cursor()
 
         cursor.execute(
@@ -174,7 +168,10 @@ def new_conversation():
 
     except Exception as error:
 
-        print("NEW CONVERSATION ERROR:", repr(error))
+        print(
+            "NEW CONVERSATION ERROR:",
+            repr(error)
+        )
 
         return jsonify({
             "error": "خطا در ساخت گفتگو."
@@ -225,7 +222,10 @@ def get_conversations():
 
     except Exception as error:
 
-        print("GET CONVERSATIONS ERROR:", repr(error))
+        print(
+            "GET CONVERSATIONS ERROR:",
+            repr(error)
+        )
 
         return jsonify({
             "error": "خطا در دریافت تاریخچه."
@@ -275,7 +275,10 @@ def get_messages(conversation_id):
 
     except Exception as error:
 
-        print("GET MESSAGES ERROR:", repr(error))
+        print(
+            "GET MESSAGES ERROR:",
+            repr(error)
+        )
 
         return jsonify({
             "error": "خطا در دریافت پیام‌ها."
@@ -306,25 +309,22 @@ def chat():
             "conversation_id"
         )
 
-        # -------------------------
-        # VALIDATION
-        # -------------------------
-
         if not text:
 
             return jsonify({
                 "error": "پیامی دریافت نشد."
             }), 400
 
-        if not API_KEY or not client:
+        if not API_KEY:
 
             return jsonify({
-                "error": "OPENROUTER_API_KEY تنظیم نشده است."
+                "error":
+                    "OPENROUTER_API_KEY تنظیم نشده است."
             }), 500
 
-        # -------------------------
+        # =========================
         # CONVERSATION
-        # -------------------------
+        # =========================
 
         if not conversation_id:
 
@@ -353,9 +353,9 @@ def chat():
             conn = get_db()
             cursor = conn.cursor()
 
-        # -------------------------
+        # =========================
         # SAVE USER MESSAGE
-        # -------------------------
+        # =========================
 
         cursor.execute("""
             INSERT INTO messages
@@ -373,9 +373,9 @@ def chat():
 
         conn.commit()
 
-        # -------------------------
+        # =========================
         # LOAD HISTORY
-        # -------------------------
+        # =========================
 
         cursor.execute("""
             SELECT
@@ -392,9 +392,9 @@ def chat():
 
         conn.close()
 
-        # -------------------------
-        # AI MESSAGES
-        # -------------------------
+        # =========================
+        # BUILD MESSAGES
+        # =========================
 
         messages = [
             {
@@ -424,42 +424,92 @@ def chat():
         print("CONVERSATION:", conversation_id)
         print("================================")
 
+        headers = {
+            "Authorization": f"Bearer {API_KEY}",
+            "Content-Type": "application/json",
+            "HTTP-Referer": "https://whale-ai.local",
+            "X-Title": "Whale AI"
+        }
+
+        payload = {
+            "model": "openrouter/free",
+            "messages": messages,
+            "temperature": 0.7,
+            "stream": False
+        }
+
         try:
 
-            response = client.chat.completions.create(
-                model="openrouter/free",
-                messages=messages,
-                temperature=0.7,
-                stream=False
+            response = requests.post(
+                OPENROUTER_URL,
+                headers=headers,
+                json=payload,
+                timeout=120
             )
 
-        except Exception as error:
+        except requests.RequestException as error:
 
             print("================================")
-            print("OPENROUTER REQUEST ERROR")
+            print("OPENROUTER CONNECTION ERROR")
             print("TYPE:", type(error).__name__)
             print("ERROR:", str(error))
             print("================================")
 
             return jsonify({
-                "error": "ارتباط با سرویس هوش مصنوعی برقرار نشد.",
-                "details": str(error)
+                "error":
+                    "ارتباط با OpenRouter برقرار نشد."
             }), 502
 
         # =========================
-        # EXTRACT RESPONSE
+        # CHECK STATUS
+        # =========================
+
+        print(
+            "OPENROUTER STATUS:",
+            response.status_code
+        )
+
+        if response.status_code != 200:
+
+            print("OPENROUTER RESPONSE:")
+            print(response.text[:2000])
+
+            try:
+                error_data = response.json()
+            except Exception:
+                error_data = {
+                    "message": response.text[:1000]
+                }
+
+            return jsonify({
+                "error":
+                    "OpenRouter درخواست را قبول نکرد.",
+                "status":
+                    response.status_code,
+                "details":
+                    error_data
+            }), 502
+
+        # =========================
+        # PARSE RESPONSE
         # =========================
 
         try:
 
-            reply = response.choices[0].message.content
+            result = response.json()
+
+            reply = (
+                result["choices"][0]["message"]["content"]
+            )
 
         except Exception as error:
 
             print("RESPONSE PARSE ERROR:", repr(error))
+            print("RAW RESPONSE:", response.text[:2000])
 
             return jsonify({
-                "error": "پاسخ نامعتبر از هوش مصنوعی دریافت شد."
+                "error":
+                    "پاسخ نامعتبر از OpenRouter دریافت شد."
             }), 502
 
         if not reply:
@@ -489,9 +539,9 @@ def chat():
             reply
         ))
 
-        # -------------------------
-        # MESSAGE COUNT
-        # -------------------------
+        # =========================
+        # TITLE
+        # =========================
 
         cursor.execute("""
             SELECT COUNT(*) AS count
@@ -502,10 +552,6 @@ def chat():
         ))
 
         count = cursor.fetchone()["count"]
-
-        # -------------------------
-        # TITLE
-        # -------------------------
 
         if count == 2:
 
@@ -526,14 +572,14 @@ def chat():
         conn.commit()
         conn.close()
 
-        # =========================
-        # RESPONSE
-        # =========================
+        print("OPENROUTER RESPONSE RECEIVED")
+        print("REPLY LENGTH:", len(reply))
 
         return jsonify({
             "type": "done",
             "content": reply,
-            "conversation_id": conversation_id
+            "conversation_id":
+                conversation_id
         })
 
     except Exception as error:
@@ -589,7 +635,10 @@ def delete_conversation(conversation_id):
 
     except Exception as error:
 
-        print("DELETE ERROR:", repr(error))
+        print(
+            "DELETE ERROR:",
+            repr(error)
+        )
 
         return jsonify({
             "error": "خطا در حذف گفتگو."
@@ -628,7 +677,10 @@ def delete_all():
 
     except Exception as error:
 
-        print("DELETE ALL ERROR:", repr(error))
+        print(
+            "DELETE ALL ERROR:",
+            repr(error)
+        )
 
         return jsonify({
             "error": "خطا در حذف گفتگوها."
@@ -660,3 +712,4 @@ if __name__ == "__main__":
         port=port,
         debug=False
     )
+```
