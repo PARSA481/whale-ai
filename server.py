@@ -27,10 +27,6 @@ DB_FILE = os.path.join(BASE_DIR, "whale.db")
 
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 
-# =========================================================
-# CURRENT VERIFIED FREE MODEL
-# =========================================================
-
 DEFAULT_MODEL = os.environ.get(
     "OPENROUTER_MODEL",
     "nvidia/nemotron-3-ultra-550b-a55b:free"
@@ -46,10 +42,17 @@ MAX_MESSAGE_CHARS = 20000
 # =========================================================
 
 def get_api_key():
-    return os.environ.get(
+
+    key = os.environ.get(
         "OPENROUTER_API_KEY",
         ""
     ).strip()
+
+    # Support accidental "Bearer " prefix
+    if key.lower().startswith("bearer "):
+        key = key[7:].strip()
+
+    return key
 
 
 # =========================================================
@@ -280,7 +283,6 @@ def extract_file_text(file):
             if page_text:
 
                 parts.append(page_text)
-
                 total += len(page_text)
 
             if total >= MAX_FILE_CHARS:
@@ -363,7 +365,8 @@ def health():
 
     return jsonify({
 
-        "status": "ok",
+        "status":
+            "ok",
 
         "openrouter_key":
             bool(api_key),
@@ -899,10 +902,48 @@ def openrouter_error_response(response):
     print("==============================")
     print()
 
+    if response.status_code == 401:
+
+        message = (
+            "OpenRouter authentication failed. "
+            "Check OPENROUTER_API_KEY."
+        )
+
+    elif response.status_code == 402:
+
+        message = (
+            "OpenRouter credits or payment are required "
+            "for this request."
+        )
+
+    elif response.status_code == 403:
+
+        message = (
+            "OpenRouter rejected access to this model."
+        )
+
+    elif response.status_code == 404:
+
+        message = (
+            "The selected OpenRouter model was not found."
+        )
+
+    elif response.status_code == 429:
+
+        message = (
+            "OpenRouter rate limit reached."
+        )
+
+    else:
+
+        message = (
+            "OpenRouter request failed."
+        )
+
     return jsonify({
 
         "error":
-            "OpenRouter request failed.",
+            message,
 
         "status":
             response.status_code,
@@ -913,7 +954,7 @@ def openrouter_error_response(response):
         "model":
             DEFAULT_MODEL
 
-    }), 502
+    }), response.status_code
 
 
 # =========================================================
@@ -928,20 +969,36 @@ def chat():
 
     try:
 
+        # -------------------------------------------------
+        # API KEY
+        # -------------------------------------------------
+
         api_key = get_api_key()
 
         if not api_key:
 
+            print(
+                "ERROR: OPENROUTER_API_KEY IS MISSING"
+            )
+
             return jsonify({
+
                 "error":
-                    "OPENROUTER_API_KEY is not configured."
+                    "OPENROUTER_API_KEY is not configured.",
+
+                "status":
+                    500
+
             }), 500
 
+
+        # -------------------------------------------------
+        # INPUT
+        # -------------------------------------------------
 
         data = request.get_json(
             silent=True
         ) or {}
-
 
         user_message = str(
             data.get(
@@ -949,7 +1006,6 @@ def chat():
                 ""
             )
         ).strip()
-
 
         if len(user_message) > MAX_MESSAGE_CHARS:
 
@@ -973,6 +1029,13 @@ def chat():
                 ""
             )
         )
+
+
+        if len(file_text) > MAX_FILE_CHARS:
+
+            file_text = file_text[
+                :MAX_FILE_CHARS
+            ]
 
 
         web_search = bool(
@@ -1123,13 +1186,13 @@ def chat():
         headers = {
 
             "Authorization":
-                "Bearer " + api_key,
+                f"Bearer {api_key}",
 
             "Content-Type":
                 "application/json",
 
             "HTTP-Referer":
-                "http://localhost:5000",
+                "https://whale-ai.local",
 
             "X-Title":
                 "Whale AI"
@@ -1166,7 +1229,8 @@ def chat():
 
             payload["plugins"] = [
                 {
-                    "id": "web"
+                    "id":
+                        "web"
                 }
             ]
 
@@ -1188,6 +1252,10 @@ def chat():
             web_search
         )
         print(
+            "API KEY:",
+            "FOUND"
+        )
+        print(
             "Message:",
             user_message[:200]
         )
@@ -1200,10 +1268,18 @@ def chat():
         # -------------------------------------------------
 
         response = requests.post(
+
             OPENROUTER_URL,
+
             headers=headers,
+
             json=payload,
-            timeout=(15, 120)
+
+            timeout=(
+                15,
+                120
+            )
+
         )
 
 
@@ -1394,6 +1470,10 @@ def chat():
         })
 
 
+    # =====================================================
+    # TIMEOUT
+    # =====================================================
+
     except requests.Timeout:
 
         print(
@@ -1407,6 +1487,10 @@ def chat():
 
         }), 504
 
+
+    # =====================================================
+    # REQUEST ERROR
+    # =====================================================
 
     except requests.RequestException as error:
 
@@ -1425,6 +1509,10 @@ def chat():
 
         }), 502
 
+
+    # =====================================================
+    # GENERAL ERROR
+    # =====================================================
 
     except Exception as error:
 
@@ -1551,6 +1639,10 @@ if __name__ == "__main__":
         )
     )
 
+    api_key_exists = bool(
+        get_api_key()
+    )
+
     print()
     print("================================")
     print("WHALE AI")
@@ -1565,13 +1657,17 @@ if __name__ == "__main__":
     )
     print(
         "API KEY:",
-        bool(get_api_key())
+        "FOUND"
+        if api_key_exists
+        else "MISSING"
     )
     print(
-        "MEMORY: ENABLED"
+        "MEMORY:",
+        "ENABLED"
     )
     print(
-        "WEB SEARCH: ENABLED"
+        "WEB SEARCH:",
+        "ENABLED"
     )
     print("================================")
     print()
