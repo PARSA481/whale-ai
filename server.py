@@ -1,10 +1,21 @@
-
 import os
+import json
+import time
 import sqlite3
 import requests
-from flask import Flask, request, jsonify, send_from_directory
 
-# Optional file readers
+from flask import (
+    Flask,
+    request,
+    jsonify,
+    send_from_directory,
+    Response
+)
+
+# =========================================================
+# OPTIONAL FILE READERS
+# =========================================================
+
 try:
     from pypdf import PdfReader
 except Exception:
@@ -25,17 +36,40 @@ app = Flask(__name__)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_FILE = os.path.join(BASE_DIR, "whale.db")
 
-OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
+OPENROUTER_URL = (
+    "https://openrouter.ai/api/v1/chat/completions"
+)
+
+# =========================================================
+# MODEL
+# =========================================================
 
 DEFAULT_MODEL = os.environ.get(
     "OPENROUTER_MODEL",
-    "nvidia/nemotron-3-ultra-550b-a55b:free"
-)
+    "minimax/minimax-m3:free"
+).strip()
 
-MAX_HISTORY_MESSAGES = 40
-MAX_FILE_CHARS = 50000
-MAX_MESSAGE_CHARS = 20000
+# Fallback can be changed from SnapDeploy environment variables.
+# Leave empty if you do not want fallback.
+FALLBACK_MODEL = os.environ.get(
+    "OPENROUTER_FALLBACK_MODEL",
+    ""
+).strip()
 
+# =========================================================
+# LIMITS
+# =========================================================
+
+MAX_HISTORY_MESSAGES = 80
+MAX_MEMORY_ITEMS = 100
+MAX_FILE_CHARS = 100000
+MAX_MESSAGE_CHARS = 30000
+MAX_CONVERSATION_TITLE = 80
+
+REQUEST_CONNECT_TIMEOUT = 20
+REQUEST_READ_TIMEOUT = 180
+
+MAX_RETRIES = 2
 
 # =========================================================
 # API KEY
@@ -48,7 +82,6 @@ def get_api_key():
         ""
     ).strip()
 
-    # Support accidental "Bearer " prefix
     if key.lower().startswith("bearer "):
         key = key[7:].strip()
 
@@ -69,10 +102,19 @@ def get_db():
     conn.row_factory = sqlite3.Row
 
     conn.execute("""
+        PRAGMA journal_mode=WAL
+    """)
+
+    conn.execute("""
+        PRAGMA foreign_keys=ON
+    """)
+
+    conn.execute("""
         CREATE TABLE IF NOT EXISTS conversations (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             title TEXT DEFAULT 'New Chat',
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     """)
 
@@ -82,7 +124,10 @@ def get_db():
             conversation_id INTEGER,
             role TEXT NOT NULL,
             content TEXT NOT NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY(conversation_id)
+                REFERENCES conversations(id)
+                ON DELETE CASCADE
         )
     """)
 
@@ -102,6 +147,38 @@ def get_db():
 
 
 # =========================================================
+# DATABASE MIGRATION
+# =========================================================
+
+def migrate_database():
+
+    conn = get_db()
+
+    columns = conn.execute(
+        "PRAGMA table_info(conversations)"
+    ).fetchall()
+
+    column_names = {
+        row["name"]
+        for row in columns
+    }
+
+    if "updated_at" not in column_names:
+
+        conn.execute("""
+            ALTER TABLE conversations
+            ADD COLUMN updated_at
+            TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        """)
+
+    conn.commit()
+    conn.close()
+
+
+migrate_database()
+
+
+# =========================================================
 # MEMORY
 # =========================================================
 
@@ -110,10 +187,16 @@ def get_memories():
     conn = get_db()
 
     rows = conn.execute("""
-        SELECT id, key, value
+        SELECT
+            id,
+            key,
+            value,
+            created_at,
+            updated_at
         FROM memories
         ORDER BY id ASC
-    """).fetchall()
+        LIMIT ?
+    """, (MAX_MEMORY_ITEMS,)).fetchall()
 
     conn.close()
 
@@ -121,7 +204,9 @@ def get_memories():
         {
             "id": row["id"],
             "key": row["key"],
-            "value": row["value"]
+            "value": row["value"],
+            "created_at": row["created_at"],
+            "updated_at": row["updated_at"]
         }
         for row in rows
     ]
@@ -163,10 +248,16 @@ def save_memory(key, value):
         conn.execute(
             """
             INSERT INTO memories
-            (key, value)
+            (
+                key,
+                value
+            )
             VALUES (?, ?)
             """,
-            (key, value)
+            (
+                key,
+                value
+            )
         )
 
     conn.commit()
@@ -221,7 +312,7 @@ def build_memory_context():
 
     return (
         "\n\n"
-        "Stored user memory:\n"
+        "IMPORTANT USER MEMORY:\n"
         + "\n".join(lines)
         + "\n"
     )
@@ -241,12 +332,33 @@ def extract_file_text(file):
         .replace(".", "")
     )
 
-    if extension in ("txt", "md", "csv", "json"):
+    # -------------------------
+    # TEXT FILES
+    # -------------------------
+
+    if extension in (
+        "txt",
+        "md",
+        "csv",
+        "json",
+        "xml",
+        "html",
+        "py",
+        "js",
+        "css",
+        "java",
+        "cpp",
+        "c",
+        "sql"
+    ):
 
         raw = file.read()
 
         try:
-            text = raw.decode("utf-8")
+
+            text = raw.decode(
+                "utf-8"
+            )
 
         except UnicodeDecodeError:
 
@@ -255,8 +367,15 @@ def extract_file_text(file):
                 errors="replace"
             )
 
-        return text[:MAX_FILE_CHARS], extension
+        return (
+            text[:MAX_FILE_CHARS],
+            extension
+        )
 
+
+    # -------------------------
+    # PDF
+    # -------------------------
 
     if extension == "pdf":
 
@@ -275,23 +394,40 @@ def extract_file_text(file):
         for page in reader.pages:
 
             try:
-                page_text = page.extract_text() or ""
+
+                page_text = (
+                    page.extract_text()
+                    or ""
+                )
 
             except Exception:
+
                 page_text = ""
 
             if page_text:
 
-                parts.append(page_text)
-                total += len(page_text)
+                parts.append(
+                    page_text
+                )
+
+                total += len(
+                    page_text
+                )
 
             if total >= MAX_FILE_CHARS:
                 break
 
         text = "\n\n".join(parts)
 
-        return text[:MAX_FILE_CHARS], extension
+        return (
+            text[:MAX_FILE_CHARS],
+            extension
+        )
 
+
+    # -------------------------
+    # DOCX
+    # -------------------------
 
     if extension == "docx":
 
@@ -304,19 +440,32 @@ def extract_file_text(file):
 
         document = Document(file)
 
-        paragraphs = [
-            paragraph.text
-            for paragraph in document.paragraphs
-            if paragraph.text.strip()
-        ]
+        paragraphs = []
 
-        text = "\n".join(paragraphs)
+        for paragraph in document.paragraphs:
 
-        return text[:MAX_FILE_CHARS], extension
+            text = paragraph.text.strip()
+
+            if text:
+
+                paragraphs.append(
+                    text
+                )
+
+        text = "\n".join(
+            paragraphs
+        )
+
+        return (
+            text[:MAX_FILE_CHARS],
+            extension
+        )
 
 
     raise ValueError(
-        "Unsupported file type."
+        "Unsupported file type: .{}".format(
+            extension
+        )
     )
 
 
@@ -342,6 +491,8 @@ def health():
 
     api_key = get_api_key()
 
+    database = False
+
     try:
 
         conn = get_db()
@@ -361,12 +512,13 @@ def health():
             repr(error)
         )
 
-        database = False
-
     return jsonify({
 
         "status":
             "ok",
+
+        "database":
+            database,
 
         "openrouter_key":
             bool(api_key),
@@ -374,11 +526,20 @@ def health():
         "key_length":
             len(api_key),
 
-        "database":
-            database,
-
         "model":
-            DEFAULT_MODEL
+            DEFAULT_MODEL,
+
+        "fallback_model":
+            FALLBACK_MODEL,
+
+        "web_search":
+            True,
+
+        "memory":
+            True,
+
+        "file_upload":
+            True
 
     })
 
@@ -411,7 +572,9 @@ def upload_file():
                     "The file has no name."
             }), 400
 
-        text, extension = extract_file_text(file)
+        text, extension = (
+            extract_file_text(file)
+        )
 
         return jsonify({
 
@@ -425,7 +588,10 @@ def upload_file():
                 extension,
 
             "text":
-                text
+                text,
+
+            "characters":
+                len(text)
 
         })
 
@@ -444,15 +610,18 @@ def upload_file():
         )
 
         return jsonify({
+
             "error":
                 "File processing failed.",
+
             "details":
                 str(error)
+
         }), 500
 
 
 # =========================================================
-# GET CONVERSATIONS
+# CONVERSATIONS
 # =========================================================
 
 @app.route(
@@ -470,6 +639,7 @@ def get_conversations():
                 c.id,
                 c.title,
                 c.created_at,
+                c.updated_at,
                 COUNT(m.id) AS message_count
             FROM conversations c
             LEFT JOIN messages m
@@ -477,13 +647,17 @@ def get_conversations():
             GROUP BY
                 c.id,
                 c.title,
-                c.created_at
-            ORDER BY c.id DESC
+                c.created_at,
+                c.updated_at
+            ORDER BY
+                c.updated_at DESC,
+                c.id DESC
         """).fetchall()
 
         conn.close()
 
         return jsonify([
+
             {
                 "id":
                     row["id"],
@@ -494,10 +668,15 @@ def get_conversations():
                 "created_at":
                     row["created_at"],
 
+                "updated_at":
+                    row["updated_at"],
+
                 "message_count":
                     row["message_count"]
             }
+
             for row in rows
+
         ])
 
     except Exception as error:
@@ -508,8 +687,13 @@ def get_conversations():
         )
 
         return jsonify({
+
             "error":
-                "Failed to load conversations."
+                "Failed to load conversations.",
+
+            "details":
+                str(error)
+
         }), 500
 
 
@@ -525,18 +709,43 @@ def create_conversation():
 
     try:
 
+        data = (
+            request.get_json(
+                silent=True
+            )
+            or {}
+        )
+
+        title = str(
+            data.get(
+                "title",
+                "New Chat"
+            )
+        ).strip()
+
+        if not title:
+            title = "New Chat"
+
+        title = title[
+            :MAX_CONVERSATION_TITLE
+        ]
+
         conn = get_db()
 
         cursor = conn.execute(
             """
             INSERT INTO conversations
-            (title)
+            (
+                title
+            )
             VALUES (?)
             """,
-            ("New Chat",)
+            (title,)
         )
 
-        conversation_id = cursor.lastrowid
+        conversation_id = (
+            cursor.lastrowid
+        )
 
         conn.commit()
         conn.close()
@@ -547,7 +756,7 @@ def create_conversation():
                 conversation_id,
 
             "title":
-                "New Chat"
+                title
 
         })
 
@@ -565,6 +774,89 @@ def create_conversation():
 
 
 # =========================================================
+# RENAME CONVERSATION
+# =========================================================
+
+@app.route(
+    "/conversations/<int:conversation_id>",
+    methods=["PATCH"]
+)
+def rename_conversation(
+    conversation_id
+):
+
+    try:
+
+        data = (
+            request.get_json(
+                silent=True
+            )
+            or {}
+        )
+
+        title = str(
+            data.get(
+                "title",
+                ""
+            )
+        ).strip()
+
+        if not title:
+
+            return jsonify({
+                "error":
+                    "Title is required."
+            }), 400
+
+        title = title[
+            :MAX_CONVERSATION_TITLE
+        ]
+
+        conn = get_db()
+
+        conn.execute(
+            """
+            UPDATE conversations
+            SET title = ?,
+                updated_at = CURRENT_TIMESTAMP
+            WHERE id = ?
+            """,
+            (
+                title,
+                conversation_id
+            )
+        )
+
+        conn.commit()
+        conn.close()
+
+        return jsonify({
+
+            "success":
+                True,
+
+            "id":
+                conversation_id,
+
+            "title":
+                title
+
+        })
+
+    except Exception as error:
+
+        return jsonify({
+
+            "error":
+                "Failed to rename conversation.",
+
+            "details":
+                str(error)
+
+        }), 500
+
+
+# =========================================================
 # GET MESSAGES
 # =========================================================
 
@@ -572,7 +864,9 @@ def create_conversation():
     "/conversations/<int:conversation_id>/messages",
     methods=["GET"]
 )
-def get_messages(conversation_id):
+def get_messages(
+    conversation_id
+):
 
     try:
 
@@ -589,12 +883,15 @@ def get_messages(conversation_id):
             WHERE conversation_id = ?
             ORDER BY id ASC
             """,
-            (conversation_id,)
+            (
+                conversation_id,
+            )
         ).fetchall()
 
         conn.close()
 
         return jsonify([
+
             {
                 "id":
                     row["id"],
@@ -608,7 +905,9 @@ def get_messages(conversation_id):
                 "created_at":
                     row["created_at"]
             }
+
             for row in rows
+
         ])
 
     except Exception as error:
@@ -619,8 +918,98 @@ def get_messages(conversation_id):
         )
 
         return jsonify({
+
             "error":
-                "Failed to load messages."
+                "Failed to load messages.",
+
+            "details":
+                str(error)
+
+        }), 500
+
+
+# =========================================================
+# SEARCH CONVERSATIONS
+# =========================================================
+
+@app.route(
+    "/conversations/search",
+    methods=["GET"]
+)
+def search_conversations():
+
+    query = str(
+        request.args.get(
+            "q",
+            ""
+        )
+    ).strip()
+
+    if not query:
+
+        return jsonify([])
+
+    try:
+
+        conn = get_db()
+
+        pattern = "%" + query + "%"
+
+        rows = conn.execute(
+            """
+            SELECT DISTINCT
+                c.id,
+                c.title,
+                c.created_at,
+                c.updated_at
+            FROM conversations c
+            LEFT JOIN messages m
+                ON m.conversation_id = c.id
+            WHERE
+                c.title LIKE ?
+                OR m.content LIKE ?
+            ORDER BY
+                c.updated_at DESC
+            LIMIT 50
+            """,
+            (
+                pattern,
+                pattern
+            )
+        ).fetchall()
+
+        conn.close()
+
+        return jsonify([
+
+            {
+                "id":
+                    row["id"],
+
+                "title":
+                    row["title"],
+
+                "created_at":
+                    row["created_at"],
+
+                "updated_at":
+                    row["updated_at"]
+            }
+
+            for row in rows
+
+        ])
+
+    except Exception as error:
+
+        return jsonify({
+
+            "error":
+                "Conversation search failed.",
+
+            "details":
+                str(error)
+
         }), 500
 
 
@@ -637,20 +1026,22 @@ def memory_get():
     try:
 
         return jsonify({
+
             "memories":
                 get_memories()
+
         })
 
     except Exception as error:
 
-        print(
-            "MEMORY GET ERROR:",
-            repr(error)
-        )
-
         return jsonify({
+
             "error":
-                "Failed to load memory."
+                "Failed to load memory.",
+
+            "details":
+                str(error)
+
         }), 500
 
 
@@ -666,16 +1057,25 @@ def memory_add():
 
     try:
 
-        data = request.get_json(
-            silent=True
-        ) or {}
+        data = (
+            request.get_json(
+                silent=True
+            )
+            or {}
+        )
 
         key = str(
-            data.get("key", "")
+            data.get(
+                "key",
+                ""
+            )
         ).strip()
 
         value = str(
-            data.get("value", "")
+            data.get(
+                "value",
+                ""
+            )
         ).strip()
 
         if not key or not value:
@@ -705,14 +1105,14 @@ def memory_add():
 
     except Exception as error:
 
-        print(
-            "MEMORY ADD ERROR:",
-            repr(error)
-        )
-
         return jsonify({
+
             "error":
-                "Failed to save memory."
+                "Failed to save memory.",
+
+            "details":
+                str(error)
+
         }), 500
 
 
@@ -724,7 +1124,7 @@ def memory_add():
     "/memory/<path:key>",
     methods=["DELETE"]
 )
-def memory_delete(key):
+def memory_delete_route(key):
 
     try:
 
@@ -737,14 +1137,14 @@ def memory_delete(key):
 
     except Exception as error:
 
-        print(
-            "MEMORY DELETE ERROR:",
-            repr(error)
-        )
-
         return jsonify({
+
             "error":
-                "Failed to delete memory."
+                "Failed to delete memory.",
+
+            "details":
+                str(error)
+
         }), 500
 
 
@@ -769,14 +1169,14 @@ def memory_delete_all():
 
     except Exception as error:
 
-        print(
-            "MEMORY DELETE ALL ERROR:",
-            repr(error)
-        )
-
         return jsonify({
+
             "error":
-                "Failed to clear memory."
+                "Failed to clear memories.",
+
+            "details":
+                str(error)
+
         }), 500
 
 
@@ -786,7 +1186,8 @@ def memory_delete_all():
 
 def build_model_messages(
     conversation_id,
-    file_text=""
+    file_text="",
+    mode="auto"
 ):
 
     conn = get_db()
@@ -813,44 +1214,157 @@ def build_model_messages(
         reversed(rows)
     )
 
+    # -----------------------------------------------------
+    # BASE SYSTEM PROMPT
+    # -----------------------------------------------------
+
     system_prompt = """
-You are Whale AI, a helpful AI assistant.
+You are Whale AI, an advanced general-purpose AI assistant.
 
-Rules:
+LANGUAGE:
+- Always answer in the same language as the user.
+- If the user writes Persian, answer naturally in Persian.
+- Do not randomly switch languages.
 
-1. Answer in the same language as the user.
-2. If the user writes Persian, answer naturally in Persian.
-3. Be direct and useful.
-4. Do not unnecessarily delay simple questions.
-5. Use Markdown when useful.
-6. Use headings when they improve readability.
-7. Use numbered lists for procedures.
-8. Use code blocks for code.
-9. Do not repeat the user's message.
-10. Never claim that you searched the web unless web search was actually used.
-11. When web search information is available, use it when relevant.
-12. Never expose private memory unless it is relevant.
-13. Be accurate and clearly state uncertainty when necessary.
+GENERAL:
+- Be accurate, useful and direct.
+- Do not repeat the user's question unnecessarily.
+- Use Markdown when it improves readability.
+- Use headings for long answers.
+- Use numbered lists for procedures.
+- Use code blocks for code.
+- Never claim that you searched the web unless web search was actually performed.
+- Never invent sources, links, citations or search results.
+- If information may be outdated, say so.
+- If you are uncertain, clearly say what is uncertain.
+- Never expose API keys, environment variables containing secrets, or private server information.
+- Do not reveal private memory unless it is relevant to the user's request.
+
+EDUCATION:
+- Explain difficult concepts step by step.
+- Adapt explanations to the user's level.
+- Give examples when useful.
+- Do not make explanations unnecessarily complicated.
+
+CODING:
+- Prefer complete working code when the user asks for code.
+- Preserve existing functionality when modifying code.
+- Explain important changes briefly.
+
+FILES:
+- When a file is attached, use its contents when relevant.
+- Do not pretend to have read information that was not extracted successfully.
+
+WEB:
+- If web-search results are supplied by the system/tool, use them carefully.
+- Clearly distinguish current web information from general knowledge.
+
+MEMORY:
+- Treat stored memory as user-specific context.
+- Do not invent memories.
 """
 
+    # -----------------------------------------------------
+    # MODES
+    # -----------------------------------------------------
+
+    mode = str(
+        mode or "auto"
+    ).lower().strip()
+
+    if mode == "study":
+
+        system_prompt += """
+
+MODE: STUDY
+
+Teach rather than merely giving the final answer.
+Break complex subjects into understandable parts.
+When useful, finish with a short recap or practice question.
+"""
+
+    elif mode == "research":
+
+        system_prompt += """
+
+MODE: RESEARCH
+
+Prioritize factual accuracy.
+When web search is enabled, use current sources.
+Compare relevant information and identify uncertainty.
+Do not fabricate references.
+"""
+
+    elif mode == "code":
+
+        system_prompt += """
+
+MODE: CODE
+
+Act as a senior software engineer.
+Focus on correctness, debugging, architecture and maintainability.
+When modifying code, provide the complete required code when requested.
+"""
+
+    elif mode == "deep":
+
+        system_prompt += """
+
+MODE: DEEP ANALYSIS
+
+Analyze the problem carefully.
+Consider multiple possibilities and edge cases.
+Give a structured conclusion.
+Do not expose private chain-of-thought.
+Provide concise reasoning summaries instead.
+"""
+
+    elif mode == "quick":
+
+        system_prompt += """
+
+MODE: QUICK
+
+Answer concisely.
+Avoid unnecessary explanation unless requested.
+"""
+
+    else:
+
+        system_prompt += """
+
+MODE: AUTO
+
+Choose the appropriate response style automatically.
+"""
+
+    # -----------------------------------------------------
+    # MEMORY
+    # -----------------------------------------------------
+
     system_prompt += build_memory_context()
+
+    # -----------------------------------------------------
+    # FILE
+    # -----------------------------------------------------
 
     if file_text:
 
         system_prompt += """
 
-The user attached a file.
+ATTACHED FILE CONTENT:
 
-Use the following extracted file content when relevant:
-
---- FILE CONTENT ---
+--- BEGIN FILE ---
 {}
---- END FILE CONTENT ---
+--- END FILE ---
+
+Use this content when relevant.
 """.format(
             file_text[:MAX_FILE_CHARS]
         )
 
     messages = [
+
         {
             "role":
                 "system",
@@ -858,7 +1372,12 @@ Use the following extracted file content when relevant:
             "content":
                 system_prompt
         }
+
     ]
+
+    # -----------------------------------------------------
+    # HISTORY
+    # -----------------------------------------------------
 
     for row in rows:
 
@@ -871,13 +1390,15 @@ Use the following extracted file content when relevant:
         ):
             continue
 
+        content = row["content"]
+
         messages.append({
 
             "role":
                 role,
 
             "content":
-                row["content"]
+                content
 
         })
 
@@ -885,21 +1406,105 @@ Use the following extracted file content when relevant:
 
 
 # =========================================================
+# REQUEST HEADERS
+# =========================================================
+
+def build_headers(api_key):
+
+    return {
+
+        "Authorization":
+            "Bearer " + api_key,
+
+        "Content-Type":
+            "application/json",
+
+        "HTTP-Referer":
+            os.environ.get(
+                "SITE_URL",
+                "https://whale-ai.local"
+            ),
+
+        "X-Title":
+            "Whale AI"
+
+    }
+
+
+# =========================================================
+# PAYLOAD
+# =========================================================
+
+def build_payload(
+    model,
+    messages,
+    web_search=False,
+    stream=False,
+    mode="auto"
+):
+
+    payload = {
+
+        "model":
+            model,
+
+        "messages":
+            messages,
+
+        "temperature":
+            0.7,
+
+        "stream":
+            stream
+
+    }
+
+    # -----------------------------------------------------
+    # WEB SEARCH
+    # -----------------------------------------------------
+
+    if web_search:
+
+        payload["tools"] = [
+
+            {
+                "type":
+                    "openrouter:web_search"
+            },
+
+            {
+                "type":
+                    "openrouter:web_fetch"
+            }
+
+        ]
+
+        # Give the model permission to decide when
+        # web tools are actually useful.
+        payload["tool_choice"] = "auto"
+
+    return payload
+
+
+# =========================================================
 # OPENROUTER ERROR
 # =========================================================
 
-def openrouter_error_response(response):
+def openrouter_error_response(
+    response,
+    model
+):
 
-    details = response.text[:4000]
+    details = response.text[:5000]
 
     print()
-    print("==============================")
+    print("================================")
     print("OPENROUTER ERROR")
-    print("==============================")
+    print("================================")
     print("STATUS:", response.status_code)
-    print("MODEL:", DEFAULT_MODEL)
+    print("MODEL:", model)
     print("DETAILS:", details)
-    print("==============================")
+    print("================================")
     print()
 
     if response.status_code == 401:
@@ -912,26 +1517,42 @@ def openrouter_error_response(response):
     elif response.status_code == 402:
 
         message = (
-            "OpenRouter credits or payment are required "
-            "for this request."
+            "OpenRouter requires credits or "
+            "payment for this request."
         )
 
     elif response.status_code == 403:
 
         message = (
-            "OpenRouter rejected access to this model."
+            "OpenRouter rejected access to this model "
+            "or tool."
         )
 
     elif response.status_code == 404:
 
         message = (
-            "The selected OpenRouter model was not found."
+            "The selected OpenRouter model or endpoint "
+            "was not found."
+        )
+
+    elif response.status_code == 408:
+
+        message = (
+            "The request timed out."
         )
 
     elif response.status_code == 429:
 
         message = (
-            "OpenRouter rate limit reached."
+            "OpenRouter rate limit reached. "
+            "Please try again shortly."
+        )
+
+    elif 500 <= response.status_code <= 599:
+
+        message = (
+            "OpenRouter or the selected provider "
+            "temporarily failed."
         )
 
     else:
@@ -952,9 +1573,220 @@ def openrouter_error_response(response):
             details,
 
         "model":
-            DEFAULT_MODEL
+            model
 
     }), response.status_code
+
+
+# =========================================================
+# NORMALIZE RESPONSE
+# =========================================================
+
+def normalize_reply(
+    result
+):
+
+    choices = result.get(
+        "choices"
+    )
+
+    if not choices:
+        return ""
+
+    message_data = choices[0].get(
+        "message",
+        {}
+    )
+
+    reply = message_data.get(
+        "content",
+        ""
+    )
+
+    # Some APIs may return content blocks.
+    if isinstance(
+        reply,
+        list
+    ):
+
+        parts = []
+
+        for item in reply:
+
+            if isinstance(
+                item,
+                dict
+            ):
+
+                text = item.get(
+                    "text",
+                    ""
+                )
+
+                if text:
+                    parts.append(
+                        text
+                    )
+
+            elif isinstance(
+                item,
+                str
+            ):
+
+                parts.append(
+                    item
+                )
+
+        reply = "".join(
+            parts
+        )
+
+    return str(
+        reply
+    ).strip()
+
+
+# =========================================================
+# SAVE MESSAGE
+# =========================================================
+
+def save_message(
+    conversation_id,
+    role,
+    content
+):
+
+    conn = get_db()
+
+    conn.execute(
+        """
+        INSERT INTO messages
+        (
+            conversation_id,
+            role,
+            content
+        )
+        VALUES (?, ?, ?)
+        """,
+        (
+            conversation_id,
+            role,
+            content
+        )
+    )
+
+    conn.execute(
+        """
+        UPDATE conversations
+        SET updated_at = CURRENT_TIMESTAMP
+        WHERE id = ?
+        """,
+        (
+            conversation_id,
+        )
+    )
+
+    conn.commit()
+    conn.close()
+
+
+# =========================================================
+# CHAT REQUEST TO OPENROUTER
+# =========================================================
+
+def request_openrouter(
+    api_key,
+    model,
+    payload
+):
+
+    headers = build_headers(
+        api_key
+    )
+
+    last_response = None
+
+    for attempt in range(
+        MAX_RETRIES + 1
+    ):
+
+        try:
+
+            response = requests.post(
+
+                OPENROUTER_URL,
+
+                headers=headers,
+
+                json=payload,
+
+                timeout=(
+                    REQUEST_CONNECT_TIMEOUT,
+                    REQUEST_READ_TIMEOUT
+                )
+
+            )
+
+            last_response = response
+
+            # Success
+            if response.status_code == 200:
+
+                return response
+
+            # Retry temporary failures
+            if response.status_code in (
+                408,
+                429,
+                500,
+                502,
+                503,
+                504
+            ):
+
+                if attempt < MAX_RETRIES:
+
+                    wait = 1.5 * (
+                        attempt + 1
+                    )
+
+                    time.sleep(
+                        wait
+                    )
+
+                    continue
+
+            return response
+
+        except requests.Timeout:
+
+            if attempt < MAX_RETRIES:
+
+                time.sleep(
+                    1.5 * (
+                        attempt + 1
+                    )
+                )
+
+                continue
+
+            raise
+
+        except requests.RequestException:
+
+            if attempt < MAX_RETRIES:
+
+                time.sleep(
+                    1.5 * (
+                        attempt + 1
+                    )
+                )
+
+                continue
+
+            raise
+
+    return last_response
 
 
 # =========================================================
@@ -977,10 +1809,6 @@ def chat():
 
         if not api_key:
 
-            print(
-                "ERROR: OPENROUTER_API_KEY IS MISSING"
-            )
-
             return jsonify({
 
                 "error":
@@ -991,14 +1819,16 @@ def chat():
 
             }), 500
 
-
         # -------------------------------------------------
         # INPUT
         # -------------------------------------------------
 
-        data = request.get_json(
-            silent=True
-        ) or {}
+        data = (
+            request.get_json(
+                silent=True
+            )
+            or {}
+        )
 
         user_message = str(
             data.get(
@@ -1010,10 +1840,11 @@ def chat():
         if len(user_message) > MAX_MESSAGE_CHARS:
 
             return jsonify({
+
                 "error":
                     "Message is too long."
-            }), 400
 
+            }), 400
 
         file_name = str(
             data.get(
@@ -1022,7 +1853,6 @@ def chat():
             )
         ).strip()
 
-
         file_text = str(
             data.get(
                 "file_text",
@@ -1030,13 +1860,11 @@ def chat():
             )
         )
 
-
         if len(file_text) > MAX_FILE_CHARS:
 
             file_text = file_text[
                 :MAX_FILE_CHARS
             ]
-
 
         web_search = bool(
             data.get(
@@ -1045,26 +1873,40 @@ def chat():
             )
         )
 
+        mode = str(
+            data.get(
+                "mode",
+                "auto"
+            )
+        ).strip().lower()
 
-        conversation_id = data.get(
-            "conversation_id"
+        conversation_id = (
+            data.get(
+                "conversation_id"
+            )
         )
 
+        # -------------------------------------------------
+        # VALIDATION
+        # -------------------------------------------------
 
-        if not user_message and not file_text:
+        if (
+            not user_message
+            and not file_text
+        ):
 
             return jsonify({
+
                 "error":
                     "Message is empty."
+
             }), 400
 
-
         # -------------------------------------------------
-        # DATABASE / CONVERSATION
+        # CONVERSATION
         # -------------------------------------------------
 
         conn = get_db()
-
 
         if conversation_id:
 
@@ -1081,7 +1923,6 @@ def chat():
 
                 conversation_id = None
 
-
         if conversation_id:
 
             exists = conn.execute(
@@ -1090,13 +1931,14 @@ def chat():
                 FROM conversations
                 WHERE id = ?
                 """,
-                (conversation_id,)
+                (
+                    conversation_id,
+                )
             ).fetchone()
 
             if not exists:
 
                 conversation_id = None
-
 
         if not conversation_id:
 
@@ -1106,22 +1948,39 @@ def chat():
                 or "New Chat"
             )
 
+            title_source = (
+                title_source
+                .replace(
+                    "\n",
+                    " "
+                )
+                .strip()
+            )
+
             cursor = conn.execute(
                 """
                 INSERT INTO conversations
-                (title)
+                (
+                    title
+                )
                 VALUES (?)
                 """,
                 (
-                    title_source[:50],
+                    title_source[
+                        :MAX_CONVERSATION_TITLE
+                    ],
                 )
             )
 
-            conversation_id = cursor.lastrowid
+            conversation_id = (
+                cursor.lastrowid
+            )
 
+        conn.commit()
+        conn.close()
 
         # -------------------------------------------------
-        # SAVE USER MESSAGE
+        # DISPLAY MESSAGE
         # -------------------------------------------------
 
         display_message = user_message
@@ -1132,113 +1991,67 @@ def chat():
                 "\n\n"
                 "[Attached file: {}]"
                 .format(
-                    file_name or "file"
+                    file_name
+                    or "file"
                 )
             )
-
 
         if not display_message:
 
             display_message = (
                 "[Attached file: {}]"
                 .format(
-                    file_name or "file"
+                    file_name
+                    or "file"
                 )
             )
 
+        # -------------------------------------------------
+        # SAVE USER
+        # -------------------------------------------------
 
-        conn.execute(
-            """
-            INSERT INTO messages
-            (
-                conversation_id,
-                role,
-                content
-            )
-            VALUES (?, ?, ?)
-            """,
-            (
-                conversation_id,
-                "user",
-                display_message
-            )
+        save_message(
+            conversation_id,
+            "user",
+            display_message
         )
 
-
-        conn.commit()
-        conn.close()
-
-
         # -------------------------------------------------
-        # BUILD MESSAGES
+        # BUILD MODEL MESSAGES
         # -------------------------------------------------
 
         messages = build_model_messages(
             conversation_id,
-            file_text
+            file_text,
+            mode
         )
-
-
-        # -------------------------------------------------
-        # HEADERS
-        # -------------------------------------------------
-
-        headers = {
-
-            "Authorization":
-                f"Bearer {api_key}",
-
-            "Content-Type":
-                "application/json",
-
-            "HTTP-Referer":
-                "https://whale-ai.local",
-
-            "X-Title":
-                "Whale AI"
-
-        }
-
 
         # -------------------------------------------------
         # PAYLOAD
         # -------------------------------------------------
 
-        payload = {
+        payload = build_payload(
 
-            "model":
-                DEFAULT_MODEL,
+            DEFAULT_MODEL,
 
-            "messages":
-                messages,
+            messages,
 
-            "temperature":
-                0.7,
+            web_search=web_search,
 
-            "stream":
-                False
+            stream=False,
 
-        }
+            mode=mode
 
+        )
 
         # -------------------------------------------------
-        # WEB SEARCH
+        # REQUEST
         # -------------------------------------------------
-
-        if web_search:
-
-            payload["plugins"] = [
-                {
-                    "id":
-                        "web"
-                }
-            ]
-
 
         print()
-        print("==============================")
+        print("================================")
         print("WHALE AI REQUEST")
-        print("==============================")
+        print("================================")
         print(
             "Conversation:",
             conversation_id
@@ -1246,6 +2059,10 @@ def chat():
         print(
             "Model:",
             DEFAULT_MODEL
+        )
+        print(
+            "Mode:",
+            mode
         )
         print(
             "Web Search:",
@@ -1259,43 +2076,96 @@ def chat():
             "Message:",
             user_message[:200]
         )
-        print("==============================")
+        print("================================")
         print()
 
+        response = request_openrouter(
 
-        # -------------------------------------------------
-        # REQUEST
-        # -------------------------------------------------
+            api_key,
 
-        response = requests.post(
+            DEFAULT_MODEL,
 
-            OPENROUTER_URL,
-
-            headers=headers,
-
-            json=payload,
-
-            timeout=(
-                15,
-                120
-            )
+            payload
 
         )
 
+        # -------------------------------------------------
+        # FALLBACK
+        # -------------------------------------------------
+
+        if (
+            response.status_code != 200
+            and FALLBACK_MODEL
+            and FALLBACK_MODEL != DEFAULT_MODEL
+            and response.status_code in (
+                408,
+                429,
+                500,
+                502,
+                503,
+                504
+            )
+        ):
+
+            print(
+                "PRIMARY MODEL FAILED."
+            )
+
+            print(
+                "Trying fallback:",
+                FALLBACK_MODEL
+            )
+
+            fallback_payload = build_payload(
+
+                FALLBACK_MODEL,
+
+                messages,
+
+                web_search=web_search,
+
+                stream=False,
+
+                mode=mode
+
+            )
+
+            response = request_openrouter(
+
+                api_key,
+
+                FALLBACK_MODEL,
+
+                fallback_payload
+
+            )
+
+            active_model = (
+                FALLBACK_MODEL
+            )
+
+        else:
+
+            active_model = (
+                DEFAULT_MODEL
+            )
 
         # -------------------------------------------------
-        # STATUS
+        # HTTP ERROR
         # -------------------------------------------------
 
         if response.status_code != 200:
 
             return openrouter_error_response(
-                response
+
+                response,
+
+                active_model
+
             )
 
-
         # -------------------------------------------------
-        # PARSE JSON
+        # JSON
         # -------------------------------------------------
 
         try:
@@ -1310,10 +2180,9 @@ def chat():
                     "OpenRouter returned invalid JSON.",
 
                 "details":
-                    response.text[:2000]
+                    response.text[:3000]
 
             }), 502
-
 
         # -------------------------------------------------
         # API ERROR
@@ -1332,122 +2201,46 @@ def chat():
                     "OpenRouter returned an error.",
 
                 "details":
-                    result["error"]
+                    result["error"],
+
+                "model":
+                    active_model
 
             }), 502
 
-
         # -------------------------------------------------
-        # CHOICES
+        # REPLY
         # -------------------------------------------------
 
-        choices = result.get(
-            "choices"
+        reply = normalize_reply(
+            result
         )
-
-
-        if not choices:
-
-            return jsonify({
-
-                "error":
-                    "No response was returned by the model.",
-
-                "details":
-                    result
-
-            }), 502
-
-
-        message_data = choices[0].get(
-            "message",
-            {}
-        )
-
-
-        reply = message_data.get(
-            "content",
-            ""
-        )
-
-
-        # -------------------------------------------------
-        # NORMALIZE CONTENT
-        # -------------------------------------------------
-
-        if isinstance(
-            reply,
-            list
-        ):
-
-            parts = []
-
-            for item in reply:
-
-                if isinstance(
-                    item,
-                    dict
-                ):
-
-                    text = item.get(
-                        "text",
-                        ""
-                    )
-
-                    if text:
-                        parts.append(text)
-
-                elif isinstance(
-                    item,
-                    str
-                ):
-
-                    parts.append(item)
-
-            reply = "".join(parts)
-
-
-        reply = str(
-            reply
-        ).strip()
-
 
         if not reply:
 
             return jsonify({
 
                 "error":
-                    "The model returned an empty response."
+                    "The model returned an empty response.",
+
+                "details":
+                    result
 
             }), 502
-
 
         # -------------------------------------------------
         # SAVE ASSISTANT
         # -------------------------------------------------
 
-        conn = get_db()
+        save_message(
 
-        conn.execute(
-            """
-            INSERT INTO messages
-            (
-                conversation_id,
-                role,
-                content
-            )
-            VALUES (?, ?, ?)
-            """,
-            (
-                conversation_id,
-                "assistant",
-                reply
-            )
+            conversation_id,
+
+            "assistant",
+
+            reply
+
         )
-
-        conn.commit()
-        conn.close()
-
 
         # -------------------------------------------------
         # RESPONSE
@@ -1464,11 +2257,16 @@ def chat():
             "conversation_id":
                 conversation_id,
 
+            "model":
+                active_model,
+
             "web_search":
-                web_search
+                web_search,
+
+            "mode":
+                mode
 
         })
-
 
     # =====================================================
     # TIMEOUT
@@ -1483,10 +2281,10 @@ def chat():
         return jsonify({
 
             "error":
-                "The request timed out."
+                "The AI request timed out. "
+                "Please try again."
 
         }), 504
-
 
     # =====================================================
     # REQUEST ERROR
@@ -1508,7 +2306,6 @@ def chat():
                 str(error)
 
         }), 502
-
 
     # =====================================================
     # GENERAL ERROR
@@ -1533,6 +2330,215 @@ def chat():
 
 
 # =========================================================
+# REGENERATE
+# =========================================================
+
+@app.route(
+    "/conversations/<int:conversation_id>/regenerate",
+    methods=["POST"]
+)
+def regenerate(
+    conversation_id
+):
+
+    try:
+
+        api_key = get_api_key()
+
+        if not api_key:
+
+            return jsonify({
+                "error":
+                    "OPENROUTER_API_KEY is not configured."
+            }), 500
+
+        conn = get_db()
+
+        rows = conn.execute(
+            """
+            SELECT
+                id,
+                role,
+                content
+            FROM messages
+            WHERE conversation_id = ?
+            ORDER BY id ASC
+            """,
+            (
+                conversation_id,
+            )
+        ).fetchall()
+
+        if not rows:
+
+            conn.close()
+
+            return jsonify({
+                "error":
+                    "Conversation is empty."
+            }), 404
+
+        # Remove last assistant message if present.
+        last = rows[-1]
+
+        if last["role"] == "assistant":
+
+            conn.execute(
+                """
+                DELETE FROM messages
+                WHERE id = ?
+                """,
+                (
+                    last["id"],
+                )
+            )
+
+            conn.commit()
+
+            rows = conn.execute(
+                """
+                SELECT
+                    role,
+                    content
+                FROM messages
+                WHERE conversation_id = ?
+                ORDER BY id ASC
+                """,
+                (
+                    conversation_id,
+                )
+            ).fetchall()
+
+        conn.close()
+
+        messages = [
+
+            {
+                "role":
+                    "system",
+
+                "content":
+                    """
+You are Whale AI.
+Answer naturally in the same language as the user.
+Regenerate the assistant response with a better,
+more accurate and useful answer.
+"""
+                    + build_memory_context()
+            }
+
+        ]
+
+        for row in rows:
+
+            if row["role"] in (
+                "user",
+                "assistant",
+                "system"
+            ):
+
+                messages.append({
+
+                    "role":
+                        row["role"],
+
+                    "content":
+                        row["content"]
+
+                })
+
+        payload = build_payload(
+
+            DEFAULT_MODEL,
+
+            messages,
+
+            web_search=False,
+
+            stream=False
+
+        )
+
+        response = request_openrouter(
+
+            api_key,
+
+            DEFAULT_MODEL,
+
+            payload
+
+        )
+
+        if response.status_code != 200:
+
+            return openrouter_error_response(
+
+                response,
+
+                DEFAULT_MODEL
+
+            )
+
+        result = response.json()
+
+        reply = normalize_reply(
+            result
+        )
+
+        if not reply:
+
+            return jsonify({
+
+                "error":
+                    "The model returned an empty response."
+
+            }), 502
+
+        save_message(
+
+            conversation_id,
+
+            "assistant",
+
+            reply
+
+        )
+
+        return jsonify({
+
+            "type":
+                "done",
+
+            "content":
+                reply,
+
+            "conversation_id":
+                conversation_id,
+
+            "model":
+                DEFAULT_MODEL
+
+        })
+
+    except Exception as error:
+
+        print(
+            "REGENERATE ERROR:",
+            repr(error)
+        )
+
+        return jsonify({
+
+            "error":
+                "Regeneration failed.",
+
+            "details":
+                str(error)
+
+        }), 500
+
+
+# =========================================================
 # DELETE ONE CONVERSATION
 # =========================================================
 
@@ -1540,7 +2546,9 @@ def chat():
     "/conversations/<int:conversation_id>",
     methods=["DELETE"]
 )
-def delete_conversation(conversation_id):
+def delete_conversation(
+    conversation_id
+):
 
     try:
 
@@ -1551,7 +2559,9 @@ def delete_conversation(conversation_id):
             DELETE FROM messages
             WHERE conversation_id = ?
             """,
-            (conversation_id,)
+            (
+                conversation_id,
+            )
         )
 
         conn.execute(
@@ -1559,7 +2569,9 @@ def delete_conversation(conversation_id):
             DELETE FROM conversations
             WHERE id = ?
             """,
-            (conversation_id,)
+            (
+                conversation_id,
+            )
         )
 
         conn.commit()
@@ -1572,14 +2584,14 @@ def delete_conversation(conversation_id):
 
     except Exception as error:
 
-        print(
-            "DELETE CONVERSATION ERROR:",
-            repr(error)
-        )
-
         return jsonify({
+
             "error":
-                "Failed to delete conversation."
+                "Failed to delete conversation.",
+
+            "details":
+                str(error)
+
         }), 500
 
 
@@ -1615,15 +2627,73 @@ def delete_all():
 
     except Exception as error:
 
-        print(
-            "DELETE ALL ERROR:",
-            repr(error)
-        )
-
         return jsonify({
+
             "error":
-                "Failed to delete conversations."
+                "Failed to delete conversations.",
+
+            "details":
+                str(error)
+
         }), 500
+
+
+# =========================================================
+# ROOT API INFO
+# =========================================================
+
+@app.route(
+    "/api",
+    methods=["GET"]
+)
+def api_info():
+
+    return jsonify({
+
+        "name":
+            "Whale AI",
+
+        "version":
+            "2.0",
+
+        "model":
+            DEFAULT_MODEL,
+
+        "features": {
+
+            "chat":
+                True,
+
+            "memory":
+                True,
+
+            "conversations":
+                True,
+
+            "conversation_search":
+                True,
+
+            "file_upload":
+                True,
+
+            "pdf":
+                PdfReader is not None,
+
+            "docx":
+                Document is not None,
+
+            "web_search":
+                True,
+
+            "web_fetch":
+                True,
+
+            "regenerate":
+                True
+
+        }
+
+    })
 
 
 # =========================================================
@@ -1644,9 +2714,9 @@ if __name__ == "__main__":
     )
 
     print()
-    print("================================")
-    print("WHALE AI")
-    print("================================")
+    print("========================================")
+    print("             WHALE AI 2.0")
+    print("========================================")
     print(
         "PORT:",
         port
@@ -1656,25 +2726,45 @@ if __name__ == "__main__":
         DEFAULT_MODEL
     )
     print(
+        "FALLBACK:",
+        FALLBACK_MODEL
+        or "DISABLED"
+    )
+    print(
         "API KEY:",
         "FOUND"
         if api_key_exists
         else "MISSING"
     )
     print(
-        "MEMORY:",
-        "ENABLED"
+        "MEMORY: ENABLED"
     )
     print(
-        "WEB SEARCH:",
-        "ENABLED"
+        "CONVERSATIONS: ENABLED"
     )
-    print("================================")
+    print(
+        "WEB SEARCH: ENABLED"
+    )
+    print(
+        "WEB FETCH: ENABLED"
+    )
+    print(
+        "FILE UPLOAD: ENABLED"
+    )
+    print(
+        "REGENERATE: ENABLED"
+    )
+    print("========================================")
     print()
 
     app.run(
+
         host="0.0.0.0",
+
         port=port,
+
         debug=False,
+
         threaded=True
+
     )
