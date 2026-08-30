@@ -1,53 +1,98 @@
-
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
 
 <head>
+
 <meta charset="UTF-8">
 
-<meta name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+>
 
-<meta name="theme-color" content="#080b12">
+<meta
+    name="theme-color"
+    content="#080b12"
+    id="themeColor"
+>
 
 <title>Whale AI</title>
 
 <style>
 
 /* =====================================================
-   THEME VARIABLES
+   ROOT / THEME
 ===================================================== */
 
 :root {
-    --bg: #080b12;
-    --surface: #0d1119;
-    --surface-2: #111824;
-    --surface-3: #151d2a;
 
-    --border: #202837;
-    --border-strong: #29364b;
+    --bg:
+        #080b12;
 
-    --text: #f4f7fb;
-    --text-soft: #bbc4d2;
-    --muted: #7f8a9d;
+    --bg-secondary:
+        #0d1119;
 
-    --accent: #5b8cff;
-    --accent-hover: #4079f3;
+    --bg-tertiary:
+        #111824;
 
-    --user-bg: #1b2941;
-    --user-border: #2b4167;
+    --surface:
+        #121a28;
 
-    --assistant-bg: #111923;
-    --assistant-border: #222d3d;
+    --surface-hover:
+        #182238;
 
-    --code-bg: #080d15;
+    --border:
+        #202837;
 
-    --danger: #c94b5d;
+    --border-strong:
+        #29364b;
+
+    --text:
+        #f4f7fb;
+
+    --text-secondary:
+        #bbc4d2;
+
+    --text-muted:
+        #7f8a9d;
+
+    --accent:
+        #5b8cff;
+
+    --accent-hover:
+        #4079f3;
+
+    --user-message:
+        #1b2941;
+
+    --assistant-message:
+        #111923;
+
+    --input-bg:
+        #111824;
+
+    --code-bg:
+        #080d15;
+
+    --scrollbar:
+        #273345;
 
     --shadow:
-        0 15px 45px rgba(0,0,0,.28);
+        rgba(0,0,0,.30);
 
-    --transition: .22s ease;
+    --glow:
+        rgba(91,140,255,.18);
+
+    --gradient-main:
+        radial-gradient(
+            circle at 50% -20%,
+            rgba(64,121,243,.10),
+            transparent 45%
+        );
+
+    --transition:
+        .22s ease;
+
 }
 
 
@@ -57,33 +102,70 @@
 
 body.light {
 
-    --bg: #f5f7fb;
-    --surface: #ffffff;
-    --surface-2: #ffffff;
-    --surface-3: #eef2f7;
+    --bg:
+        #f4f7fb;
 
-    --border: #dce2eb;
-    --border-strong: #cbd4e2;
+    --bg-secondary:
+        #ffffff;
 
-    --text: #172033;
-    --text-soft: #4c586c;
-    --muted: #778298;
+    --bg-tertiary:
+        #eef2f7;
 
-    --accent: #4678ee;
-    --accent-hover: #3567da;
+    --surface:
+        #ffffff;
 
-    --user-bg: #e8f0ff;
-    --user-border: #c8d9ff;
+    --surface-hover:
+        #edf2f9;
 
-    --assistant-bg: #ffffff;
-    --assistant-border: #dce2eb;
+    --border:
+        #dce3ed;
 
-    --code-bg: #f0f3f7;
+    --border-strong:
+        #cbd5e3;
 
-    --danger: #c94255;
+    --text:
+        #172033;
+
+    --text-secondary:
+        #475569;
+
+    --text-muted:
+        #718096;
+
+    --accent:
+        #3975ee;
+
+    --accent-hover:
+        #2864db;
+
+    --user-message:
+        #e7efff;
+
+    --assistant-message:
+        #ffffff;
+
+    --input-bg:
+        #ffffff;
+
+    --code-bg:
+        #f1f4f8;
+
+    --scrollbar:
+        #c4cedc;
 
     --shadow:
-        0 15px 40px rgba(35,50,75,.12);
+        rgba(32,52,80,.13);
+
+    --glow:
+        rgba(57,117,238,.14);
+
+    --gradient-main:
+        radial-gradient(
+            circle at 50% -20%,
+            rgba(57,117,238,.12),
+            transparent 45%
+        );
+
 }
 
 
@@ -92,22 +174,41 @@ body.light {
 ===================================================== */
 
 * {
-    box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent;
+
+    box-sizing:
+        border-box;
+
+    -webkit-tap-highlight-color:
+        transparent;
+
 }
+
 
 html,
 body {
-    width: 100%;
-    height: 100%;
-    margin: 0;
-    padding: 0;
+
+    width:
+        100%;
+
+    height:
+        100%;
+
+    margin:
+        0;
+
+    padding:
+        0;
+
 }
+
 
 body {
 
-    background: var(--bg);
-    color: var(--text);
+    background:
+        var(--bg);
+
+    color:
+        var(--text);
 
     font-family:
         Inter,
@@ -115,24 +216,37 @@ body {
         Arial,
         sans-serif;
 
-    overflow: hidden;
+    overflow:
+        hidden;
 
-    overscroll-behavior: none;
+    overscroll-behavior:
+        none;
 
     transition:
         background var(--transition),
         color var(--transition);
+
 }
+
 
 button,
 textarea,
 input {
-    font: inherit;
+
+    font:
+        inherit;
+
 }
 
+
 button {
-    -webkit-user-select: none;
-    user-select: none;
+
+    -webkit-user-select:
+        none;
+
+    user-select:
+        none;
+
 }
 
 
@@ -141,12 +255,22 @@ button {
 ===================================================== */
 
 .app {
-    width: 100%;
-    height: 100dvh;
 
-    display: flex;
+    width:
+        100%;
 
-    overflow: hidden;
+    height:
+        100dvh;
+
+    display:
+        flex;
+
+    overflow:
+        hidden;
+
+    background:
+        var(--gradient-main);
+
 }
 
 
@@ -156,24 +280,34 @@ button {
 
 .sidebar {
 
-    width: 280px;
-    min-width: 280px;
+    width:
+        280px;
 
-    background: var(--surface);
+    min-width:
+        280px;
+
+    background:
+        var(--bg-secondary);
 
     border-right:
         1px solid var(--border);
 
-    display: flex;
-    flex-direction: column;
+    display:
+        flex;
 
-    padding: 16px;
+    flex-direction:
+        column;
 
-    z-index: 100;
+    padding:
+        16px;
+
+    z-index:
+        100;
 
     transition:
         background var(--transition),
         border-color var(--transition);
+
 }
 
 
@@ -183,50 +317,72 @@ button {
 
 .brand {
 
-    display: flex;
-    align-items: center;
+    display:
+        flex;
 
-    gap: 11px;
+    align-items:
+        center;
+
+    gap:
+        11px;
 
     padding:
         6px 6px 18px;
+
 }
+
 
 .brand-logo {
 
-    width: 43px;
-    height: 43px;
+    width:
+        43px;
 
-    border-radius: 13px;
+    height:
+        43px;
 
-    object-fit: cover;
+    border-radius:
+        13px;
 
-    background: #111a2b;
+    object-fit:
+        cover;
+
+    background:
+        var(--surface);
 
     border:
-        1px solid #263b60;
+        1px solid var(--border-strong);
 
     box-shadow:
-        0 8px 25px
-        rgba(52,105,255,.18);
+        0 8px 25px var(--glow);
+
 }
+
 
 .brand-name {
 
-    font-size: 18px;
+    font-size:
+        18px;
 
-    font-weight: 700;
+    font-weight:
+        700;
 
-    letter-spacing: -.2px;
+    letter-spacing:
+        -.2px;
+
 }
+
 
 .brand-subtitle {
 
-    margin-top: 3px;
+    margin-top:
+        3px;
 
-    font-size: 11px;
+    font-size:
+        11px;
 
-    color: var(--muted);
+    color:
+        var(--text-muted);
+
 }
 
 
@@ -236,34 +392,53 @@ button {
 
 .new-chat {
 
-    width: 100%;
-    height: 44px;
+    width:
+        100%;
+
+    height:
+        44px;
 
     border:
         1px solid var(--border-strong);
 
-    border-radius: 12px;
+    border-radius:
+        12px;
 
-    background: var(--surface-2);
+    background:
+        var(--surface);
 
-    color: var(--text);
+    color:
+        var(--text);
 
-    cursor: pointer;
+    cursor:
+        pointer;
 
-    font-size: 13px;
+    font-size:
+        13px;
 
-    font-weight: 600;
+    font-weight:
+        600;
 
-    transition: var(--transition);
+    transition:
+        var(--transition);
 
-    margin-bottom: 18px;
+    margin-bottom:
+        18px;
+
 }
+
 
 .new-chat:hover {
 
-    background: var(--surface-3);
+    background:
+        var(--surface-hover);
 
-    border-color: var(--accent);
+    border-color:
+        var(--accent);
+
+    transform:
+        translateY(-1px);
+
 }
 
 
@@ -273,18 +448,24 @@ button {
 
 .sidebar-title {
 
-    color: var(--muted);
+    color:
+        var(--text-muted);
 
-    font-size: 11px;
+    font-size:
+        11px;
 
-    font-weight: 600;
+    font-weight:
+        600;
 
     padding:
         0 7px 8px;
 
-    text-transform: uppercase;
+    text-transform:
+        uppercase;
 
-    letter-spacing: .5px;
+    letter-spacing:
+        .5px;
+
 }
 
 
@@ -294,93 +475,144 @@ button {
 
 .conversations {
 
-    flex: 1;
+    flex:
+        1;
 
-    overflow-y: auto;
+    overflow-y:
+        auto;
 
-    min-height: 0;
+    min-height:
+        0;
+
 }
+
 
 .conversation {
 
-    width: 100%;
+    width:
+        100%;
 
-    display: flex;
-    align-items: center;
+    display:
+        flex;
 
-    gap: 8px;
+    align-items:
+        center;
+
+    gap:
+        8px;
 
     padding:
         10px 9px;
 
-    margin-bottom: 3px;
+    margin-bottom:
+        3px;
 
-    border-radius: 10px;
+    border-radius:
+        10px;
 
-    color: var(--text-soft);
+    color:
+        var(--text-secondary);
 
-    cursor: pointer;
+    cursor:
+        pointer;
 
-    transition: var(--transition);
+    transition:
+        var(--transition);
+
 }
+
 
 .conversation:hover {
 
-    background: var(--surface-3);
+    background:
+        var(--surface-hover);
+
 }
+
 
 .conversation.active {
 
-    background: var(--user-bg);
+    background:
+        var(--user-message);
 
-    color: var(--text);
+    color:
+        var(--text);
+
 }
+
 
 .conversation-text {
 
-    flex: 1;
-    min-width: 0;
+    flex:
+        1;
 
-    overflow: hidden;
+    min-width:
+        0;
 
-    white-space: nowrap;
+    overflow:
+        hidden;
 
-    text-overflow: ellipsis;
+    white-space:
+        nowrap;
 
-    font-size: 13px;
+    text-overflow:
+        ellipsis;
+
+    font-size:
+        13px;
+
 }
+
 
 .delete-conversation {
 
-    width: 25px;
-    height: 25px;
+    width:
+        25px;
 
-    border: 0;
+    height:
+        25px;
 
-    border-radius: 7px;
+    border:
+        0;
 
-    background: transparent;
+    border-radius:
+        7px;
 
-    color: var(--muted);
+    background:
+        transparent;
 
-    cursor: pointer;
+    color:
+        var(--text-muted);
 
-    opacity: 0;
+    cursor:
+        pointer;
 
-    transition: .15s;
+    opacity:
+        0;
+
+    transition:
+        var(--transition);
+
 }
+
 
 .conversation:hover
 .delete-conversation {
 
-    opacity: 1;
+    opacity:
+        1;
+
 }
+
 
 .delete-conversation:hover {
 
-    color: #ff7180;
+    color:
+        #ff7180;
 
-    background: rgba(255,70,90,.1);
+    background:
+        rgba(255,80,100,.10);
+
 }
 
 
@@ -393,39 +625,58 @@ button {
     border-top:
         1px solid var(--border);
 
-    margin-top: 10px;
+    margin-top:
+        10px;
 
-    padding-top: 10px;
+    padding-top:
+        10px;
+
 }
+
 
 .sidebar-button {
 
-    width: 100%;
+    width:
+        100%;
 
-    border: 0;
+    border:
+        0;
 
-    background: transparent;
+    background:
+        transparent;
 
-    color: var(--text-soft);
+    color:
+        var(--text-secondary);
 
-    text-align: left;
+    text-align:
+        left;
 
-    padding: 10px;
+    padding:
+        10px;
 
-    border-radius: 9px;
+    border-radius:
+        9px;
 
-    cursor: pointer;
+    cursor:
+        pointer;
 
-    font-size: 12px;
+    font-size:
+        12px;
 
-    transition: .15s;
+    transition:
+        var(--transition);
+
 }
+
 
 .sidebar-button:hover {
 
-    background: var(--surface-3);
+    background:
+        var(--surface-hover);
 
-    color: var(--text);
+    color:
+        var(--text);
+
 }
 
 
@@ -435,15 +686,24 @@ button {
 
 .main {
 
-    flex: 1;
+    flex:
+        1;
 
-    min-width: 0;
-    min-height: 0;
+    min-width:
+        0;
 
-    display: flex;
-    flex-direction: column;
+    min-height:
+        0;
 
-    position: relative;
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    position:
+        relative;
+
 }
 
 
@@ -453,14 +713,20 @@ button {
 
 .topbar {
 
-    height: 62px;
-    min-height: 62px;
+    height:
+        62px;
 
-    display: flex;
+    min-height:
+        62px;
 
-    align-items: center;
+    display:
+        flex;
 
-    justify-content: space-between;
+    align-items:
+        center;
+
+    justify-content:
+        space-between;
 
     padding:
         0 22px;
@@ -476,36 +742,92 @@ button {
         1px solid var(--border);
 
     backdrop-filter:
-        blur(16px);
+        blur(18px);
 
-    z-index: 20;
+    z-index:
+        20;
 
     transition:
-        background var(--transition),
-        border-color var(--transition);
+        var(--transition);
+
 }
+
 
 .topbar-left {
 
-    display: flex;
-    align-items: center;
+    display:
+        flex;
 
-    gap: 10px;
+    align-items:
+        center;
 
-    min-width: 0;
+    gap:
+        10px;
+
+    min-width:
+        0;
+
 }
+
 
 .topbar-title {
 
-    font-size: 14px;
+    font-size:
+        14px;
 
-    font-weight: 650;
+    font-weight:
+        650;
 
-    overflow: hidden;
+    overflow:
+        hidden;
 
-    white-space: nowrap;
+    white-space:
+        nowrap;
 
-    text-overflow: ellipsis;
+    text-overflow:
+        ellipsis;
+
+}
+
+
+.status {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    gap:
+        7px;
+
+    color:
+        var(--text-muted);
+
+    font-size:
+        11px;
+
+}
+
+
+.status-dot {
+
+    width:
+        7px;
+
+    height:
+        7px;
+
+    border-radius:
+        50%;
+
+    background:
+        #37d98b;
+
+    box-shadow:
+        0 0 12px
+        rgba(55,217,139,.65);
+
 }
 
 
@@ -515,75 +837,67 @@ button {
 
 .theme-button {
 
-    width: 38px;
-    height: 38px;
+    width:
+        38px;
 
-    display: flex;
+    height:
+        38px;
 
-    align-items: center;
-    justify-content: center;
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
 
     border:
         1px solid var(--border);
 
-    border-radius: 10px;
+    border-radius:
+        10px;
 
-    background: var(--surface-2);
+    background:
+        var(--surface);
 
-    color: var(--text-soft);
+    color:
+        var(--text-secondary);
 
-    cursor: pointer;
+    cursor:
+        pointer;
 
-    transition: var(--transition);
+    transition:
+        var(--transition);
+
 }
+
 
 .theme-button:hover {
 
-    background: var(--surface-3);
+    color:
+        var(--text);
 
-    color: var(--text);
+    border-color:
+        var(--accent);
 
-    border-color: var(--accent);
+    background:
+        var(--surface-hover);
 
-    transform: translateY(-1px);
+    transform:
+        rotate(8deg);
+
 }
+
 
 .theme-icon {
 
-    width: 18px;
-    height: 18px;
-}
+    width:
+        18px;
 
+    height:
+        18px;
 
-/* =====================================================
-   STATUS
-===================================================== */
-
-.status {
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 7px;
-
-    color: var(--muted);
-
-    font-size: 11px;
-}
-
-.status-dot {
-
-    width: 7px;
-    height: 7px;
-
-    border-radius: 50%;
-
-    background: #37d98b;
-
-    box-shadow:
-        0 0 12px
-        rgba(55,217,139,.65);
 }
 
 
@@ -593,25 +907,35 @@ button {
 
 .chat {
 
-    flex: 1;
+    flex:
+        1;
 
-    min-height: 0;
+    min-height:
+        0;
 
-    overflow-y: auto;
+    overflow-y:
+        auto;
 
-    overscroll-behavior-y: contain;
+    overscroll-behavior-y:
+        contain;
 
     padding:
         28px 18px 180px;
+
 }
+
 
 .chat-inner {
 
-    width: 100%;
+    width:
+        100%;
 
-    max-width: 920px;
+    max-width:
+        920px;
 
-    margin: 0 auto;
+    margin:
+        0 auto;
+
 }
 
 
@@ -624,127 +948,188 @@ button {
     min-height:
         calc(100dvh - 250px);
 
-    display: flex;
+    display:
+        flex;
 
-    align-items: center;
-    justify-content: center;
+    align-items:
+        center;
 
-    flex-direction: column;
+    justify-content:
+        center;
 
-    text-align: center;
+    flex-direction:
+        column;
 
-    padding: 35px 20px;
+    text-align:
+        center;
+
+    padding:
+        35px 20px;
+
 }
+
 
 .welcome-logo {
 
-    width: 72px;
-    height: 72px;
+    width:
+        72px;
 
-    border-radius: 22px;
+    height:
+        72px;
 
-    object-fit: cover;
+    border-radius:
+        22px;
 
-    margin-bottom: 19px;
+    object-fit:
+        cover;
+
+    margin-bottom:
+        19px;
 
     box-shadow:
         0 14px 45px
-        rgba(52,105,255,.23);
+        var(--glow);
+
 }
+
 
 .welcome h1 {
 
-    margin: 0;
+    margin:
+        0;
 
-    font-size: 29px;
+    font-size:
+        29px;
 
-    letter-spacing: -.7px;
+    letter-spacing:
+        -.7px;
+
 }
+
 
 .welcome p {
 
     margin:
         10px 0 0;
 
-    color: var(--muted);
+    color:
+        var(--text-muted);
 
-    font-size: 13px;
+    font-size:
+        13px;
+
 }
 
 
 /* =====================================================
-   MESSAGE
+   MESSAGE ROW
 ===================================================== */
 
 .message-row {
 
-    display: flex;
+    display:
+        flex;
 
-    width: 100%;
+    width:
+        100%;
 
-    margin-bottom: 20px;
+    margin-bottom:
+        20px;
+
 }
+
 
 .message-row.user {
-    justify-content: flex-end;
+
+    justify-content:
+        flex-end;
+
 }
 
+
 .message-row.assistant {
-    justify-content: flex-start;
+
+    justify-content:
+        flex-start;
+
 }
+
 
 .message {
 
     max-width:
-        min(82%,760px);
+        min(82%, 760px);
 
-    border-radius: 16px;
+    border-radius:
+        16px;
 
     padding:
         12px 15px;
 
-    line-height: 1.8;
+    line-height:
+        1.8;
 
-    font-size: 14px;
+    font-size:
+        14px;
 
-    overflow-wrap: anywhere;
+    overflow-wrap:
+        anywhere;
 
-    word-break: break-word;
+    word-break:
+        break-word;
+
+    box-shadow:
+        0 8px 30px
+        rgba(0,0,0,.04);
 
     transition:
-        background var(--transition),
-        border-color var(--transition);
+        var(--transition);
+
 }
+
 
 .user-message {
 
-    background: var(--user-bg);
+    background:
+        var(--user-message);
 
     border:
-        1px solid var(--user-border);
+        1px solid var(--border-strong);
 
-    border-bottom-right-radius: 5px;
+    border-bottom-right-radius:
+        5px;
+
 }
+
 
 .assistant-message {
 
-    background: var(--assistant-bg);
+    background:
+        var(--assistant-message);
 
     border:
-        1px solid var(--assistant-border);
+        1px solid var(--border);
 
-    border-bottom-left-radius: 5px;
+    border-bottom-left-radius:
+        5px;
+
 }
+
 
 .message-role {
 
-    color: var(--muted);
+    color:
+        var(--text-muted);
 
-    font-size: 10px;
+    font-size:
+        10px;
 
-    margin-bottom: 5px;
+    margin-bottom:
+        5px;
 
-    font-weight: 600;
+    font-weight:
+        600;
+
 }
 
 
@@ -759,24 +1144,37 @@ button {
     margin:
         13px 0 7px;
 
-    line-height: 1.4;
+    line-height:
+        1.4;
+
 }
+
 
 .message h1 {
-    font-size: 20px;
+    font-size:
+        20px;
 }
+
 
 .message h2 {
-    font-size: 17px;
+    font-size:
+        17px;
 }
+
 
 .message h3 {
-    font-size: 15px;
+    font-size:
+        15px;
 }
 
+
 .message p {
-    margin: 5px 0;
+
+    margin:
+        5px 0;
+
 }
+
 
 .message ul,
 .message ol {
@@ -784,32 +1182,49 @@ button {
     margin:
         8px 0;
 
-    padding-left: 23px;
+    padding-left:
+        23px;
+
 }
 
+
 .message li {
-    margin-bottom: 4px;
+
+    margin-bottom:
+        4px;
+
 }
+
 
 .message a {
 
-    color: var(--accent);
+    color:
+        var(--accent);
 
-    text-decoration: none;
+    text-decoration:
+        none;
+
 }
+
 
 .message a:hover {
-    text-decoration: underline;
+
+    text-decoration:
+        underline;
+
 }
+
 
 .message code {
 
-    background: var(--code-bg);
+    background:
+        var(--code-bg);
 
     border:
-        1px solid var(--border-strong);
+        1px solid var(--border);
 
-    border-radius: 5px;
+    border-radius:
+        5px;
 
     padding:
         2px 5px;
@@ -818,41 +1233,44 @@ button {
         Consolas,
         monospace;
 
-    direction: ltr;
+    direction:
+        ltr;
 
-    unicode-bidi: plaintext;
+    unicode-bidi:
+        plaintext;
+
 }
+
 
 .message pre {
 
     margin:
         10px 0;
 
-    padding: 13px;
+    padding:
+        13px;
 
-    background: var(--code-bg);
+    background:
+        var(--code-bg);
 
     border:
-        1px solid var(--border-strong);
+        1px solid var(--border);
 
-    border-radius: 10px;
+    border-radius:
+        10px;
 
-    overflow-x: auto;
+    overflow-x:
+        auto;
 
-    direction: ltr;
+    direction:
+        ltr;
 
-    text-align: left;
+    text-align:
+        left;
 
-    white-space: pre-wrap;
-}
+    white-space:
+        pre-wrap;
 
-.message pre code {
-
-    background: transparent;
-
-    border: 0;
-
-    padding: 0;
 }
 
 
@@ -862,34 +1280,47 @@ button {
 
 .file-card {
 
-    display: flex;
+    display:
+        flex;
 
-    align-items: center;
+    align-items:
+        center;
 
-    gap: 9px;
+    gap:
+        9px;
 
     padding:
         8px 10px;
 
-    margin-bottom: 8px;
+    margin-bottom:
+        8px;
 
-    border-radius: 9px;
+    border-radius:
+        9px;
 
-    background: var(--surface-3);
+    background:
+        var(--surface);
 
     border:
         1px solid var(--border-strong);
 
-    font-size: 12px;
+    font-size:
+        12px;
+
 }
+
 
 .file-name {
 
-    overflow: hidden;
+    overflow:
+        hidden;
 
-    white-space: nowrap;
+    white-space:
+        nowrap;
 
-    text-overflow: ellipsis;
+    text-overflow:
+        ellipsis;
+
 }
 
 
@@ -899,44 +1330,70 @@ button {
 
 .thinking {
 
-    display: flex;
+    display:
+        flex;
 
-    align-items: center;
+    align-items:
+        center;
 
-    gap: 9px;
+    gap:
+        9px;
 
-    color: var(--muted);
+    color:
+        var(--text-muted);
 
-    font-size: 12px;
+    font-size:
+        12px;
+
 }
+
 
 .thinking-dots {
 
-    display: flex;
+    display:
+        flex;
 
-    gap: 4px;
+    gap:
+        4px;
+
 }
+
 
 .thinking-dots span {
 
-    width: 6px;
-    height: 6px;
+    width:
+        6px;
 
-    border-radius: 50%;
+    height:
+        6px;
 
-    background: var(--muted);
+    border-radius:
+        50%;
+
+    background:
+        var(--accent);
 
     animation:
         thinking 1.1s infinite;
+
 }
+
 
 .thinking-dots span:nth-child(2) {
-    animation-delay: .14s;
+
+    animation-delay:
+        .14s;
+
 }
 
+
 .thinking-dots span:nth-child(3) {
-    animation-delay: .28s;
+
+    animation-delay:
+        .28s;
+
 }
+
 
 @keyframes thinking {
 
@@ -947,7 +1404,9 @@ button {
         transform:
             translateY(0);
 
-        opacity: .35;
+        opacity:
+            .35;
+
     }
 
     32% {
@@ -955,22 +1414,31 @@ button {
         transform:
             translateY(-4px);
 
-        opacity: 1;
+        opacity:
+            1;
+
     }
+
 }
 
 
 /* =====================================================
-   INPUT
+   INPUT AREA
 ===================================================== */
 
 .input-area {
 
-    position: absolute;
+    position:
+        absolute;
 
-    left: 0;
-    right: 0;
-    bottom: 0;
+    left:
+        0;
+
+    right:
+        0;
+
+    bottom:
+        0;
 
     padding:
         16px 18px 18px;
@@ -982,36 +1450,54 @@ button {
             var(--bg) 28%
         );
 
-    z-index: 30;
+    z-index:
+        30;
+
 }
+
+
+/* =====================================================
+   INPUT CONTAINER
+===================================================== */
 
 .input-container {
 
-    max-width: 920px;
+    max-width:
+        920px;
 
-    margin: 0 auto;
+    margin:
+        0 auto;
+
 }
+
+
+/* =====================================================
+   COMPOSER
+===================================================== */
 
 .composer {
 
     background:
-        var(--surface-2);
+        var(--input-bg);
 
     border:
         1px solid var(--border-strong);
 
-    border-radius: 17px;
+    border-radius:
+        17px;
 
-    overflow: hidden;
+    overflow:
+        hidden;
 
     box-shadow:
+        0 15px 45px
         var(--shadow);
 
     transition:
-        border-color .18s,
-        box-shadow .18s,
-        background var(--transition);
+        var(--transition);
+
 }
+
 
 .composer:focus-within {
 
@@ -1020,7 +1506,8 @@ button {
 
     box-shadow:
         0 15px 45px
-        rgba(35,65,120,.16);
+        var(--glow);
+
 }
 
 
@@ -1030,25 +1517,36 @@ button {
 
 .file-preview {
 
-    display: none;
+    display:
+        none;
 
     padding:
         9px 12px 0;
+
 }
 
+
 .file-preview.show {
-    display: block;
+
+    display:
+        block;
+
 }
+
 
 .file-preview-inner {
 
-    display: inline-flex;
+    display:
+        inline-flex;
 
-    align-items: center;
+    align-items:
+        center;
 
-    gap: 8px;
+    gap:
+        8px;
 
-    max-width: 100%;
+    max-width:
+        100%;
 
     padding:
         7px 9px;
@@ -1057,35 +1555,51 @@ button {
         1px solid var(--border-strong);
 
     background:
-        var(--surface-3);
+        var(--surface);
 
-    border-radius: 9px;
+    border-radius:
+        9px;
 
-    font-size: 12px;
+    font-size:
+        12px;
+
 }
+
 
 .remove-file {
 
-    width: 23px;
-    height: 23px;
+    width:
+        23px;
 
-    border: 0;
+    height:
+        23px;
 
-    border-radius: 6px;
+    border:
+        0;
 
-    background: transparent;
+    border-radius:
+        6px;
 
-    color: var(--muted);
+    background:
+        transparent;
 
-    cursor: pointer;
+    color:
+        var(--text-muted);
+
+    cursor:
+        pointer;
+
 }
+
 
 .remove-file:hover {
 
     background:
-        rgba(255,70,90,.1);
+        rgba(255,80,100,.10);
 
-    color: #ff7381;
+    color:
+        #ff7381;
+
 }
 
 
@@ -1095,32 +1609,50 @@ button {
 
 #messageInput {
 
-    width: 100%;
+    width:
+        100%;
 
-    min-height: 52px;
-    max-height: 170px;
+    min-height:
+        52px;
 
-    resize: none;
+    max-height:
+        170px;
 
-    border: 0;
-    outline: none;
+    resize:
+        none;
 
-    background: transparent;
+    border:
+        0;
 
-    color: var(--text);
+    outline:
+        none;
+
+    background:
+        transparent;
+
+    color:
+        var(--text);
 
     padding:
         15px 16px 5px;
 
-    font-size: 14px;
+    font-size:
+        14px;
 
-    line-height: 1.65;
+    line-height:
+        1.65;
 
-    overflow-y: auto;
+    overflow-y:
+        auto;
+
 }
 
+
 #messageInput::placeholder {
-    color: var(--muted);
+
+    color:
+        var(--text-muted);
+
 }
 
 
@@ -1130,65 +1662,96 @@ button {
 
 .composer-bottom {
 
-    display: flex;
+    display:
+        flex;
 
-    align-items: center;
+    align-items:
+        center;
 
-    justify-content: space-between;
+    justify-content:
+        space-between;
 
     padding:
         7px 9px 9px;
+
 }
+
 
 .composer-tools {
 
-    display: flex;
+    display:
+        flex;
 
-    align-items: center;
+    align-items:
+        center;
 
-    gap: 5px;
+    gap:
+        5px;
+
 }
+
 
 .tool-button {
 
-    width: 38px;
-    height: 38px;
+    width:
+        38px;
 
-    display: flex;
+    height:
+        38px;
 
-    align-items: center;
-    justify-content: center;
+    display:
+        flex;
 
-    border: 0;
+    align-items:
+        center;
 
-    border-radius: 10px;
+    justify-content:
+        center;
 
-    background: transparent;
+    border:
+        0;
 
-    color: var(--text-soft);
+    border-radius:
+        10px;
 
-    cursor: pointer;
+    background:
+        transparent;
 
-    transition: .15s;
+    color:
+        var(--text-muted);
+
+    cursor:
+        pointer;
+
+    transition:
+        var(--transition);
+
 }
+
 
 .tool-button:hover,
 .tool-button.active {
 
     background:
-        var(--surface-3);
+        var(--surface-hover);
 
-    color: var(--text);
+    color:
+        var(--text);
+
 }
 
 
 /* =====================================================
-   SEARCH
+   WEB SEARCH
 ===================================================== */
 
 .search-button {
-    position: relative;
+
+    position:
+        relative;
+
 }
+
 
 .search-button.active {
 
@@ -1196,60 +1759,90 @@ button {
         var(--accent);
 
     background:
-        var(--user-bg);
+        var(--user-message);
+
 }
+
 
 .search-indicator {
 
-    position: absolute;
+    position:
+        absolute;
 
-    right: 5px;
-    top: 5px;
+    right:
+        5px;
 
-    width: 6px;
-    height: 6px;
+    top:
+        5px;
 
-    border-radius: 50%;
+    width:
+        6px;
+
+    height:
+        6px;
+
+    border-radius:
+        50%;
 
     background:
         var(--accent);
 
-    display: none;
+    display:
+        none;
+
 }
+
 
 .search-button.active
 .search-indicator {
-    display: block;
+
+    display:
+        block;
+
 }
 
 
 /* =====================================================
-   SEND
+   SEND BUTTON
 ===================================================== */
 
 .send-button {
 
-    width: 40px;
-    height: 40px;
+    width:
+        40px;
 
-    display: flex;
+    height:
+        40px;
 
-    align-items: center;
-    justify-content: center;
+    display:
+        flex;
 
-    border: 0;
+    align-items:
+        center;
 
-    border-radius: 12px;
+    justify-content:
+        center;
+
+    border:
+        0;
+
+    border-radius:
+        12px;
 
     background:
         var(--accent);
 
-    color: white;
+    color:
+        white;
 
-    cursor: pointer;
+    cursor:
+        pointer;
 
-    transition: .15s;
+    transition:
+        var(--transition);
+
 }
+
 
 .send-button:hover {
 
@@ -1258,23 +1851,34 @@ button {
 
     transform:
         translateY(-1px);
+
 }
+
 
 .send-button.stop {
+
     background:
-        var(--danger);
+        #c94b5d;
+
 }
 
+
 .send-button.stop:hover {
+
     background:
         #ad3e4f;
+
 }
+
 
 .send-button:disabled {
 
-    cursor: not-allowed;
+    cursor:
+        not-allowed;
 
-    opacity: .75;
+    opacity:
+        .75;
+
 }
 
 
@@ -1284,44 +1888,60 @@ button {
 
 .mobile-menu {
 
-    display: none;
+    display:
+        none;
 
-    width: 38px;
-    height: 38px;
+    width:
+        38px;
 
-    border: 0;
+    height:
+        38px;
 
-    border-radius: 10px;
+    border:
+        0;
+
+    border-radius:
+        10px;
 
     background:
-        var(--surface-3);
+        var(--surface);
 
     color:
         var(--text);
 
-    cursor: pointer;
+    cursor:
+        pointer;
 
-    align-items: center;
-    justify-content: center;
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
 }
 
 
 /* =====================================================
-   OVERLAY
+   SIDEBAR OVERLAY
 ===================================================== */
 
 .sidebar-overlay {
 
-    display: none;
+    display:
+        none;
 
-    position: fixed;
+    position:
+        fixed;
 
-    inset: 0;
+    inset:
+        0;
 
     background:
         rgba(0,0,0,.45);
 
-    z-index: 90;
+    z-index:
+        90;
+
 }
 
 
@@ -1330,7 +1950,10 @@ button {
 ===================================================== */
 
 .hidden {
-    display: none !important;
+
+    display:
+        none !important;
+
 }
 
 
@@ -1339,19 +1962,29 @@ button {
 ===================================================== */
 
 ::-webkit-scrollbar {
-    width: 7px;
+
+    width:
+        7px;
+
 }
 
+
 ::-webkit-scrollbar-track {
-    background: transparent;
+
+    background:
+        transparent;
+
 }
+
 
 ::-webkit-scrollbar-thumb {
 
     background:
-        var(--border-strong);
+        var(--scrollbar);
 
-    border-radius: 10px;
+    border-radius:
+        10px;
+
 }
 
 
@@ -1359,27 +1992,38 @@ button {
    MOBILE
 ===================================================== */
 
-@media (max-width:800px) {
+@media (max-width: 800px) {
 
     body {
 
-        overflow: hidden;
+        overflow:
+            hidden;
 
-        position: fixed;
+        position:
+            fixed;
 
-        inset: 0;
+        inset:
+            0;
+
     }
+
 
     .sidebar {
 
-        position: fixed;
+        position:
+            fixed;
 
-        top: 0;
-        bottom: 0;
+        top:
+            0;
 
-        left: -290px;
+        bottom:
+            0;
 
-        width: 280px;
+        left:
+            -290px;
+
+        width:
+            280px;
 
         transition:
             left .22s ease;
@@ -1387,100 +2031,179 @@ button {
         box-shadow:
             12px 0 45px
             rgba(0,0,0,.4);
+
     }
+
 
     .sidebar.open {
-        left: 0;
+
+        left:
+            0;
+
     }
+
 
     .sidebar-overlay.open {
-        display: block;
+
+        display:
+            block;
+
     }
 
+
     .mobile-menu {
-        display: flex;
+
+        display:
+            flex;
+
     }
+
 
     .topbar {
 
-        height: 57px;
-        min-height: 57px;
+        height:
+            57px;
+
+        min-height:
+            57px;
 
         padding:
             0 12px;
+
     }
 
+
     .topbar-title {
-        max-width: 200px;
+
+        max-width:
+            200px;
+
     }
+
 
     .chat {
 
         padding:
             18px 10px 160px;
+
     }
+
 
     .message {
 
-        max-width: 91%;
+        max-width:
+            91%;
 
-        font-size: 13px;
+        font-size:
+            13px;
 
-        line-height: 1.75;
+        line-height:
+            1.75;
 
-        border-radius: 14px;
+        border-radius:
+            14px;
+
     }
+
 
     .input-area {
 
         padding:
             8px 8px
             calc(8px + env(safe-area-inset-bottom));
+
     }
 
+
     .composer {
-        border-radius: 15px;
+
+        border-radius:
+            15px;
+
     }
+
 
     #messageInput {
 
-        min-height: 48px;
+        min-height:
+            48px;
 
-        font-size: 16px;
+        font-size:
+            16px;
+
     }
+
 
     .welcome {
 
         min-height:
             calc(100dvh - 240px);
+
     }
+
 
     .welcome-logo {
 
-        width: 62px;
-        height: 62px;
+        width:
+            62px;
+
+        height:
+            62px;
+
     }
+
 
     .welcome h1 {
-        font-size: 23px;
+
+        font-size:
+            23px;
+
     }
+
 
     .welcome p {
-        font-size: 12px;
+
+        font-size:
+            12px;
+
     }
+
 
     .status {
-        display: none;
+
+        display:
+            none;
+
     }
 
-    .theme-button {
+}
 
-        width: 36px;
-        height: 36px;
+
+/* =====================================================
+   REDUCE MOTION
+===================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+
+        animation-duration:
+            .01ms !important;
+
+        animation-iteration-count:
+            1 !important;
+
+        transition-duration:
+            .01ms !important;
+
     }
+
 }
 
 </style>
+
 </head>
 
 
@@ -1490,11 +2213,14 @@ button {
 <div class="app">
 
 
-<!-- =====================================================
+<!-- ===================================================
      SIDEBAR
-===================================================== -->
+=================================================== -->
 
-<aside class="sidebar" id="sidebar">
+<aside
+    class="sidebar"
+    id="sidebar"
+>
 
     <div class="brand">
 
@@ -1521,7 +2247,7 @@ button {
 
     <button
         class="new-chat"
-        onclick="newConversation()"
+        id="newChatButton"
     >
         + New Chat
     </button>
@@ -1542,14 +2268,15 @@ button {
 
         <button
             class="sidebar-button"
-            onclick="clearAllConversations()"
+            id="deleteAllButton"
         >
             Delete All Chats
         </button>
 
+
         <button
             class="sidebar-button"
-            onclick="showMemory()"
+            id="memoryButton"
         >
             Whale Memory
         </button>
@@ -1562,24 +2289,24 @@ button {
 <div
     class="sidebar-overlay"
     id="sidebarOverlay"
-    onclick="closeMobileSidebar()"
 ></div>
 
 
-<!-- =====================================================
+<!-- ===================================================
      MAIN
-===================================================== -->
+=================================================== -->
 
 <main class="main">
 
 
 <header class="topbar">
 
+
     <div class="topbar-left">
 
         <button
             class="mobile-menu"
-            onclick="toggleSidebar()"
+            id="mobileMenuButton"
             aria-label="Open menu"
         >
             ☰
@@ -1604,12 +2331,20 @@ button {
         "
     >
 
+        <div class="status">
+
+            <span class="status-dot"></span>
+
+            Online
+
+        </div>
+
+
         <!-- THEME BUTTON -->
 
         <button
             class="theme-button"
             id="themeButton"
-            onclick="toggleTheme()"
             title="Switch theme"
             aria-label="Switch theme"
         >
@@ -1623,27 +2358,58 @@ button {
                 stroke-width="1.8"
                 stroke-linecap="round"
                 stroke-linejoin="round"
-            ></svg>
+            >
+
+                <circle
+                    cx="12"
+                    cy="12"
+                    r="4"
+                ></circle>
+
+                <path
+                    d="M12 2v2"
+                ></path>
+
+                <path
+                    d="M12 20v2"
+                ></path>
+
+                <path
+                    d="m4.93 4.93 1.41 1.41"
+                ></path>
+
+                <path
+                    d="m17.66 17.66 1.41 1.41"
+                ></path>
+
+                <path
+                    d="M2 12h2"
+                ></path>
+
+                <path
+                    d="M20 12h2"
+                ></path>
+
+                <path
+                    d="m6.34 17.66-1.41 1.41"
+                ></path>
+
+                <path
+                    d="m19.07 4.93-1.41 1.41"
+                ></path>
+
+            </svg>
 
         </button>
-
-
-        <div class="status">
-
-            <span class="status-dot"></span>
-
-            Online
-
-        </div>
 
     </div>
 
 </header>
 
 
-<!-- =====================================================
+<!-- ===================================================
      CHAT
-===================================================== -->
+=================================================== -->
 
 <section
     class="chat"
@@ -1681,9 +2447,9 @@ button {
 </section>
 
 
-<!-- =====================================================
+<!-- ===================================================
      INPUT
-===================================================== -->
+=================================================== -->
 
 <div class="input-area">
 
@@ -1701,7 +2467,9 @@ button {
 
                 <div class="file-preview-inner">
 
-                    <span>📎</span>
+                    <span>
+                        📎
+                    </span>
 
                     <span
                         class="file-name"
@@ -1710,7 +2478,7 @@ button {
 
                     <button
                         class="remove-file"
-                        onclick="removeFile()"
+                        id="removeFileButton"
                         aria-label="Remove file"
                     >
                         ×
@@ -1738,6 +2506,7 @@ button {
 
             <div class="composer-bottom">
 
+
                 <div class="composer-tools">
 
 
@@ -1745,8 +2514,9 @@ button {
 
                     <button
                         class="tool-button"
+                        id="fileButton"
                         title="Attach file"
-                        onclick="document.getElementById('fileInput').click()"
+                        aria-label="Attach file"
                     >
 
                         <svg
@@ -1774,7 +2544,6 @@ button {
                         type="file"
                         class="hidden"
                         accept=".txt,.md,.csv,.json,.pdf,.docx"
-                        onchange="handleFile(event)"
                     >
 
 
@@ -1784,7 +2553,7 @@ button {
                         class="tool-button search-button"
                         id="webSearchButton"
                         title="Web Search"
-                        onclick="toggleWebSearch()"
+                        aria-label="Web Search"
                     >
 
                         <svg
@@ -1802,13 +2571,14 @@ button {
                                 cx="11"
                                 cy="11"
                                 r="7"
-                            />
+                            ></circle>
 
                             <path
                                 d="m20 20-4-4"
-                            />
+                            ></path>
 
                         </svg>
+
 
                         <span
                             class="search-indicator"
@@ -1824,8 +2594,8 @@ button {
                 <button
                     class="send-button"
                     id="sendButton"
-                    onclick="handleSendButton()"
                     title="Send"
+                    aria-label="Send"
                 >
 
                     <svg
@@ -1840,9 +2610,13 @@ button {
                         stroke-linejoin="round"
                     >
 
-                        <path d="M22 2 11 13"></path>
+                        <path
+                            d="M22 2 11 13"
+                        ></path>
 
-                        <path d="m22 2-7 20-4-9-9-4Z"></path>
+                        <path
+                            d="m22 2-7 20-4-9-9-4Z"
+                        ></path>
 
                     </svg>
 
@@ -1867,17 +2641,23 @@ button {
    STATE
 ===================================================== */
 
-let currentConversationId = null;
+let currentConversationId =
+    null;
 
-let selectedFile = null;
+let selectedFile =
+    null;
 
-let selectedFileText = "";
+let selectedFileText =
+    "";
 
-let webSearchEnabled = false;
+let webSearchEnabled =
+    false;
 
-let isSending = false;
+let isSending =
+    false;
 
-let activeController = null;
+let activeController =
+    null;
 
 
 /* =====================================================
@@ -1885,50 +2665,193 @@ let activeController = null;
 ===================================================== */
 
 const chat =
-    document.getElementById("chat");
+    document.getElementById(
+        "chat"
+    );
 
 const chatInner =
-    document.getElementById("chatInner");
+    document.getElementById(
+        "chatInner"
+    );
 
 const messageInput =
-    document.getElementById("messageInput");
+    document.getElementById(
+        "messageInput"
+    );
 
 const sendButton =
-    document.getElementById("sendButton");
+    document.getElementById(
+        "sendButton"
+    );
 
 const sendIcon =
-    document.getElementById("sendIcon");
+    document.getElementById(
+        "sendIcon"
+    );
 
 const conversationsElement =
-    document.getElementById("conversations");
+    document.getElementById(
+        "conversations"
+    );
 
 const webSearchButton =
-    document.getElementById("webSearchButton");
+    document.getElementById(
+        "webSearchButton"
+    );
 
 const themeButton =
-    document.getElementById("themeButton");
+    document.getElementById(
+        "themeButton"
+    );
 
 const themeIcon =
-    document.getElementById("themeIcon");
+    document.getElementById(
+        "themeIcon"
+    );
+
+const themeColor =
+    document.getElementById(
+        "themeColor"
+    );
+
+
+/* =====================================================
+   SAFE FETCH JSON
+===================================================== */
+
+async function fetchJson(
+    url,
+    options = {}
+) {
+
+    const response =
+        await fetch(
+            url,
+            options
+        );
+
+
+    let data = null;
+
+
+    try {
+
+        data =
+            await response.json();
+
+    } catch {
+
+        data =
+            {};
+
+    }
+
+
+    if (!response.ok) {
+
+        throw new Error(
+            data.error ||
+            `Request failed: ${response.status}`
+        );
+
+    }
+
+
+    return data;
+
+}
 
 
 /* =====================================================
    THEME
 ===================================================== */
 
-function applyTheme(theme) {
+function getSavedTheme() {
 
-    if (theme === "light") {
+    try {
 
-        document.body.classList.add("light");
-
-        localStorage.setItem(
-            "whale-theme",
-            "light"
+        return localStorage.getItem(
+            "whale-ai-theme"
         );
 
-        themeButton.title =
-            "Switch to dark mode";
+    } catch {
+
+        return null;
+
+    }
+
+}
+
+
+function saveTheme(theme) {
+
+    try {
+
+        localStorage.setItem(
+            "whale-ai-theme",
+            theme
+        );
+
+    } catch (error) {
+
+        console.warn(
+            "Could not save theme:",
+            error
+        );
+
+    }
+
+}
+
+
+function applyTheme(theme) {
+
+    const isLight =
+        theme === "light";
+
+
+    document.body.classList.toggle(
+        "light",
+        isLight
+    );
+
+
+    themeButton.title =
+        isLight
+            ? "Switch to Dark Mode"
+            : "Switch to Light Mode";
+
+
+    themeButton.setAttribute(
+        "aria-label",
+        themeButton.title
+    );
+
+
+    if (isLight) {
+
+        themeColor.content =
+            "#f4f7fb";
+
+
+        /* Moon */
+
+        themeIcon.innerHTML = `
+
+            <path
+                d="M21 12.79A9 9 0 1 1 11.21 3
+                7 7 0 0 0 21 12.79Z"
+            ></path>
+
+        `;
+
+    } else {
+
+        themeColor.content =
+            "#080b12";
+
+
+        /* Sun */
 
         themeIcon.innerHTML = `
 
@@ -1940,40 +2863,19 @@ function applyTheme(theme) {
 
             <path d="M12 2v2"></path>
             <path d="M12 20v2"></path>
-
             <path d="m4.93 4.93 1.41 1.41"></path>
             <path d="m17.66 17.66 1.41 1.41"></path>
-
             <path d="M2 12h2"></path>
             <path d="M20 12h2"></path>
-
-            <path d="m4.93 19.07 1.41-1.41"></path>
-            <path d="m17.66 6.34 1.41-1.41"></path>
-
-        `;
-
-    } else {
-
-        document.body.classList.remove("light");
-
-        localStorage.setItem(
-            "whale-theme",
-            "dark"
-        );
-
-        themeButton.title =
-            "Switch to light mode";
-
-        themeIcon.innerHTML = `
-
-            <path
-                d="M21 12.79A9 9 0 1 1 11.21 3
-                7 7 0 0 0 21 12.79Z"
-            ></path>
+            <path d="m6.34 17.66-1.41 1.41"></path>
+            <path d="m19.07 4.93-1.41 1.41"></path>
 
         `;
 
     }
+
+
+    saveTheme(theme);
 
 }
 
@@ -1985,6 +2887,7 @@ function toggleTheme() {
             "light"
         );
 
+
     applyTheme(
         isLight
             ? "dark"
@@ -1995,57 +2898,50 @@ function toggleTheme() {
 
 
 /* =====================================================
-   INIT
-===================================================== */
-
-document.addEventListener(
-    "DOMContentLoaded",
-    () => {
-
-        const savedTheme =
-            localStorage.getItem(
-                "whale-theme"
-            );
-
-        applyTheme(
-            savedTheme === "light"
-                ? "light"
-                : "dark"
-        );
-
-        loadConversations();
-
-        messageInput.focus();
-
-    }
-);
-
-
-/* =====================================================
    SIDEBAR
 ===================================================== */
 
 function toggleSidebar() {
 
     document
-        .getElementById("sidebar")
-        .classList.toggle("open");
+        .getElementById(
+            "sidebar"
+        )
+        .classList.toggle(
+            "open"
+        );
+
 
     document
-        .getElementById("sidebarOverlay")
-        .classList.toggle("open");
+        .getElementById(
+            "sidebarOverlay"
+        )
+        .classList.toggle(
+            "open"
+        );
+
 }
 
 
 function closeMobileSidebar() {
 
     document
-        .getElementById("sidebar")
-        .classList.remove("open");
+        .getElementById(
+            "sidebar"
+        )
+        .classList.remove(
+            "open"
+        );
+
 
     document
-        .getElementById("sidebarOverlay")
-        .classList.remove("open");
+        .getElementById(
+            "sidebarOverlay"
+        )
+        .classList.remove(
+            "open"
+        );
+
 }
 
 
@@ -2058,15 +2954,18 @@ function toggleWebSearch() {
     webSearchEnabled =
         !webSearchEnabled;
 
+
     webSearchButton.classList.toggle(
         "active",
         webSearchEnabled
     );
 
+
     webSearchButton.title =
         webSearchEnabled
             ? "Web Search: ON"
             : "Web Search: OFF";
+
 }
 
 
@@ -2078,25 +2977,26 @@ async function loadConversations() {
 
     try {
 
-        const response =
-            await fetch(
+        const data =
+            await fetchJson(
                 "/conversations",
                 {
-                    cache: "no-store"
+                    cache:
+                        "no-store"
                 }
             );
 
-        if (!response.ok) {
 
-            throw new Error(
-                "Conversation request failed."
-            );
+        conversationsElement.innerHTML =
+            "";
+
+
+        if (!Array.isArray(data)) {
+
+            return;
+
         }
 
-        const data =
-            await response.json();
-
-        conversationsElement.innerHTML = "";
 
         data.forEach(
             conversation => {
@@ -2106,49 +3006,67 @@ async function loadConversations() {
                         "div"
                     );
 
+
                 item.className =
-                    "conversation"
-                    +
-                    (
-                        Number(conversation.id)
-                        ===
-                        Number(currentConversationId)
-                            ? " active"
-                            : ""
+                    "conversation";
+
+
+                if (
+                    Number(
+                        conversation.id
+                    )
+                    ===
+                    Number(
+                        currentConversationId
+                    )
+                ) {
+
+                    item.classList.add(
+                        "active"
                     );
 
+                }
+
+
                 item.onclick =
-                    () =>
-                        loadConversation(
-                            conversation.id
-                        );
+                    () => loadConversation(
+                        conversation.id
+                    );
+
 
                 const text =
                     document.createElement(
                         "div"
                     );
 
+
                 text.className =
                     "conversation-text";
+
 
                 text.textContent =
                     conversation.title
                     ||
                     "New Chat";
 
+
                 const deleteButton =
                     document.createElement(
                         "button"
                     );
 
+
                 deleteButton.className =
                     "delete-conversation";
+
 
                 deleteButton.textContent =
                     "×";
 
+
                 deleteButton.title =
                     "Delete chat";
+
 
                 deleteButton.onclick =
                     event => {
@@ -2161,11 +3079,15 @@ async function loadConversations() {
 
                     };
 
-                item.appendChild(text);
+
+                item.appendChild(
+                    text
+                );
 
                 item.appendChild(
                     deleteButton
                 );
+
 
                 conversationsElement.appendChild(
                     item
@@ -2173,6 +3095,7 @@ async function loadConversations() {
 
             }
         );
+
 
     } catch (error) {
 
@@ -2198,40 +3121,51 @@ async function newConversation() {
 
     }
 
+
     try {
 
-        const response =
-            await fetch(
+        const data =
+            await fetchJson(
                 "/conversations",
                 {
-                    method: "POST"
+                    method:
+                        "POST"
                 }
             );
 
-        const data =
-            await response.json();
 
         currentConversationId =
             data.id;
 
+
         clearChat();
+
 
         document.getElementById(
             "topbarTitle"
         ).textContent =
             "New Chat";
 
+
         removeFile();
+
 
         await loadConversations();
 
+
         closeMobileSidebar();
+
 
         messageInput.focus();
 
+
     } catch (error) {
 
-        console.error(error);
+        console.error(
+            "NEW CHAT:",
+            error
+        );
+
 
         alert(
             "Could not create a new chat."
@@ -2246,7 +3180,9 @@ async function newConversation() {
    LOAD CONVERSATION
 ===================================================== */
 
-async function loadConversation(id) {
+async function loadConversation(
+    id
+) {
 
     if (isSending) {
 
@@ -2254,48 +3190,43 @@ async function loadConversation(id) {
 
     }
 
+
     try {
 
-        const response =
-            await fetch(
+        const messages =
+            await fetchJson(
                 `/conversations/${id}/messages`
             );
 
-        const messages =
-            await response.json();
-
-        if (!response.ok) {
-
-            throw new Error(
-                messages.error
-                ||
-                "Failed to load chat."
-            );
-        }
 
         currentConversationId =
             Number(id);
 
+
         clearChat();
 
-        messages.forEach(
-            message => {
 
-                addMessage(
-                    message.role,
-                    message.content
-                );
+        if (Array.isArray(messages)) {
 
-            }
-        );
+            messages.forEach(
+                message => {
 
-        const conversationsResponse =
-            await fetch(
+                    addMessage(
+                        message.role,
+                        message.content
+                    );
+
+                }
+            );
+
+        }
+
+
+        const conversations =
+            await fetchJson(
                 "/conversations"
             );
 
-        const conversations =
-            await conversationsResponse.json();
 
         const conversation =
             conversations.find(
@@ -2305,6 +3236,7 @@ async function loadConversation(id) {
                     Number(id)
             );
 
+
         document.getElementById(
             "topbarTitle"
         ).textContent =
@@ -2312,15 +3244,23 @@ async function loadConversation(id) {
                 ? conversation.title
                 : "Chat";
 
+
         await loadConversations();
+
 
         closeMobileSidebar();
 
+
         scrollToBottom();
+
 
     } catch (error) {
 
-        console.error(error);
+        console.error(
+            "LOAD CHAT:",
+            error
+        );
+
 
         alert(
             "Could not load this chat."
@@ -2335,7 +3275,9 @@ async function loadConversation(id) {
    DELETE CHAT
 ===================================================== */
 
-async function deleteConversation(id) {
+async function deleteConversation(
+    id
+) {
 
     if (
         !confirm(
@@ -2347,25 +3289,22 @@ async function deleteConversation(id) {
 
     }
 
+
     try {
 
-        const response =
-            await fetch(
-                `/conversations/${id}`,
-                {
-                    method: "DELETE"
-                }
-            );
+        await fetchJson(
+            `/conversations/${id}`,
+            {
+                method:
+                    "DELETE"
+            }
+        );
 
-        if (!response.ok) {
-
-            throw new Error(
-                "Delete failed."
-            );
-        }
 
         if (
-            Number(currentConversationId)
+            Number(
+                currentConversationId
+            )
             ===
             Number(id)
         ) {
@@ -2373,7 +3312,9 @@ async function deleteConversation(id) {
             currentConversationId =
                 null;
 
+
             clearChat();
+
 
             document.getElementById(
                 "topbarTitle"
@@ -2382,11 +3323,17 @@ async function deleteConversation(id) {
 
         }
 
+
         await loadConversations();
+
 
     } catch (error) {
 
-        console.error(error);
+        console.error(
+            "DELETE CHAT:",
+            error
+        );
+
 
         alert(
             "Could not delete the chat."
@@ -2413,38 +3360,41 @@ async function clearAllConversations() {
 
     }
 
+
     try {
 
-        const response =
-            await fetch(
-                "/conversations",
-                {
-                    method: "DELETE"
-                }
-            );
+        await fetchJson(
+            "/conversations",
+            {
+                method:
+                    "DELETE"
+            }
+        );
 
-        if (!response.ok) {
-
-            throw new Error(
-                "Delete all failed."
-            );
-        }
 
         currentConversationId =
             null;
 
+
         clearChat();
+
 
         document.getElementById(
             "topbarTitle"
         ).textContent =
             "New Chat";
 
+
         await loadConversations();
+
 
     } catch (error) {
 
-        console.error(error);
+        console.error(
+            "DELETE ALL:",
+            error
+        );
+
 
         alert(
             "Could not delete the chats."
@@ -2504,14 +3454,19 @@ function addMessage(
             "welcome"
         );
 
+
     if (welcome) {
+
         welcome.remove();
+
     }
+
 
     const row =
         document.createElement(
             "div"
         );
+
 
     row.className =
         "message-row "
@@ -2522,10 +3477,12 @@ function addMessage(
                 : "assistant"
         );
 
+
     const message =
         document.createElement(
             "div"
         );
+
 
     message.className =
         "message "
@@ -2536,22 +3493,27 @@ function addMessage(
                 : "assistant-message"
         );
 
+
     const roleText =
         document.createElement(
             "div"
         );
 
+
     roleText.className =
         "message-role";
+
 
     roleText.textContent =
         role === "user"
             ? "You"
             : "Whale AI";
 
+
     message.appendChild(
         roleText
     );
+
 
     if (fileName) {
 
@@ -2560,31 +3522,44 @@ function addMessage(
                 "div"
             );
 
+
         fileCard.className =
             "file-card";
+
 
         const icon =
             document.createElement(
                 "span"
             );
 
+
         icon.textContent =
             "📎";
+
 
         const name =
             document.createElement(
                 "span"
             );
 
+
         name.className =
             "file-name";
+
 
         name.textContent =
             fileName;
 
-        fileCard.appendChild(icon);
 
-        fileCard.appendChild(name);
+        fileCard.appendChild(
+            icon
+        );
+
+
+        fileCard.appendChild(
+            name
+        );
+
 
         message.appendChild(
             fileCard
@@ -2592,29 +3567,68 @@ function addMessage(
 
     }
 
+
     const contentElement =
         document.createElement(
             "div"
         );
+
 
     contentElement.innerHTML =
         formatMarkdown(
             content
         );
 
+
     message.appendChild(
         contentElement
     );
+
 
     row.appendChild(
         message
     );
 
+
     chatInner.appendChild(
         row
     );
 
+
     scrollToBottom();
+
+}
+
+
+/* =====================================================
+   ESCAPE HTML
+===================================================== */
+
+function escapeHtml(
+    text
+) {
+
+    return String(text)
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+        .replace(
+            /</g,
+            "&lt;"
+        )
+        .replace(
+            />/g,
+            "&gt;"
+        )
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+        .replace(
+            /'/g,
+            "&#039;"
+        );
 
 }
 
@@ -2623,26 +3637,19 @@ function addMessage(
    MARKDOWN
 ===================================================== */
 
-function escapeHtml(text) {
-
-    return String(text)
-        .replace(/&/g,"&amp;")
-        .replace(/</g,"&lt;")
-        .replace(/>/g,"&gt;")
-        .replace(/"/g,"&quot;")
-        .replace(/'/g,"&#039;");
-
-}
-
-
-function formatMarkdown(text) {
+function formatMarkdown(
+    text
+) {
 
     let html =
         escapeHtml(
-            String(text)
+            String(text ?? "")
         );
 
-    const codeBlocks = [];
+
+    const codeBlocks =
+        [];
+
 
     html =
         html.replace(
@@ -2655,6 +3662,7 @@ function formatMarkdown(text) {
                 const token =
                     `___CODE_${codeBlocks.length}___`;
 
+
                 codeBlocks.push(
                     "<pre><code>"
                     +
@@ -2663,10 +3671,12 @@ function formatMarkdown(text) {
                     "</code></pre>"
                 );
 
+
                 return token;
 
             }
         );
+
 
     html =
         html.replace(
@@ -2674,11 +3684,13 @@ function formatMarkdown(text) {
             "<h3>$1</h3>"
         );
 
+
     html =
         html.replace(
             /^## (.*)$/gm,
             "<h2>$1</h2>"
         );
+
 
     html =
         html.replace(
@@ -2686,11 +3698,13 @@ function formatMarkdown(text) {
             "<h1>$1</h1>"
         );
 
+
     html =
         html.replace(
             /\*\*(.*?)\*\*/g,
             "<strong>$1</strong>"
         );
+
 
     html =
         html.replace(
@@ -2698,11 +3712,13 @@ function formatMarkdown(text) {
             "<em>$1</em>"
         );
 
+
     html =
         html.replace(
             /`([^`\n]+)`/g,
             "<code>$1</code>"
         );
+
 
     html =
         html.replace(
@@ -2710,17 +3726,20 @@ function formatMarkdown(text) {
             "<li>$1</li>"
         );
 
+
     html =
         html.replace(
             /(<li>.*<\/li>)/gs,
             "<ul>$1</ul>"
         );
 
+
     html =
         html.replace(
             /\n/g,
             "<br>"
         );
+
 
     codeBlocks.forEach(
         (
@@ -2737,6 +3756,7 @@ function formatMarkdown(text) {
         }
     );
 
+
     return html;
 
 }
@@ -2750,16 +3770,20 @@ function showThinking() {
 
     removeThinking();
 
+
     const row =
         document.createElement(
             "div"
         );
 
+
     row.className =
         "message-row assistant";
 
+
     row.id =
         "thinkingMessage";
+
 
     row.innerHTML = `
 
@@ -2789,9 +3813,14 @@ function showThinking() {
 
     `;
 
-    chatInner.appendChild(row);
+
+    chatInner.appendChild(
+        row
+    );
+
 
     scrollToBottom();
+
 
     if (webSearchEnabled) {
 
@@ -2804,12 +3833,15 @@ function showThinking() {
 }
 
 
-function setThinkingText(text) {
+function setThinkingText(
+    text
+) {
 
     const element =
         document.getElementById(
             "thinkingText"
         );
+
 
     if (element) {
 
@@ -2828,15 +3860,18 @@ function removeThinking() {
             "thinkingMessage"
         );
 
+
     if (element) {
+
         element.remove();
+
     }
 
 }
 
 
 /* =====================================================
-   SEND
+   SEND BUTTON
 ===================================================== */
 
 function handleSendButton() {
@@ -2849,38 +3884,57 @@ function handleSendButton() {
 
     }
 
+
     sendMessage();
 
 }
 
 
+/* =====================================================
+   SEND MESSAGE
+===================================================== */
+
 async function sendMessage() {
 
     if (isSending) {
+
         return;
+
     }
+
 
     const text =
         messageInput.value.trim();
+
 
     if (
         !text &&
         !selectedFileText
     ) {
+
         return;
+
     }
 
-    isSending = true;
+
+    isSending =
+        true;
+
 
     activeController =
         new AbortController();
 
-    updateSendButton(true);
+
+    updateSendButton(
+        true
+    );
+
 
     const fileName =
         selectedFile
             ? selectedFile.name
             : "";
+
 
     addMessage(
         "user",
@@ -2889,16 +3943,21 @@ async function sendMessage() {
         fileName
     );
 
-    messageInput.value = "";
+
+    messageInput.value =
+        "";
+
 
     autoResize();
 
+
     showThinking();
+
 
     try {
 
-        const response =
-            await fetch(
+        const data =
+            await fetchJson(
                 "/chat",
                 {
 
@@ -2906,8 +3965,10 @@ async function sendMessage() {
                         "POST",
 
                     headers: {
+
                         "Content-Type":
                             "application/json"
+
                     },
 
                     signal:
@@ -2936,38 +3997,31 @@ async function sendMessage() {
                 }
             );
 
-        const data =
-            await response.json();
 
         removeThinking();
 
-        if (!response.ok) {
-
-            addMessage(
-                "assistant",
-                data.error
-                ||
-                "Something went wrong."
-            );
-
-            return;
-        }
 
         currentConversationId =
             data.conversation_id;
 
+
         addMessage(
             "assistant",
-            data.content
+            data.content ||
+            "No response received."
         );
+
 
         removeFile();
 
+
         await loadConversations();
+
 
     } catch (error) {
 
         removeThinking();
+
 
         if (
             error.name ===
@@ -2986,6 +4040,7 @@ async function sendMessage() {
                 error
             );
 
+
             addMessage(
                 "assistant",
                 "Could not connect to the server."
@@ -2995,11 +4050,18 @@ async function sendMessage() {
 
     } finally {
 
-        isSending = false;
+        isSending =
+            false;
 
-        activeController = null;
 
-        updateSendButton(false);
+        activeController =
+            null;
+
+
+        updateSendButton(
+            false
+        );
+
 
         messageInput.focus();
 
@@ -3009,12 +4071,14 @@ async function sendMessage() {
 
 
 /* =====================================================
-   STOP
+   STOP GENERATION
 ===================================================== */
 
 function stopGeneration() {
 
-    if (activeController) {
+    if (
+        activeController
+    ) {
 
         activeController.abort();
 
@@ -3037,8 +4101,10 @@ function updateSendButton(
             "stop"
         );
 
+
         sendButton.title =
             "Stop generating";
+
 
         sendIcon.innerHTML = `
 
@@ -3058,8 +4124,10 @@ function updateSendButton(
             "stop"
         );
 
+
         sendButton.title =
             "Send";
+
 
         sendIcon.innerHTML = `
 
@@ -3079,20 +4147,27 @@ function updateSendButton(
 
 
 /* =====================================================
-   FILE
+   FILE UPLOAD
 ===================================================== */
 
-async function handleFile(event) {
+async function handleFile(
+    event
+) {
 
     const file =
         event.target.files[0];
 
+
     if (!file) {
+
         return;
+
     }
+
 
     const maxSize =
         20 * 1024 * 1024;
+
 
     if (
         file.size >
@@ -3103,23 +4178,29 @@ async function handleFile(event) {
             "Maximum file size is 20 MB."
         );
 
+
         event.target.value =
             "";
+
 
         return;
 
     }
 
+
     selectedFile =
         file;
 
+
     selectedFileText =
         "";
+
 
     document.getElementById(
         "fileName"
     ).textContent =
         file.name;
+
 
     document.getElementById(
         "filePreview"
@@ -3127,18 +4208,21 @@ async function handleFile(event) {
         "show"
     );
 
+
     const formData =
         new FormData();
+
 
     formData.append(
         "file",
         file
     );
 
+
     try {
 
-        const response =
-            await fetch(
+        const data =
+            await fetchJson(
                 "/upload",
                 {
 
@@ -3151,22 +4235,11 @@ async function handleFile(event) {
                 }
             );
 
-        const data =
-            await response.json();
-
-        if (!response.ok) {
-
-            throw new Error(
-                data.error
-                ||
-                "Upload failed."
-            );
-        }
 
         selectedFileText =
-            data.text
-            ||
+            data.text ||
             "";
+
 
         if (
             !selectedFileText
@@ -3178,6 +4251,7 @@ async function handleFile(event) {
 
         }
 
+
     } catch (error) {
 
         console.error(
@@ -3185,11 +4259,12 @@ async function handleFile(event) {
             error
         );
 
+
         alert(
-            error.message
-            ||
+            error.message ||
             "File upload failed."
         );
+
 
         removeFile();
 
@@ -3207,22 +4282,27 @@ function removeFile() {
     selectedFile =
         null;
 
+
     selectedFileText =
         "";
+
 
     const input =
         document.getElementById(
             "fileInput"
         );
 
+
     input.value =
         "";
+
 
     document.getElementById(
         "filePreview"
     ).classList.remove(
         "show"
     );
+
 
     document.getElementById(
         "fileName"
@@ -3241,10 +4321,12 @@ messageInput.addEventListener(
     autoResize
 );
 
+
 function autoResize() {
 
     messageInput.style.height =
         "auto";
+
 
     messageInput.style.height =
         Math.min(
@@ -3273,8 +4355,11 @@ messageInput.addEventListener(
 
             event.preventDefault();
 
+
             if (!isSending) {
+
                 sendMessage();
+
             }
 
         }
@@ -3316,13 +4401,11 @@ async function showMemory() {
 
     try {
 
-        const response =
-            await fetch(
+        const data =
+            await fetchJson(
                 "/memory"
             );
 
-        const data =
-            await response.json();
 
         if (
             !data.memories
@@ -3334,9 +4417,11 @@ async function showMemory() {
                 "Whale Memory is empty."
             );
 
+
             return;
 
         }
+
 
         const text =
             data.memories
@@ -3346,15 +4431,21 @@ async function showMemory() {
                 )
                 .join("\n");
 
+
         alert(
             "Whale Memory\n\n"
             +
             text
         );
 
+
     } catch (error) {
 
-        console.error(error);
+        console.error(
+            "MEMORY:",
+            error
+        );
+
 
         alert(
             "Could not load memory."
@@ -3364,8 +4455,146 @@ async function showMemory() {
 
 }
 
+
+/* =====================================================
+   EVENT LISTENERS
+===================================================== */
+
+themeButton.addEventListener(
+    "click",
+    toggleTheme
+);
+
+
+document
+    .getElementById(
+        "newChatButton"
+    )
+    .addEventListener(
+        "click",
+        newConversation
+    );
+
+
+document
+    .getElementById(
+        "deleteAllButton"
+    )
+    .addEventListener(
+        "click",
+        clearAllConversations
+    );
+
+
+document
+    .getElementById(
+        "memoryButton"
+    )
+    .addEventListener(
+        "click",
+        showMemory
+    );
+
+
+document
+    .getElementById(
+        "mobileMenuButton"
+    )
+    .addEventListener(
+        "click",
+        toggleSidebar
+    );
+
+
+document
+    .getElementById(
+        "sidebarOverlay"
+    )
+    .addEventListener(
+        "click",
+        closeMobileSidebar
+    );
+
+
+document
+    .getElementById(
+        "fileButton"
+    )
+    .addEventListener(
+        "click",
+        () => {
+
+            document
+                .getElementById(
+                    "fileInput"
+                )
+                .click();
+
+        }
+    );
+
+
+document
+    .getElementById(
+        "fileInput"
+    )
+    .addEventListener(
+        "change",
+        handleFile
+    );
+
+
+document
+    .getElementById(
+        "removeFileButton"
+    )
+    .addEventListener(
+        "click",
+        removeFile
+    );
+
+
+webSearchButton.addEventListener(
+    "click",
+    toggleWebSearch
+);
+
+
+sendButton.addEventListener(
+    "click",
+    handleSendButton
+);
+
+
+/* =====================================================
+   INITIALIZATION
+===================================================== */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    async () => {
+
+        const savedTheme =
+            getSavedTheme();
+
+
+        applyTheme(
+            savedTheme === "light"
+                ? "light"
+                : "dark"
+        );
+
+
+        await loadConversations();
+
+
+        messageInput.focus();
+
+    }
+);
+
 </script>
 
 </body>
-</html>
 
+</html>
